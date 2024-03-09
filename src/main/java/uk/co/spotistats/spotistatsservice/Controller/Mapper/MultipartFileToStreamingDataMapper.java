@@ -31,8 +31,8 @@ public class MultipartFileToStreamingDataMapper {
 
     public Result<StreamingData, Error> map(MultipartFile file) {
         try {
-            JsonNode jsonArray = objectMapper.readTree(new String(file.getBytes()));
-            List<StreamData> streamData = StreamSupport.stream(jsonArray.spliterator(), false).map(this::mapStreamData).toList();
+            JsonNode streamingDataJson = objectMapper.readTree(new String(file.getBytes()));
+            List<StreamData> streamData = StreamSupport.stream(streamingDataJson.spliterator(), false).map(this::mapStreamData).toList();
             return new Result.Success<>(aStreamingData()
                     .withStreamData(streamData)
                     .withFirstStreamDateTime(streamData.getFirst().streamDateTime())
