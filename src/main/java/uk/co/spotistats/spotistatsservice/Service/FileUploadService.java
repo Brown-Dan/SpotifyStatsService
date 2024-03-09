@@ -1,18 +1,27 @@
 package uk.co.spotistats.spotistatsservice.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uk.co.spotistats.spotistatsservice.Domain.Response.FileUploadResponse;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.UserDataUploadResponse;
 
-import static uk.co.spotistats.spotistatsservice.Domain.Response.FileUploadResponse.Builder.aFileUploadResponse;
+import java.io.IOException;
 
 @Service
 public class FileUploadService {
 
-    public FileUploadResponse uploadFile(MultipartFile file) {
-        return aFileUploadResponse()
-                .withFileName(file.getName())
-                .withContentType(file.getContentType())
-                .withFileSize(file.getSize()).build();
+    private static final Logger LOG = LoggerFactory.getLogger(FileUploadService.class);
+
+    public Result<UserDataUploadResponse, Error> uploadFile(MultipartFile file) {
+        try {
+            String asJson = new String(file.getBytes());
+        } catch (IOException ioException){
+            LOG.error("Failed to parse file", ioException);
+            return new Result.Failure<>(new Error("Failed to parse file"));
+        }
+        return new Result.Success<>(new UserDataUploadResponse(null, null, 3));
     }
 }
