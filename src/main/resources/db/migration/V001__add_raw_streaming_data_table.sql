@@ -1,15 +1,14 @@
 create table streaming_data(
-    id uuid primary key,
-    username text,
-    stream_count int,
-    first_stream_date date,
-    last_stream_data date
+    username text primary key,
+    stream_count int not null,
+    first_stream_date timestamp not null,
+    last_stream_data timestamp not null
 );
 
 
 create table stream_data(
-    streaming_data_id uuid references streaming_data(id),
-    date date,
+    username text references streaming_data(username),
+    date timestamp not null,
     country varchar(10),
     time_streamed int,
     track_uri text,
