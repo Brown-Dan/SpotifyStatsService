@@ -26,10 +26,9 @@ public class StreamingDataService {
     }
 
     public Result<StreamingDataUpsertResult, Error> upsert(StreamingData streamingData, String username) {
-        StreamingDataUpsertResult streamingDataUpsertResult;
-
         Optional<StreamingData> existingStreamingData = streamingDataRepository.getStreamingDataByUsername(username);
 
+        StreamingDataUpsertResult streamingDataUpsertResult;
         if (existingStreamingData.isPresent()) {
             Optional<StreamingDataUpsertResult> updateResult = streamingDataRepository
                     .updateStreamingData(combineStreamingData(existingStreamingData.get(), streamingData), username);

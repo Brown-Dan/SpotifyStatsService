@@ -25,9 +25,9 @@ public class StreamingDataController {
         this.multipartFileToStreamingDataMapper = multipartFileToStreamingDataMapper;
     }
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload/{username}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResult<StreamingDataUpsertResult, Error>> upload(@RequestPart MultipartFile streamingDataFile,
-                                                                              @RequestParam String username) {
+                                                                              @PathVariable String username) {
         Result<StreamingData, Error> streamingDataMapResult = multipartFileToStreamingDataMapper.map(streamingDataFile);
 
         if (streamingDataMapResult.isFailure()) {

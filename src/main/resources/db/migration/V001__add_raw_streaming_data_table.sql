@@ -5,7 +5,6 @@ create table streaming_data(
     last_stream_data timestamp not null
 );
 
-
 create table stream_data(
     username text references streaming_data(username),
     date timestamp not null,
@@ -16,4 +15,4 @@ create table stream_data(
     artist_name text,
     album_name text,
     platform text
-)
+);
