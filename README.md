@@ -1,2 +1,2 @@
-# SpotiStatsService
-Simple web service to facilitate FTP transfer and storage of Spotify account data
+# [WIP] SpotiStatsService
+Simple web service enabling user's to perform advanced queries on their uploaded Spotify account data.
