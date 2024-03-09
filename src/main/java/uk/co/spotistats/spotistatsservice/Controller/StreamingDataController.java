@@ -35,10 +35,10 @@ public class StreamingDataController {
         if (streamingDataMapResult.isFailure()) {
             return badRequest(streamingDataMapResult.getError());
         }
-        Result<StreamingDataInsertResult, Error> streamingDataUploadResult =
-                streamingDataService.uploadFile(streamingDataMapResult.getValue());
+        Result<StreamingDataInsertResult, Error> insertResult =
+                streamingDataService.insert(streamingDataMapResult.getValue());
 
-        return switch (streamingDataUploadResult) {
+        return switch (insertResult) {
             case Result.Success(StreamingDataInsertResult streamingDataInsertResult) -> ok(streamingDataInsertResult);
             case Result.Failure(Error error) -> badRequest(error);
         };

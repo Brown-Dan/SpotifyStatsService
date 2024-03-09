@@ -1,6 +1,7 @@
 package uk.co.spotistats.spotistatsservice.Domain.Response;
 
 import java.util.NoSuchElementException;
+
 public sealed interface Result<T, E> {
 
     boolean isFailure();

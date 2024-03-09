@@ -21,7 +21,7 @@ public class DatabaseConfig {
     @Bean
     public DSLContext dslContext() throws SQLException {
         Connection connection = DriverManager.getConnection(
-                "jdbc:postgresql://localhost:5432/UserData",
+                "jdbc:postgresql://localhost:5432/StreamingData",
                 "admin",
                 "password"
         );
@@ -35,7 +35,7 @@ public class DatabaseConfig {
             @Value("${spring.datasource.password}") String password) {
 
         HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setSchema("UserData");
+        dataSource.setSchema("StreamingData");
         dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setUsername(userName);
         dataSource.setPassword(password);
@@ -51,8 +51,8 @@ public class DatabaseConfig {
     @PostConstruct
     public void migrate() {
         Flyway.configure()
-                .dataSource("jdbc:postgresql://localhost:5432/UserData", "admin", "password")
-                .schemas("UserData")
+                .dataSource("jdbc:postgresql://localhost:5432/StreamingData", "admin", "password")
+                .schemas("StreamingData")
                 .baselineOnMigrate(true)
                 .locations("classpath:db/migration")
                 .table("changelog")

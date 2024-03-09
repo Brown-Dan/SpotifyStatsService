@@ -101,7 +101,7 @@
             <plugin>
                 <groupId>uk.co.autotrader</groupId>
                 <artifactId>intellij-formatter-maven-plugin</artifactId>
-                <version>0.0.4</version>
+                <version>0.0.9</version>
                 <executions>
                     <execution>
                         <goals>
@@ -116,14 +116,14 @@
                 <version>9.22.2</version>
                 <configuration>
                     <user>admin</user>
-                    <url>jdbc:postgresql://localhost:5432/UserData</url>
+                    <url>jdbc:postgresql://localhost:5432/StreamingData</url>
                     <password>password</password>
                     <table>changelog</table>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
                     <schemas>
-                        <schema>UserData</schema>
+                        <schema>StreamingData</schema>
                     </schemas>
                     <baselineOnMigrate>true</baselineOnMigrate>
                 </configuration>
@@ -153,18 +153,15 @@
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost:5432/UserData</url>
+                        <url>jdbc:postgresql://localhost:5432/StreamingData</url>
                         <username>admin</username>
                         <password>password</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.codegen.DefaultGenerator</name>
-                        <strategy>
-                            <name>org.jooq.codegen.DefaultGeneratorStrategy</name>
-                        </strategy>
                         <database>
                             <name>org.jooq.meta.postgres.PostgresDatabase</name>
-                            <inputSchema>SpringPractice</inputSchema>
+                            <inputSchema>StreamingData</inputSchema>
                         </database>
                         <generate>
                             <generatedAnnotation>true</generatedAnnotation>
