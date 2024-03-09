@@ -3,10 +3,7 @@ package uk.co.spotistats.spotistatsservice.Controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uk.co.spotistats.spotistatsservice.Controller.Mapper.MultipartFileToStreamingDataMapper;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
@@ -32,20 +29,11 @@ public class FileUploadController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResult<StreamingDataUploadResponse, Error>> upload(@RequestParam Map<String, MultipartFile> files) {
-
-        Result<StreamingData, Error> streamingDataResult = multipartFileToStreamingDataMapper.map(files.values().stream().toList().getFirst());
+    public ResponseEntity<ApiResult<StreamingDataUploadResponse, Error>> upload(@RequestPart MultipartFile file) {
+        Result<StreamingData, Error> streamingDataResult = multipartFileToStreamingDataMapper.map(file);
 
         if (streamingDataResult.isFailure()) {
             return badRequest(streamingDataResult.getError());
-        }
-
-        List<Result<StreamingData, Error>> mappedFiles = files.values().stream().map(multipartFileToStreamingDataMapper::map).toList();
-
-        List<Error> errors = mappedFiles.stream().filter(Result::isFailure).map(Result::getError).toList();
-
-        if (!errors.isEmpty()){
-            return badRequest(mappedFiles.getFirst().getError());
         }
 
         Result<StreamingDataUploadResponse, Error> streamingDataUploadResponseResult =
