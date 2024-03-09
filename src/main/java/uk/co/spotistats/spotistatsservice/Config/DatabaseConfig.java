@@ -1,4 +1,4 @@
-package uk.co.spotistats.spotistatsservice;
+package uk.co.spotistats.spotistatsservice.Config;
 
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.annotation.PostConstruct;

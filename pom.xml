@@ -80,6 +80,11 @@
             <artifactId>spring-integration-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>uk.co.autotrader</groupId>
+            <artifactId>traverson4j-hc5</artifactId>
+            <version>4.2.0</version>
+        </dependency>
     </dependencies>
 
     <build>
