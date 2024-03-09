@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public record StreamData(
-        @JsonProperty("ts") LocalDateTime eventDateTime,
+        @JsonProperty("ts") LocalDateTime streamDateTime,
         @JsonProperty("conn_country") String country,
         @JsonProperty("ms_played") long timeStreamed,
         @JsonProperty("spotify_track_uri") String trackUri,

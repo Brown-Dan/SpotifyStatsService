@@ -12,34 +12,34 @@ import uk.co.spotistats.spotistatsservice.Controller.Mapper.MultipartFileToStrea
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUploadResponse;
+import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataInsertResult;
 import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
-import uk.co.spotistats.spotistatsservice.Service.FileUploadService;
+import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 @RestController
-@RequestMapping("/file")
-public class FileUploadController {
+@RequestMapping("/data")
+public class StreamingDataController {
 
-    private final FileUploadService fileUploadService;
+    private final StreamingDataService streamingDataService;
     private final MultipartFileToStreamingDataMapper multipartFileToStreamingDataMapper;
 
-    public FileUploadController(FileUploadService fileUploadService, MultipartFileToStreamingDataMapper multipartFileToStreamingDataMapper) {
-        this.fileUploadService = fileUploadService;
+    public StreamingDataController(StreamingDataService streamingDataService, MultipartFileToStreamingDataMapper multipartFileToStreamingDataMapper) {
+        this.streamingDataService = streamingDataService;
         this.multipartFileToStreamingDataMapper = multipartFileToStreamingDataMapper;
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResult<StreamingDataUploadResponse, Error>> upload(@RequestPart MultipartFile file) {
-        Result<StreamingData, Error> fileMapResult = multipartFileToStreamingDataMapper.map(file);
+    public ResponseEntity<ApiResult<StreamingDataInsertResult, Error>> upload(@RequestPart MultipartFile streamingDataFile) {
+        Result<StreamingData, Error> streamingDataMapResult = multipartFileToStreamingDataMapper.map(streamingDataFile);
 
-        if (fileMapResult.isFailure()) {
-            return badRequest(fileMapResult.getError());
+        if (streamingDataMapResult.isFailure()) {
+            return badRequest(streamingDataMapResult.getError());
         }
-        Result<StreamingDataUploadResponse, Error> streamingDataUploadResponseResult = fileUploadService.uploadFile(fileMapResult.getValue());
+        Result<StreamingDataInsertResult, Error> streamingDataUploadResult =
+                streamingDataService.uploadFile(streamingDataMapResult.getValue());
 
-        return switch (streamingDataUploadResponseResult) {
-            case Result.Success(StreamingDataUploadResponse streamingDataUploadResponse) ->
-                    ok(streamingDataUploadResponse);
+        return switch (streamingDataUploadResult) {
+            case Result.Success(StreamingDataInsertResult streamingDataInsertResult) -> ok(streamingDataInsertResult);
             case Result.Failure(Error error) -> badRequest(error);
         };
     }

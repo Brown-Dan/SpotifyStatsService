@@ -10,7 +10,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
-import uk.co.spotistats.spotistatsservice.Service.FileUploadService;
+import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +23,7 @@ public class MultipartFileToStreamingDataMapper {
 
     private final ObjectMapper objectMapper;
 
-    private static final Logger LOG = LoggerFactory.getLogger(FileUploadService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
     public MultipartFileToStreamingDataMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -35,13 +35,13 @@ public class MultipartFileToStreamingDataMapper {
             List<StreamData> streamData = StreamSupport.stream(jsonArray.spliterator(), false).map(this::mapStreamData).toList();
             return new Result.Success<>(aStreamingData()
                     .withStreamData(streamData)
-                    .withFirstStreamDateTime(streamData.getFirst().eventDateTime())
-                    .withLastStreamDateTime(streamData.getLast().eventDateTime())
+                    .withFirstStreamDateTime(streamData.getFirst().streamDateTime())
+                    .withLastStreamDateTime(streamData.getLast().streamDateTime())
                     .withTotalStreams(streamData.size())
                     .build());
         } catch (IOException ioException) {
             LOG.error("Exception accessing bytes of supplied file", ioException);
-            return new Result.Failure<>(new Error("Failed to read file - %s".formatted(file.getName())));
+            return new Result.Failure<>(new Error("Failed to read streaming data - %s".formatted(file.getName())));
         }
     }
 
