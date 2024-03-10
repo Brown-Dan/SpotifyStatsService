@@ -10,7 +10,6 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
-import uk.co.spotistats.spotistatsservice.Service.StreamingDataUploadService;
 
 import java.io.IOException;
 import java.util.List;
