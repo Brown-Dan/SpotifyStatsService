@@ -16,3 +16,10 @@ create table stream_data(
     album_name text,
     platform text
 );
+
+create table user_auth_data(
+    username text primary key,
+    refresh_token text,
+    access_token text,
+    last_updated timestamp
+)

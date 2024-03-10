@@ -14,7 +14,7 @@ import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 @RestController
-@RequestMapping("/data")
+@RequestMapping("{username}/data")
 public class StreamingDataController {
 
     private final StreamingDataService streamingDataService;
@@ -25,7 +25,7 @@ public class StreamingDataController {
         this.multipartFileToStreamingDataMapper = multipartFileToStreamingDataMapper;
     }
 
-    @PostMapping(value = "/upload/{username}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResult<StreamingDataUpsertResult, Error>> upload(@RequestPart MultipartFile streamingDataFile,
                                                                               @PathVariable String username) {
         Result<StreamingData, Error> streamingDataMapResult = multipartFileToStreamingDataMapper.map(streamingDataFile);
@@ -40,6 +40,11 @@ public class StreamingDataController {
             case Result.Success(StreamingDataUpsertResult streamingDataUpsertResult) -> ok(streamingDataUpsertResult);
             case Result.Failure(Error error) -> badRequest(error);
         };
+    }
+
+    @GetMapping(value = "/callback")
+    public ResponseEntity<ApiResult<Object, Error>> temporaryCallback(@PathVariable String username, @RequestParam String code) {
+        return ok(streamingDataService.getTop(username, code));
     }
 
     private <T> ResponseEntity<ApiResult<T, Error>> ok(T body) {

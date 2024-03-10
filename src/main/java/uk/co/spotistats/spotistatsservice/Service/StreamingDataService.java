@@ -50,6 +50,11 @@ public class StreamingDataService {
         return new Result.Success<>(streamingDataUpsertResult);
     }
 
+    public Object getTop(String username, String code) {
+        LOG.info(code);
+        return null;
+    }
+
     private StreamingData combineStreamingData(StreamingData originalData, StreamingData newData) {
         LocalDateTime firstStreamDateTime = originalData.firstStreamDateTime().isBefore(newData.firstStreamDateTime())
                 ? originalData.firstStreamDateTime() : newData.firstStreamDateTime();
