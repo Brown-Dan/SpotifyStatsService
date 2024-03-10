@@ -22,7 +22,7 @@ public class StreamingDataController {
 
     @GetMapping(value = "/test")
     public ResponseEntity<ApiResult<String, Error>> temporaryCallback(@PathVariable String username) {
-        return ok(streamingDataService.tokenTesting(username));
+        return ok(streamingDataService.tokenTesting(username).getValue());
     }
 
     private <T> ResponseEntity<ApiResult<T, Error>> ok(T body) {

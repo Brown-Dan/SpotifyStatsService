@@ -3,23 +3,27 @@ package uk.co.spotistats.spotistatsservice.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 
 @Service
 public class StreamingDataService {
 
-    private final UserService userService;
+    private final SpotifyAuthService spotifyAuthService;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
 
-    public StreamingDataService(UserService userService) {
-        this.userService = userService;
+    public StreamingDataService(SpotifyAuthService spotifyAuthService) {
+        this.spotifyAuthService = spotifyAuthService;
     }
 
-    public String tokenTesting(String username) {
-        if (userService.hasAuthData(username)) {
-            return userService.getAccessToken(username);
+    public Result<String, Error> tokenTesting(String username) {
+        Result<String, Error> getSpotifyAccessTokenResponse = spotifyAuthService.getAccessToken(username);
+
+        if (getSpotifyAccessTokenResponse.isFailure()){
+            return new Result.Failure<>(getSpotifyAccessTokenResponse.getError());
         }
-        return null;
+        return getSpotifyAccessTokenResponse;
     }
 }

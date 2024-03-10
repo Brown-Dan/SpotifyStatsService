@@ -2,7 +2,22 @@ package uk.co.spotistats.spotistatsservice.Domain;
 
 import java.time.LocalDateTime;
 
-public record UserAuthData(String username, String refreshToken, String accessToken, LocalDateTime lastUpdated) {
+import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuthData.Builder.someUserAuthData;
+
+public record SpotifyAuthData(String username, String refreshToken, String accessToken, LocalDateTime lastUpdated) {
+
+    public boolean hasValidAccessToken(){
+        return lastUpdated.isBefore(LocalDateTime.now().minusHours(1));
+    }
+
+    public SpotifyAuthData updateFromRefreshResponse(SpotifyRefreshTokenResponse spotifyRefreshTokenResponse){
+        return someUserAuthData()
+                .withUsername(username)
+                .withLastUpdated(lastUpdated)
+                .withRefreshToken(refreshToken)
+                .withAccessToken(spotifyRefreshTokenResponse.accessToken())
+                .build();
+    }
 
     public static final class Builder {
         private String username;
@@ -13,7 +28,7 @@ public record UserAuthData(String username, String refreshToken, String accessTo
         private Builder() {
         }
 
-        public static Builder aUser() {
+        public static Builder someUserAuthData() {
             return new Builder();
         }
 
@@ -37,8 +52,8 @@ public record UserAuthData(String username, String refreshToken, String accessTo
             return this;
         }
 
-        public UserAuthData build() {
-            return new UserAuthData(username, refreshToken, accessToken, lastUpdated);
+        public SpotifyAuthData build() {
+            return new SpotifyAuthData(username, refreshToken, accessToken, lastUpdated);
         }
     }
 }

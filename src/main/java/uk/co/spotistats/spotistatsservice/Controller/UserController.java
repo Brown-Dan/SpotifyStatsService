@@ -3,29 +3,28 @@ package uk.co.spotistats.spotistatsservice.Controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.UserAuthData;
-import uk.co.spotistats.spotistatsservice.Service.UserService;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuthData;
+import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
 
 @Controller
 @RequestMapping("user")
 public class UserController {
 
-    private final UserService userService;
+    private final SpotifyAuthService spotifyAuthService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(SpotifyAuthService spotifyAuthService) {
+        this.spotifyAuthService = spotifyAuthService;
     }
 
-    @PostMapping(value = "/register")
-    public ResponseEntity<ApiResult<UserAuthData, Error>> register(@RequestBody UserAuthData userAuthData) {
-        return userService.register(userAuthData).<ResponseEntity<ApiResult<UserAuthData, Error>>>
-                map(this::badRequest).orElseGet(() -> ok(userAuthData));
+    @PostMapping(value = "/authenticate")
+    public ResponseEntity<ApiResult<SpotifyAuthData, Error>> authenticate(@RequestBody SpotifyAuthData spotifyAuthData) {
+        return spotifyAuthService.insertSpotifyAuthData(spotifyAuthData).<ResponseEntity<ApiResult<SpotifyAuthData, Error>>>
+                map(this::badRequest).orElseGet(() -> ok(spotifyAuthData));
     }
 
     private <T> ResponseEntity<ApiResult<T, Error>> ok(T body) {
