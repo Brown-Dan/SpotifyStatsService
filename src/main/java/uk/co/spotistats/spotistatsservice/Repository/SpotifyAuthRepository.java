@@ -37,7 +37,7 @@ public class SpotifyAuthRepository {
                 .execute();
     }
 
-    public SpotifyAuthData updateUserAuthData(SpotifyAuthData spotifyAuthData){
+    public SpotifyAuthData updateUserAuthData(SpotifyAuthData spotifyAuthData) {
         return mapUserAuthDataEntityToUserAuthData(
                 Objects.requireNonNull(db.update(USER_AUTH_DATA)
                         .set(USER_AUTH_DATA.LAST_UPDATED, LocalDateTime.now())

@@ -7,7 +7,8 @@ create table streaming_data(
 
 create table stream_data(
     username text references streaming_data(username),
-    date timestamp not null,
+    date date not null,
+    date_time timestamp not null,
     country varchar(10),
     time_streamed int,
     track_uri text,

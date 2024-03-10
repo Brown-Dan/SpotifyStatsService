@@ -6,11 +6,11 @@ import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthD
 
 public record SpotifyAuthData(String username, String refreshToken, String accessToken, LocalDateTime lastUpdated) {
 
-    public boolean hasValidAccessToken(){
+    public boolean hasValidAccessToken() {
         return !lastUpdated.isBefore(LocalDateTime.now().minusHours(1));
     }
 
-    public SpotifyAuthData updateFromRefreshResponse(SpotifyRefreshTokenResponse spotifyRefreshTokenResponse){
+    public SpotifyAuthData updateFromRefreshResponse(SpotifyRefreshTokenResponse spotifyRefreshTokenResponse) {
         return someUserAuthData()
                 .withUsername(username)
                 .withLastUpdated(lastUpdated)
