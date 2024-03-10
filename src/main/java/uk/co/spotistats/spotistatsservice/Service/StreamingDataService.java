@@ -5,25 +5,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
+import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
+import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 
 @Service
 public class StreamingDataService {
 
     private final SpotifyAuthService spotifyAuthService;
+    private final SpotifyRepository spotifyRepository;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
-
-    public StreamingDataService(SpotifyAuthService spotifyAuthService) {
+    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository) {
         this.spotifyAuthService = spotifyAuthService;
+        this.spotifyRepository = spotifyRepository;
     }
 
-    public Result<String, Error> tokenTesting(String username) {
-        Result<String, Error> getSpotifyAccessTokenResponse = spotifyAuthService.getAccessToken(username);
+    public Result<StreamingData, Error> getRecentStreams(String username) {
+        Result<SpotifyAuthData, Error> getSpotifyAuthDataResult = spotifyAuthService.getAuthData(username);
 
-        if (getSpotifyAccessTokenResponse.isFailure()){
-            return new Result.Failure<>(getSpotifyAccessTokenResponse.getError());
+        if (getSpotifyAuthDataResult.isFailure()) {
+            return new Result.Failure<>(getSpotifyAuthDataResult.getError());
         }
-        return getSpotifyAccessTokenResponse;
+        return spotifyRepository.getRecentStreamingData(getSpotifyAuthDataResult.getValue());
     }
 }

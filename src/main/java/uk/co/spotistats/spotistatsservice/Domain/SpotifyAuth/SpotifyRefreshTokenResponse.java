@@ -1,4 +1,4 @@
-package uk.co.spotistats.spotistatsservice.Domain;
+package uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

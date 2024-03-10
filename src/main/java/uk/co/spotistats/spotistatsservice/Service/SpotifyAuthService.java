@@ -10,8 +10,8 @@ import uk.co.autotrader.traverson.http.Response;
 import uk.co.autotrader.traverson.http.TextBody;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.SpotifyRefreshTokenResponse;
-import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuthData;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyAuthRepository;
 
 import java.util.Optional;
@@ -43,7 +43,7 @@ public class SpotifyAuthService {
         return Optional.empty();
     }
 
-    public Result<String, Error> getAccessToken(String username) {
+    public Result<SpotifyAuthData, Error> getAuthData(String username) {
         Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(username);
         if (existingAuthData.isEmpty()) {
             return new Result.Failure<>(Error.authorizationDetailsNotPresent(username));
@@ -51,12 +51,12 @@ public class SpotifyAuthService {
         SpotifyAuthData spotifyAuthData = existingAuthData.get();
 
         if (spotifyAuthData.hasValidAccessToken()) {
-            return new Result.Success<>(spotifyAuthData.accessToken());
+            return new Result.Success<>(spotifyAuthData);
         }
         return refreshToken(spotifyAuthData);
     }
 
-    private Result<String, Error> refreshToken(SpotifyAuthData spotifyAuthData) {
+    private Result<SpotifyAuthData, Error> refreshToken(SpotifyAuthData spotifyAuthData) {
         Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
                 .withHeader("content-type", "application/x-www-form-urlencoded")
                 .withHeader("Authorization", "Basic MjAyNWI0OGQ5MjJhNDkwOTlkNjY1Y2JiZDI1NjM0MzY6NmNmZjZjMWRjM2MyNGZlY2FjNzU5ZThmZDY4ZTJkOWE=")
@@ -68,7 +68,7 @@ public class SpotifyAuthService {
         LOG.info("Refreshed access token for user - {}", spotifyAuthData.username());
         SpotifyRefreshTokenResponse spotifyRefreshTokenResponse = objectMapper.convertValue(response.getResource(), SpotifyRefreshTokenResponse.class);
         return new Result.Success<>(spotifyAuthRepository.updateUserAuthData
-                (spotifyAuthData.updateFromRefreshResponse(spotifyRefreshTokenResponse)).accessToken());
+                (spotifyAuthData.updateFromRefreshResponse(spotifyRefreshTokenResponse)));
     }
 
     private TextBody buildRefreshTokenRequestBody(String refreshToken) {

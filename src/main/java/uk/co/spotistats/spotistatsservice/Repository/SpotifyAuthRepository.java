@@ -2,14 +2,14 @@ package uk.co.spotistats.spotistatsservice.Repository;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
-import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuthData;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
 import static uk.co.spotistats.generated.Tables.USER_AUTH_DATA;
-import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuthData.Builder.someUserAuthData;
+import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData.Builder.someUserAuthData;
 
 @Repository
 public class SpotifyAuthRepository {

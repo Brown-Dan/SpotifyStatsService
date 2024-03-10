@@ -1,13 +1,13 @@
-package uk.co.spotistats.spotistatsservice.Domain;
+package uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth;
 
 import java.time.LocalDateTime;
 
-import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuthData.Builder.someUserAuthData;
+import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData.Builder.someUserAuthData;
 
 public record SpotifyAuthData(String username, String refreshToken, String accessToken, LocalDateTime lastUpdated) {
 
     public boolean hasValidAccessToken(){
-        return lastUpdated.isBefore(LocalDateTime.now().minusHours(1));
+        return !lastUpdated.isBefore(LocalDateTime.now().minusHours(1));
     }
 
     public SpotifyAuthData updateFromRefreshResponse(SpotifyRefreshTokenResponse spotifyRefreshTokenResponse){

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
+import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 @Controller
@@ -20,9 +21,9 @@ public class StreamingDataController {
         this.streamingDataService = streamingDataService;
     }
 
-    @GetMapping(value = "/test")
-    public ResponseEntity<ApiResult<String, Error>> temporaryCallback(@PathVariable String username) {
-        return ok(streamingDataService.tokenTesting(username).getValue());
+    @GetMapping(value = "/recent")
+    public ResponseEntity<ApiResult<StreamingData, Error>> getRecentStreams(@PathVariable String username) {
+        return ok(streamingDataService.getRecentStreams(username).getValue());
     }
 
     private <T> ResponseEntity<ApiResult<T, Error>> ok(T body) {

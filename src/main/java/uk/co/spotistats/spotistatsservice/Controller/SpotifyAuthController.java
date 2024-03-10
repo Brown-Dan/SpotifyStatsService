@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuthData;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
 
 @Controller
 @RequestMapping("user")
-public class UserController {
+public class SpotifyAuthController {
 
     private final SpotifyAuthService spotifyAuthService;
 
-    public UserController(SpotifyAuthService spotifyAuthService) {
+    public SpotifyAuthController(SpotifyAuthService spotifyAuthService) {
         this.spotifyAuthService = spotifyAuthService;
     }
 
