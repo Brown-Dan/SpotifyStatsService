@@ -42,6 +42,7 @@ public class UserService {
         if (existingAuthData.isPresent()) {
             return Optional.of(Error.authorizationDetailsPresent(userAuthData.username()));
         }
+        userRepository.register(userAuthData);
         return Optional.empty();
     }
 

@@ -42,9 +42,10 @@ public class StreamingDataUploadController {
         };
     }
 
+    // TODO will remove eventually
     @GetMapping(value = "/callback")
-    public ResponseEntity<ApiResult<Object, Error>> temporaryCallback(@PathVariable String username, @RequestParam String code) {
-        return ok(streamingDataUploadService.getTop(username, code));
+    public ResponseEntity<ApiResult<String, Error>> temporaryCallback(@PathVariable String username, @RequestParam String code) {
+        return ok("");
     }
 
     private <T> ResponseEntity<ApiResult<T, Error>> ok(T body) {
