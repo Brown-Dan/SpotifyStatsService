@@ -7,7 +7,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
 import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
-import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
+import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -15,22 +15,22 @@ import java.util.Optional;
 import static uk.co.spotistats.spotistatsservice.Domain.StreamingData.Builder.aStreamingData;
 
 @Service
-public class StreamingDataService {
+public class StreamingDataUploadService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamingDataUploadService.class);
 
-    private final StreamingDataRepository streamingDataRepository;
+    private final StreamingDataUploadRepository streamingDataUploadRepository;
 
-    public StreamingDataService(StreamingDataRepository streamingDataRepository) {
-        this.streamingDataRepository = streamingDataRepository;
+    public StreamingDataUploadService(StreamingDataUploadRepository streamingDataUploadRepository) {
+        this.streamingDataUploadRepository = streamingDataUploadRepository;
     }
 
     public Result<StreamingDataUpsertResult, Error> upsert(StreamingData streamingData, String username) {
-        Optional<StreamingData> existingStreamingData = streamingDataRepository.getStreamingDataByUsername(username);
+        Optional<StreamingData> existingStreamingData = streamingDataUploadRepository.getStreamingDataByUsername(username);
 
         StreamingDataUpsertResult streamingDataUpsertResult;
         if (existingStreamingData.isPresent()) {
-            Optional<StreamingDataUpsertResult> updateResult = streamingDataRepository
+            Optional<StreamingDataUpsertResult> updateResult = streamingDataUploadRepository
                     .updateStreamingData(combineStreamingData(existingStreamingData.get(), streamingData), username);
             if (updateResult.isEmpty()) {
                 return new Result.Failure<>(new Error("Failure updating streaming data - %s for username - %s ".formatted(streamingData, username)));
@@ -38,7 +38,7 @@ public class StreamingDataService {
             streamingDataUpsertResult = updateResult.get();
             LOG.info("Updated streaming data for user - {}", username);
         } else {
-            Optional<StreamingDataUpsertResult> insertResult = streamingDataRepository
+            Optional<StreamingDataUpsertResult> insertResult = streamingDataUploadRepository
                     .insertStreamingData(streamingData, username);
             if (insertResult.isEmpty()) {
                 return new Result.Failure<>(new Error("Failure inserting streaming data - %s for username - %s ".formatted(streamingData, username)));
@@ -46,7 +46,7 @@ public class StreamingDataService {
             streamingDataUpsertResult = insertResult.get();
             LOG.info("Inserted streaming data for user - {}", username);
         }
-        streamingData.streamData().forEach(streamData -> streamingDataRepository.insertStreamData(streamData, username));
+        streamingData.streamData().forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, username));
         return new Result.Success<>(streamingDataUpsertResult);
     }
 

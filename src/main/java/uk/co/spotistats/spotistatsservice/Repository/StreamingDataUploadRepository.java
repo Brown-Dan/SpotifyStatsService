@@ -15,11 +15,11 @@ import static uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUp
 import static uk.co.spotistats.spotistatsservice.Domain.StreamingData.Builder.aStreamingData;
 
 @Component
-public class StreamingDataRepository {
+public class StreamingDataUploadRepository {
 
     private final DSLContext db;
 
-    public StreamingDataRepository(DSLContext db) {
+    public StreamingDataUploadRepository(DSLContext db) {
         this.db = db;
     }
 

@@ -11,17 +11,17 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
 import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
-import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
+import uk.co.spotistats.spotistatsservice.Service.StreamingDataUploadService;
 
 @RestController
 @RequestMapping("{username}/data")
-public class StreamingDataController {
+public class StreamingDataUploadController {
 
-    private final StreamingDataService streamingDataService;
+    private final StreamingDataUploadService streamingDataUploadService;
     private final MultipartFileToStreamingDataMapper multipartFileToStreamingDataMapper;
 
-    public StreamingDataController(StreamingDataService streamingDataService, MultipartFileToStreamingDataMapper multipartFileToStreamingDataMapper) {
-        this.streamingDataService = streamingDataService;
+    public StreamingDataUploadController(StreamingDataUploadService streamingDataUploadService, MultipartFileToStreamingDataMapper multipartFileToStreamingDataMapper) {
+        this.streamingDataUploadService = streamingDataUploadService;
         this.multipartFileToStreamingDataMapper = multipartFileToStreamingDataMapper;
     }
 
@@ -34,7 +34,7 @@ public class StreamingDataController {
             return badRequest(streamingDataMapResult.getError());
         }
         Result<StreamingDataUpsertResult, Error> upsertResult =
-                streamingDataService.upsert(streamingDataMapResult.getValue(), username);
+                streamingDataUploadService.upsert(streamingDataMapResult.getValue(), username);
 
         return switch (upsertResult) {
             case Result.Success(StreamingDataUpsertResult streamingDataUpsertResult) -> ok(streamingDataUpsertResult);
@@ -44,7 +44,7 @@ public class StreamingDataController {
 
     @GetMapping(value = "/callback")
     public ResponseEntity<ApiResult<Object, Error>> temporaryCallback(@PathVariable String username, @RequestParam String code) {
-        return ok(streamingDataService.getTop(username, code));
+        return ok(streamingDataUploadService.getTop(username, code));
     }
 
     private <T> ResponseEntity<ApiResult<T, Error>> ok(T body) {

@@ -10,7 +10,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
-import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
+import uk.co.spotistats.spotistatsservice.Service.StreamingDataUploadService;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +23,7 @@ public class MultipartFileToStreamingDataMapper {
 
     private final ObjectMapper objectMapper;
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MultipartFileToStreamingDataMapper.class);
 
     public MultipartFileToStreamingDataMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
