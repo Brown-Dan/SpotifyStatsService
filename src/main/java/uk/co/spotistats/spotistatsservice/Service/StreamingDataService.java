@@ -15,7 +15,9 @@ import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamData.Builder.aRankedStreamData;
@@ -87,16 +89,18 @@ public class StreamingDataService {
         StreamingData streamingData = streamingDataRepository.search(streamingDataSearchRequest);
 
         long totalTimeStreamed = streamingData.streamData().stream().mapToLong(StreamData::timeStreamed).sum();
-        return aRankedStreamData()
+        RankedStreamData.Builder rankedStreamData = aRankedStreamData()
                 .withTotalMsPlayed((int) totalTimeStreamed)
-                .withLastStreamDateTime(streamingData.streamData().getLast().streamDateTime())
                 .withTrackName(streamData.name())
                 .withRanking(rank + 1)
                 .withMinutesPlayed(((int) totalTimeStreamed / 1000) / 60)
                 .withArtistName(streamData.artist())
                 .withAlbumName(streamData.album())
                 .withTrackUri(streamData.trackUri())
-                .withTotalStreams(streamingData.streamCount())
-                .build();
+                .withTotalStreams(streamingData.streamCount());
+
+        return streamingData.streamData().isEmpty() ? rankedStreamData.build() :
+                rankedStreamData.withLastStreamDateTime(Optional.ofNullable(streamingData.streamData().getLast())
+                        .map(StreamData::streamDateTime).orElse(null)).build();
     }
 }
