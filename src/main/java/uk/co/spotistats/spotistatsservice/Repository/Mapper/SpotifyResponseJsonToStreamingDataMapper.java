@@ -21,17 +21,17 @@ import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder
 import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
 
 @Component
-public class PlayHistoryJsonToStreamingDataMapper {
+public class SpotifyResponseJsonToStreamingDataMapper {
 
     private final ObjectMapper objectMapper;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
-    public PlayHistoryJsonToStreamingDataMapper(ObjectMapper objectMapper) {
+    public SpotifyResponseJsonToStreamingDataMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public Result<StreamingData, Error> map(JSONObject playHistory) {
+    public Result<StreamingData, Error> mapFromRecentStreamsJson(JSONObject playHistory) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(playHistory.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> mapStreamData(item.get("track"))
@@ -48,7 +48,7 @@ public class PlayHistoryJsonToStreamingDataMapper {
         }
     }
 
-    public Result<StreamingData, Error> mapFromTopStreams(JSONObject playHistory) {
+    public Result<StreamingData, Error> mapFromTopStreamsJson(JSONObject playHistory) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(playHistory.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> mapStreamData(item)

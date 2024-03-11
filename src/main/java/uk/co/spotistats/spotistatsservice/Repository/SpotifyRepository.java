@@ -8,7 +8,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Repository.Mapper.PlayHistoryJsonToStreamingDataMapper;
+import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseJsonToStreamingDataMapper;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -17,14 +17,14 @@ import java.time.ZoneOffset;
 public class SpotifyRepository {
 
     private final Traverson traverson;
-    private final PlayHistoryJsonToStreamingDataMapper playHistoryJsonToStreamingDataMapper;
+    private final SpotifyResponseJsonToStreamingDataMapper spotifyResponseJsonToStreamingDataMapper;
 
     private static final String RECENT_STREAMS_URL = "https://api.spotify.com/v1/me/player/recently-played";
     private static final String TOP_TRACKS_URL = "https://api.spotify.com/v1/me/top/tracks";
 
-    public SpotifyRepository(Traverson traverson, PlayHistoryJsonToStreamingDataMapper playHistoryJsonToStreamingDataMapper) {
+    public SpotifyRepository(Traverson traverson, SpotifyResponseJsonToStreamingDataMapper spotifyResponseJsonToStreamingDataMapper) {
         this.traverson = traverson;
-        this.playHistoryJsonToStreamingDataMapper = playHistoryJsonToStreamingDataMapper;
+        this.spotifyResponseJsonToStreamingDataMapper = spotifyResponseJsonToStreamingDataMapper;
     }
 
     public Result<StreamingData, Error> getRecentStreamingData(SpotifyAuthData spotifyAuthData) {
@@ -34,7 +34,7 @@ public class SpotifyRepository {
                 .withQueryParam("before", LocalDateTime.now().toInstant(ZoneOffset.UTC).toString())
                 .get();
         if (response.isSuccessful()) {
-            return playHistoryJsonToStreamingDataMapper.map(response.getResource());
+            return spotifyResponseJsonToStreamingDataMapper.mapFromRecentStreamsJson(response.getResource());
         }
         return new Result.Failure<>(responseToError(response));
     }
@@ -46,7 +46,7 @@ public class SpotifyRepository {
                 .withQueryParam("time_range", "long_term")
                 .get();
         if (response.isSuccessful()) {
-            return playHistoryJsonToStreamingDataMapper.mapFromTopStreams(response.getResource());
+            return spotifyResponseJsonToStreamingDataMapper.mapFromTopStreamsJson(response.getResource());
         }
         return new Result.Failure<>(responseToError(response));
     }
