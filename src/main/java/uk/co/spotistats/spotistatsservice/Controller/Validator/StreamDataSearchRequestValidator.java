@@ -1,9 +1,9 @@
 package uk.co.spotistats.spotistatsservice.Controller.Validator;
 
 import org.springframework.stereotype.Component;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.StreamDataSearchRequestOrderBy;
+import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,15 @@ public class StreamDataSearchRequestValidator {
         List<Error> errors = new ArrayList<>();
         validateQueryPeriod(streamingDataSearchRequest).ifPresent(errors::add);
         validateOrderBy(streamingDataSearchRequest).ifPresent(errors::add);
+        validateLimit(streamingDataSearchRequest).ifPresent(errors::add);
         return errors;
+    }
+
+    private Optional<Error> validateLimit(StreamingDataSearchRequest streamingDataSearchRequest) {
+        if (streamingDataSearchRequest.limit() == null) {
+            return Optional.of(new Error("Limit must be provided"));
+        }
+        return Optional.empty();
     }
 
     private Optional<Error> validateOrderBy(StreamingDataSearchRequest streamingDataSearchRequest) {

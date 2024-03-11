@@ -42,7 +42,8 @@ public class StreamingDataRepository {
 
         List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData =
                 db.selectFrom(STREAM_DATA).where(conditions).and(STREAM_DATA.USERNAME.eq(username))
-                        .orderBy(StreamDataSearchRequestOrderBy.valueOf(streamingDataSearchRequest.orderBy()).getField()).fetchInto(uk.co.spotistats.generated.tables.pojos.StreamData.class);
+                        .orderBy(StreamDataSearchRequestOrderBy.valueOf(streamingDataSearchRequest.orderBy()).getField())
+                        .limit(streamingDataSearchRequest.limit()).fetchInto(uk.co.spotistats.generated.tables.pojos.StreamData.class);
 
         return buildStreamingData(streamData);
     }

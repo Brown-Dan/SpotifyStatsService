@@ -13,7 +13,8 @@ public record StreamingDataSearchRequest(
         String artist,
         String album,
         String platform,
-        String orderBy
+        String orderBy,
+        Integer limit
 ) {
 
     public static final class Builder {
@@ -28,6 +29,7 @@ public record StreamingDataSearchRequest(
         private String album;
         private String platform;
         private String orderBy;
+        private Integer limit;
 
         private Builder() {
         }
@@ -91,8 +93,13 @@ public record StreamingDataSearchRequest(
             return this;
         }
 
+        public Builder withLimit(Integer limit) {
+            this.limit = limit;
+            return this;
+        }
+
         public StreamingDataSearchRequest build() {
-            return new StreamingDataSearchRequest(username, start, end, on, country, uri, trackName, artist, album, platform, orderBy);
+            return new StreamingDataSearchRequest(username, start, end, on, country, uri, trackName, artist, album, platform, orderBy, limit);
         }
     }
 }
