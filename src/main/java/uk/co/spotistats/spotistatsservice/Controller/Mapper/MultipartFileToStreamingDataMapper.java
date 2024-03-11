@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.StreamData;
-import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import static uk.co.spotistats.spotistatsservice.Domain.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
 
 @Component
 public class MultipartFileToStreamingDataMapper {

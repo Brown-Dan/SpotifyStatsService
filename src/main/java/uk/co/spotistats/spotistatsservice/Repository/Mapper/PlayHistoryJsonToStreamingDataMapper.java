@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.StreamData;
-import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.time.ZonedDateTime;
@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
-import static uk.co.spotistats.spotistatsservice.Domain.StreamData.Builder.aStreamData;
-import static uk.co.spotistats.spotistatsservice.Domain.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder.aStreamData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
 
 @Component
 public class PlayHistoryJsonToStreamingDataMapper {

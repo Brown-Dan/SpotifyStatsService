@@ -7,7 +7,7 @@ import uk.co.autotrader.traverson.http.Response;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
-import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.PlayHistoryJsonToStreamingDataMapper;
 
 import java.time.LocalDateTime;

@@ -3,16 +3,20 @@ package uk.co.spotistats.spotistatsservice.Repository;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
-import uk.co.spotistats.generated.tables.pojos.StreamData;
-import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.StreamingDataSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.StreamDataSearchRequestOrderBy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static uk.co.spotistats.generated.tables.StreamData.STREAM_DATA;
-import static uk.co.spotistats.spotistatsservice.Domain.StreamData.Builder.aStreamData;
-import static uk.co.spotistats.spotistatsservice.Domain.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.generated.tables.StreamingData.STREAMING_DATA;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder.aStreamData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
 
 @Repository
 public class StreamingDataRepository {
@@ -23,14 +27,28 @@ public class StreamingDataRepository {
         this.db = db;
     }
 
-    public StreamingData get(StreamingDataSearchRequest streamingDataSearchRequest, String username) {
+    public Result<StreamingData, Error> getStreamingData (String username){
+        uk.co.spotistats.generated.tables.pojos.StreamingData streamingData =
+                db.selectFrom(STREAMING_DATA).where(STREAMING_DATA.USERNAME.eq(username))
+                        .fetchOneInto(uk.co.spotistats.generated.tables.pojos.StreamingData.class);
+        if (streamingData == null){
+            return new Result.Failure<>(new Error("Streaming data not found for user - %s".formatted(username)));
+        }
+        return new Result.Success<>(StreamingData.fromStreamingDataEntity(streamingData));
+    }
+
+    public StreamingData search(StreamingDataSearchRequest streamingDataSearchRequest, String username) {
         List<Condition> conditions = buildQueryConditions(streamingDataSearchRequest);
 
-        List<StreamData> streamData =
+        List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData =
                 db.selectFrom(STREAM_DATA).where(conditions).and(STREAM_DATA.USERNAME.eq(username))
-                        .orderBy(STREAM_DATA.DATE_TIME).fetchInto(StreamData.class);
+                        .orderBy(StreamDataSearchRequestOrderBy.valueOf(streamingDataSearchRequest.orderBy()).getField()).fetchInto(uk.co.spotistats.generated.tables.pojos.StreamData.class);
 
         return buildStreamingData(streamData);
+    }
+
+    public StreamingData search(StreamingDataSearchRequest streamingDataSearchRequest) {
+        return search(streamingDataSearchRequest, streamingDataSearchRequest.username());
     }
 
     private List<Condition> buildQueryConditions(StreamingDataSearchRequest streamingDataSearchRequest) {
@@ -63,7 +81,7 @@ public class StreamingDataRepository {
         return conditions;
     }
 
-    private StreamingData buildStreamingData(List<StreamData> streamData) {
+    private StreamingData buildStreamingData(List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData) {
         if (streamData.isEmpty()) {
             return aStreamingData()
                     .withTotalStreams(0)
@@ -78,7 +96,7 @@ public class StreamingDataRepository {
                 .build();
     }
 
-    private uk.co.spotistats.spotistatsservice.Domain.StreamData mapStreamDataEntityToStreamData(StreamData streamData) {
+    private StreamData mapStreamDataEntityToStreamData(uk.co.spotistats.generated.tables.pojos.StreamData streamData) {
         return aStreamData()
                 .withName(streamData.getTrackName())
                 .withTimeStreamed(streamData.getTimeStreamed())

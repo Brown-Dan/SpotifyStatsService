@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
-import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static uk.co.spotistats.spotistatsservice.Domain.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
 
 @Service
 public class StreamingDataUploadService {

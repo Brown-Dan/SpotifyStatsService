@@ -1,8 +1,7 @@
-package uk.co.spotistats.spotistatsservice.Domain;
+package uk.co.spotistats.spotistatsservice.Domain.Model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record StreamData(

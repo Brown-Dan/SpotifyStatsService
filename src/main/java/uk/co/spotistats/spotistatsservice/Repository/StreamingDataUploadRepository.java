@@ -4,15 +4,14 @@ import org.jooq.DSLContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
-import uk.co.spotistats.spotistatsservice.Domain.StreamData;
-import uk.co.spotistats.spotistatsservice.Domain.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 
 import java.util.Optional;
 
 import static uk.co.spotistats.generated.Tables.STREAM_DATA;
 import static uk.co.spotistats.generated.tables.StreamingData.STREAMING_DATA;
 import static uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult.Builder.aStreamingDataInsertResult;
-import static uk.co.spotistats.spotistatsservice.Domain.StreamingData.Builder.aStreamingData;
 
 @Component
 public class StreamingDataUploadRepository {
@@ -28,7 +27,7 @@ public class StreamingDataUploadRepository {
                 Optional.ofNullable(db.selectFrom(STREAMING_DATA).where(STREAMING_DATA.USERNAME.eq(username))
                         .fetchOneInto(uk.co.spotistats.generated.tables.pojos.StreamingData.class));
 
-        return streamingDataEntity.map(this::mapStreamingDataEntityToStreamingData);
+        return streamingDataEntity.map(StreamingData::fromStreamingDataEntity);
     }
 
     public Optional<StreamingDataUpsertResult> insertStreamingData(StreamingData streamingData, String username) {
@@ -71,14 +70,6 @@ public class StreamingDataUploadRepository {
     private StreamingDataUpsertResult mapStreamingDataEntityToStreamingDataInsertResult(uk.co.spotistats.generated.tables.pojos.StreamingData streamingDataEntity) {
         return aStreamingDataInsertResult()
                 .withUsername(streamingDataEntity.getUsername())
-                .withFirstStreamDateTime(streamingDataEntity.getFirstStreamDate())
-                .withLastStreamDateTime(streamingDataEntity.getLastStreamData())
-                .withTotalStreams(streamingDataEntity.getStreamCount())
-                .build();
-    }
-
-    private StreamingData mapStreamingDataEntityToStreamingData(uk.co.spotistats.generated.tables.pojos.StreamingData streamingDataEntity) {
-        return aStreamingData()
                 .withFirstStreamDateTime(streamingDataEntity.getFirstStreamDate())
                 .withLastStreamDateTime(streamingDataEntity.getLastStreamData())
                 .withTotalStreams(streamingDataEntity.getStreamCount())
