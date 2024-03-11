@@ -14,7 +14,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataUploadService;
 
 @RestController
-@RequestMapping("{username}/data")
+@RequestMapping("{username}")
 public class StreamingDataUploadController {
 
     private final StreamingDataUploadService streamingDataUploadService;
@@ -45,7 +45,7 @@ public class StreamingDataUploadController {
     // TODO will remove when frontend implemented
     @GetMapping(value = "/callback")
     public ResponseEntity<ApiResult<String, Error>> temporaryCallback(@PathVariable String username, @RequestParam String code) {
-        return ok("");
+        return ok("TEST ENDPOINT");
     }
 
     private <T> ResponseEntity<ApiResult<T, Error>> ok(T body) {

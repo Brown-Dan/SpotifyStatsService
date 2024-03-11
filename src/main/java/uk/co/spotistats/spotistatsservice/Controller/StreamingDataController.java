@@ -17,7 +17,7 @@ import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 import java.util.List;
 
 @Controller
-@RequestMapping("{username}/data")
+@RequestMapping("{username}")
 public class StreamingDataController {
 
     private final StreamingDataService streamingDataService;

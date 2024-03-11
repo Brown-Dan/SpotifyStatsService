@@ -12,7 +12,7 @@ import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
 
 @Controller
-@RequestMapping("user")
+@RequestMapping("spotify")
 public class SpotifyAuthController {
 
     private final SpotifyAuthService spotifyAuthService;

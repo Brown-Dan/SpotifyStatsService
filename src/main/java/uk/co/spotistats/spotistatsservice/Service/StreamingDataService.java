@@ -15,7 +15,6 @@ import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
