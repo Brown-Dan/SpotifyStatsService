@@ -99,8 +99,8 @@
                 <version>9.22.2</version>
                 <configuration>
                     <user>admin</user>
-                    <url>jdbc:postgresql://localhost:5432/StreamingData</url>
-                    <password>password</password>
+                    <url>jdbc:postgresql://admin:e9I5ysuZQXtn@ep-shrill-snow-a2lajvf5.eu-central-1.aws.neon.tech/StreamingData?sslmode=require</url>
+                    <password>e9I5ysuZQXtn</password>
                     <table>changelog</table>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
@@ -138,7 +138,7 @@
                         <driver>org.postgresql.Driver</driver>
                         <url>jdbc:postgresql://localhost:5432/StreamingData</url>
                         <username>admin</username>
-                        <password>password</password>
+                        <password>e9I5ysuZQXtn</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.codegen.DefaultGenerator</name>
