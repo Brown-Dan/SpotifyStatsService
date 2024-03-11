@@ -98,8 +98,8 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.22.2</version>
                 <configuration>
+                    <url>jdbc:postgresql://ep-shrill-snow-a2lajvf5.eu-central-1.aws.neon.tech/StreamingData?user=admin&amp;password=e9I5ysuZQXtn&amp;sslmode=require</url>
                     <user>admin</user>
-                    <url>jdbc:postgresql://admin:e9I5ysuZQXtn@ep-shrill-snow-a2lajvf5.eu-central-1.aws.neon.tech/StreamingData?sslmode=require</url>
                     <password>e9I5ysuZQXtn</password>
                     <table>changelog</table>
                     <locations>
@@ -136,7 +136,7 @@
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost:5432/StreamingData</url>
+                        <url>jdbc:postgresql://ep-shrill-snow-a2lajvf5.eu-central-1.aws.neon.tech:5432/StreamingData?sslmode=require</url>
                         <username>admin</username>
                         <password>e9I5ysuZQXtn</password>
                     </jdbc>
