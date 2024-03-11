@@ -30,6 +30,11 @@ public class StreamingDataController {
         return ok(streamingDataService.getRecentStreams(username).getValue());
     }
 
+    @GetMapping(value = "/top")
+    public ResponseEntity<ApiResult<StreamingData, Error>> getTopStreams(@PathVariable String username) {
+        return ok(streamingDataService.getTopStreams(username).getValue());
+    }
+
     @GetMapping(value = "/query")
     public ResponseEntity<ApiResult<StreamingData, List<Error>>> getStreamingData(@PathVariable String username, StreamingDataSearchRequest streamingDataSearchRequest) {
         Result<StreamingData, List<Error>> getStreamingDataResult = streamingDataService.get(username, streamingDataSearchRequest);

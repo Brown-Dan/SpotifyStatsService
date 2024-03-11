@@ -23,11 +23,12 @@ public class StreamingDataRepository {
         this.db = db;
     }
 
-    public StreamingData get(StreamingDataSearchRequest streamingDataSearchRequest){
+    public StreamingData get(StreamingDataSearchRequest streamingDataSearchRequest, String username) {
         List<Condition> conditions = buildQueryConditions(streamingDataSearchRequest);
 
         List<StreamData> streamData =
-                db.selectFrom(STREAM_DATA).where(conditions).orderBy(STREAM_DATA.DATE_TIME).fetchInto(StreamData.class);
+                db.selectFrom(STREAM_DATA).where(conditions).and(STREAM_DATA.USERNAME.eq(username))
+                        .orderBy(STREAM_DATA.DATE_TIME).fetchInto(StreamData.class);
 
         return buildStreamingData(streamData);
     }
@@ -38,24 +39,24 @@ public class StreamingDataRepository {
         if (streamingDataSearchRequest.country() != null) {
             conditions.add(STREAM_DATA.COUNTRY.eq(streamingDataSearchRequest.country()));
         }
-        if (streamingDataSearchRequest.on() != null){
+        if (streamingDataSearchRequest.on() != null) {
             conditions.add(STREAM_DATA.DATE.eq(streamingDataSearchRequest.on()));
-        } else{
+        } else {
             conditions.add(STREAM_DATA.DATE.between(streamingDataSearchRequest.start(), streamingDataSearchRequest.end()));
         }
-        if (streamingDataSearchRequest.uri() != null){
+        if (streamingDataSearchRequest.uri() != null) {
             conditions.add(STREAM_DATA.TRACK_URI.eq(streamingDataSearchRequest.uri()));
         }
-        if (streamingDataSearchRequest.album() != null){
+        if (streamingDataSearchRequest.album() != null) {
             conditions.add(STREAM_DATA.ALBUM_NAME.eq(streamingDataSearchRequest.album()));
         }
-        if (streamingDataSearchRequest.artist() != null){
+        if (streamingDataSearchRequest.artist() != null) {
             conditions.add(STREAM_DATA.ARTIST_NAME.eq(streamingDataSearchRequest.artist()));
         }
-        if (streamingDataSearchRequest.trackName() != null){
+        if (streamingDataSearchRequest.trackName() != null) {
             conditions.add(STREAM_DATA.TRACK_NAME.eq(streamingDataSearchRequest.trackName()));
         }
-        if (streamingDataSearchRequest.platform() != null){
+        if (streamingDataSearchRequest.platform() != null) {
             conditions.add(STREAM_DATA.PLATFORM.eq(streamingDataSearchRequest.platform()));
         }
 
@@ -63,7 +64,7 @@ public class StreamingDataRepository {
     }
 
     private StreamingData buildStreamingData(List<StreamData> streamData) {
-        if (streamData.isEmpty()){
+        if (streamData.isEmpty()) {
             return aStreamingData()
                     .withTotalStreams(0)
                     .withStreamData(new ArrayList<>())
@@ -77,7 +78,7 @@ public class StreamingDataRepository {
                 .build();
     }
 
-    private uk.co.spotistats.spotistatsservice.Domain.StreamData mapStreamDataEntityToStreamData(StreamData streamData){
+    private uk.co.spotistats.spotistatsservice.Domain.StreamData mapStreamDataEntityToStreamData(StreamData streamData) {
         return aStreamData()
                 .withName(streamData.getTrackName())
                 .withTimeStreamed(streamData.getTimeStreamed())

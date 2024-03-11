@@ -20,6 +20,7 @@ public class SpotifyRepository {
     private final PlayHistoryJsonToStreamingDataMapper playHistoryJsonToStreamingDataMapper;
 
     private static final String RECENT_STREAMS_URL = "https://api.spotify.com/v1/me/player/recently-played";
+    private static final String TOP_TRACKS_URL = "https://api.spotify.com/v1/me/top/tracks";
 
     public SpotifyRepository(Traverson traverson, PlayHistoryJsonToStreamingDataMapper playHistoryJsonToStreamingDataMapper) {
         this.traverson = traverson;
@@ -34,6 +35,18 @@ public class SpotifyRepository {
                 .get();
         if (response.isSuccessful()) {
             return playHistoryJsonToStreamingDataMapper.map(response.getResource());
+        }
+        return new Result.Failure<>(responseToError(response));
+    }
+
+    public Result<StreamingData, Error> getTopTracks(SpotifyAuthData spotifyAuthData) {
+        Response<JSONObject> response = traverson.from(TOP_TRACKS_URL)
+                .withHeader("Authorization", "Bearer %s ".formatted(spotifyAuthData.accessToken()))
+                .withQueryParam("limit", "50")
+                .withQueryParam("time_range", "long_term")
+                .get();
+        if (response.isSuccessful()) {
+            return playHistoryJsonToStreamingDataMapper.mapFromTopStreams(response.getResource());
         }
         return new Result.Failure<>(responseToError(response));
     }
