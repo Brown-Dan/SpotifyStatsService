@@ -59,7 +59,7 @@ public class SpotifyAuthService {
     private Result<SpotifyAuthData, Error> refreshToken(SpotifyAuthData spotifyAuthData) {
         Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
                 .withHeader("content-type", "application/x-www-form-urlencoded")
-                .withHeader("Authorization", "Basic MjAyNWI0OGQ5MjJhNDkwOTlkNjY1Y2JiZDI1NjM0MzY6NmNmZjZjMWRjM2MyNGZlY2FjNzU5ZThmZDY4ZTJkOWE=")
+                .withHeader("Authorization", System.getenv("SPOTIFY_BASE_64_AUTH"))
                 .post(buildRefreshTokenRequestBody(spotifyAuthData.refreshToken()));
         if (!response.isSuccessful()) {
             LOG.info("Failed to refresh access token for user - {} received response - {}", spotifyAuthData.username(), response.getStatusCode());
