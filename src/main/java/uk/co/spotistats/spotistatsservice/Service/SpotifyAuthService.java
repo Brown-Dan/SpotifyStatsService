@@ -37,7 +37,7 @@ public class SpotifyAuthService {
         Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(spotifyAuthData.username());
 
         if (existingAuthData.isPresent()) {
-            return Optional.of(Error.authorizationDetailsPresent(spotifyAuthData.username()));
+            return Optional.of(Error.forbiddenToUpdate("spotifyAuthData", spotifyAuthData.username()));
         }
         spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData);
         return Optional.empty();
@@ -46,7 +46,7 @@ public class SpotifyAuthService {
     public Result<SpotifyAuthData, Error> getAuthData(String username) {
         Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(username);
         if (existingAuthData.isEmpty()) {
-            return new Result.Failure<>(Error.authorizationDetailsNotPresent(username));
+            return new Result.Failure<>(Error.notFound("spotifyAuthDetails", username));
         }
         SpotifyAuthData spotifyAuthData = existingAuthData.get();
 

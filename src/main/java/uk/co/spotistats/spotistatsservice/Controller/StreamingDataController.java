@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
+import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
@@ -27,38 +28,38 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/recent")
-    public ResponseEntity<ApiResult<StreamingData, Error>> getRecentStreams(@PathVariable String username) {
+    public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username) {
         Result<StreamingData, Error> result = streamingDataService.getRecentStreams(username);
         return switch (result) {
             case Result.Success(StreamingData streamingData) -> ok(streamingData);
-            case Result.Failure(Error error) -> badRequest(error);
+            case Result.Failure(Error error) -> badRequest(Errors.fromError(error));
         };
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<List<RankedStreamData>, Error>> getTopStreams(@PathVariable String username) {
+    public ResponseEntity<ApiResult<List<RankedStreamData>, Errors>> getTopStreams(@PathVariable String username) {
         Result<List<RankedStreamData>, Error> result = streamingDataService.getTopStreams(username);
         return switch (result) {
             case Result.Success(List<RankedStreamData> rankedStreamData) -> ok(rankedStreamData);
-            case Result.Failure(Error error) -> badRequest(error);
+            case Result.Failure(Error error) -> badRequest(Errors.fromError(error));
         };
     }
 
     @GetMapping(value = "/search")
-    public ResponseEntity<ApiResult<StreamingData, List<Error>>> searchStreamingData(@PathVariable String username, StreamingDataSearchRequest streamingDataSearchRequest) {
+    public ResponseEntity<ApiResult<StreamingData, Errors>> searchStreamingData(@PathVariable String username, StreamingDataSearchRequest streamingDataSearchRequest) {
         Result<StreamingData, List<Error>> getStreamingDataResult = streamingDataService.search(username, streamingDataSearchRequest);
 
         return switch (getStreamingDataResult) {
-            case Result.Failure(List<Error> errors) -> badRequest(errors);
+            case Result.Failure(List<Error> errors) -> badRequest(Errors.fromErrors(errors));
             case Result.Success(StreamingData streamingData) -> ok(streamingData);
         };
     }
 
-    private <T, U> ResponseEntity<ApiResult<T, U>> ok(T body) {
+    private <T, U> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
         return ResponseEntity.ok(ApiResult.success(body));
     }
 
-    private <T, U> ResponseEntity<ApiResult<T, U>> badRequest(U error) {
-        return new ResponseEntity<>(ApiResult.failure(error), HttpStatus.BAD_REQUEST);
+    private <T, U> ResponseEntity<ApiResult<T, Errors>> badRequest(Errors errors) {
+        return new ResponseEntity<>(ApiResult.failure(errors), errors.httpStatus());
     }
 }

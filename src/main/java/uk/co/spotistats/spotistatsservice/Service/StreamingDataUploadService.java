@@ -3,10 +3,10 @@ package uk.co.spotistats.spotistatsservice.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ public class StreamingDataUploadService {
             Optional<StreamingDataUpsertResult> updateResult = streamingDataUploadRepository
                     .updateStreamingData(combineStreamingData(existingStreamingData.get(), streamingData), username);
             if (updateResult.isEmpty()) {
-                return new Result.Failure<>(new Error("Failure updating streaming data - %s for username - %s ".formatted(streamingData, username)));
+                return new Result.Failure<>(Error.unknownError(null, "Failure updating streaming data - %s for username - %s ".formatted(streamingData, username)));
             }
             streamingDataUpsertResult = updateResult.get();
             LOG.info("Updated streaming data for user - {}", username);
@@ -41,7 +41,7 @@ public class StreamingDataUploadService {
             Optional<StreamingDataUpsertResult> insertResult = streamingDataUploadRepository
                     .insertStreamingData(streamingData, username);
             if (insertResult.isEmpty()) {
-                return new Result.Failure<>(new Error("Failure inserting streaming data - %s for username - %s ".formatted(streamingData, username)));
+                return new Result.Failure<>(Error.unknownError(null, "Failure inserting streaming data - %s for username - %s ".formatted(streamingData, username)));
             }
             streamingDataUpsertResult = insertResult.get();
             LOG.info("Inserted streaming data for user - {}", username);

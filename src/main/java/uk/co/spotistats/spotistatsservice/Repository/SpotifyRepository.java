@@ -4,10 +4,10 @@ import com.alibaba.fastjson2.JSONObject;
 import org.springframework.stereotype.Repository;
 import uk.co.autotrader.traverson.Traverson;
 import uk.co.autotrader.traverson.http.Response;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseJsonToStreamingDataMapper;
 
 import java.time.LocalDateTime;
@@ -36,7 +36,7 @@ public class SpotifyRepository {
         if (response.isSuccessful()) {
             return spotifyResponseJsonToStreamingDataMapper.mapFromRecentStreamsJson(response.getResource());
         }
-        return new Result.Failure<>(responseToError(response));
+        return new Result.Failure<>(responseToError(response, spotifyAuthData.username()));
     }
 
     public Result<StreamingData, Error> getTopTracks(SpotifyAuthData spotifyAuthData) {
@@ -48,15 +48,14 @@ public class SpotifyRepository {
         if (response.isSuccessful()) {
             return spotifyResponseJsonToStreamingDataMapper.mapFromTopStreamsJson(response.getResource());
         }
-        return new Result.Failure<>(responseToError(response));
+        return new Result.Failure<>(responseToError(response, spotifyAuthData.username()));
     }
 
-    private Error responseToError(Response<JSONObject> response) {
+    private Error responseToError(Response<JSONObject> response, String username) {
         return switch (response.getStatusCode()) {
-            case 401 -> new Error("User needs to reauthenticate");
-            case 403 -> new Error("User is not authenticated");
-            case 429 -> new Error("App exceeding rate limit");
-            default -> new Error("Failed to getRecentStreamingData");
+            case 401, 403 -> Error.notFound("spotifyAuthDetails", username);
+            case 429 -> Error.spotifyRateLimitExceeded();
+            default -> Error.unknownError("streamingData", "Failed to get streamingData");
         };
     }
 }

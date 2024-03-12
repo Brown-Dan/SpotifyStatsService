@@ -31,9 +31,9 @@ public class SpotifyResponseJsonToStreamingDataMapper {
         this.objectMapper = objectMapper;
     }
 
-    public Result<StreamingData, Error> mapFromRecentStreamsJson(JSONObject playHistory) {
+    public Result<StreamingData, Error> mapFromRecentStreamsJson(JSONObject json) {
         try {
-            JsonNode responseAsJsonNode = objectMapper.readTree(playHistory.toJSONString()).get("items");
+            JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> mapStreamData(item.get("track"))
                     .withStreamDateTime(Optional.ofNullable(item.get("played_at")).map(JsonNode::asText).map(ZonedDateTime::parse).map(ZonedDateTime::toLocalDateTime).orElse(null)).build()).toList();
 
@@ -44,13 +44,13 @@ public class SpotifyResponseJsonToStreamingDataMapper {
                     .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build());
         } catch (Exception e) {
             LOG.error("Failed to parse streaming data");
-            return new Result.Failure<>(new Error("Failed to parse streaming data"));
+            return new Result.Failure<>(Error.failedToParseData("recentStreams", "failed to read streaming data"));
         }
     }
 
-    public Result<StreamingData, Error> mapFromTopStreamsJson(JSONObject playHistory) {
+    public Result<StreamingData, Error> mapFromTopStreamsJson(JSONObject json) {
         try {
-            JsonNode responseAsJsonNode = objectMapper.readTree(playHistory.toJSONString()).get("items");
+            JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> mapStreamData(item)
                     .withStreamDateTime(Optional.ofNullable(item.get("played_at")).map(JsonNode::asText).map(ZonedDateTime::parse).map(ZonedDateTime::toLocalDateTime).orElse(null)).build()).toList();
 
@@ -61,7 +61,7 @@ public class SpotifyResponseJsonToStreamingDataMapper {
                     .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build());
         } catch (Exception e) {
             LOG.error("Failed to parse streaming data");
-            return new Result.Failure<>(new Error("Failed to parse streaming data"));
+            return new Result.Failure<>(Error.failedToParseData("topStreams", "failed to read streaming data"));
         }
     }
 

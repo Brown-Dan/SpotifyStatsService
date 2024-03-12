@@ -3,12 +3,12 @@ package uk.co.spotistats.spotistatsservice.Repository;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.StreamDataSearchRequestOrderBy;
+import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
-import uk.co.spotistats.spotistatsservice.Domain.Request.StreamDataSearchRequestOrderBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,12 @@ public class StreamingDataRepository {
         this.db = db;
     }
 
-    public Result<StreamingData, Error> getStreamingData (String username){
+    public Result<StreamingData, Error> getStreamingData(String username) {
         uk.co.spotistats.generated.tables.pojos.StreamingData streamingData =
                 db.selectFrom(STREAMING_DATA).where(STREAMING_DATA.USERNAME.eq(username))
                         .fetchOneInto(uk.co.spotistats.generated.tables.pojos.StreamingData.class);
-        if (streamingData == null){
-            return new Result.Failure<>(new Error("Streaming data not found for user - %s".formatted(username)));
+        if (streamingData == null) {
+            return new Result.Failure<>(Error.notFound("streamingData", username));
         }
         return new Result.Success<>(StreamingData.fromStreamingDataEntity(streamingData));
     }

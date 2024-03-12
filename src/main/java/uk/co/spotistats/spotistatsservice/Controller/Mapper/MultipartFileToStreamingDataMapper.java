@@ -40,7 +40,7 @@ public class MultipartFileToStreamingDataMapper {
                     .build());
         } catch (IOException ioException) {
             LOG.error("Exception accessing bytes of supplied file", ioException);
-            return new Result.Failure<>(new Error("Failed to read streaming data - %s".formatted(file.getName())));
+            return new Result.Failure<>(Error.failedToParseData(file.getName(), "failed to read streaming data"));
         }
     }
 
