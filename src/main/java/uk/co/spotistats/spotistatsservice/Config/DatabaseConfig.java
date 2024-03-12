@@ -20,11 +20,9 @@ public class DatabaseConfig {
 
     @Bean
     public DSLContext dslContext() throws SQLException {
+
         Connection connection = DriverManager.getConnection(
-                System.getenv("DB_URL"),
-                System.getenv("DB_USERNAME"),
-                System.getenv("DB_PASSWORD")
-        );
+                System.getenv("JDBC_DATABASE_URL"));
         return DSL.using(connection, SQLDialect.POSTGRES);
     }
 
@@ -51,7 +49,7 @@ public class DatabaseConfig {
     @PostConstruct
     public void migrate() {
         Flyway.configure()
-                .dataSource(System.getenv("DB_URL"), System.getenv("DB_USERNAME"), System.getenv("DB_PASSWORD"))
+                .dataSource(System.getenv("SPRING_DATASOURCE_URL"), System.getenv("SPRING_DATASOURCE_USERNAME"), System.getenv("SPRING_DATASOURCE_PASSWORD"))
                 .schemas("StreamingData")
                 .baselineOnMigrate(true)
                 .locations("classpath:db/migration")

@@ -98,9 +98,9 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.22.2</version>
                 <configuration>
-                    <url>${DB_URL}?user=${DB_USERNAME}&amp;password=${DB_PASSWORD}&amp;sslmode=require</url>
-                    <user>${DB_USERNAME}</user>
-                    <password>${DB_PASSWORD}</password>
+                    <url>${env.SPRING_DATASOURCE_URL}?user=${env.SPRING_DATASOURCE_USERNAME}&amp;password=${env.SPRING_DATASOURCE_PASSWORD}&amp;sslmode=require</url>
+                    <user>${env.SPRING_DATASOURCE_USERNAME}</user>
+                    <password>${env.SPRING_DATASOURCE_PASSWORD}</password>
                     <table>changelog</table>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
@@ -136,9 +136,9 @@
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>${env.DB_URL}</url>
-                        <username>${env.DB_USERNAME}</username>
-                        <password>${env.DB_PASSWORD}</password>
+                        <url>${env.SPRING_DATASOURCE_URL}</url>
+                        <username>${env.SPRING_DATASOURCE_USERNAME}</username>
+                        <password>${env.SPRING_DATASOURCE_PASSWORD}</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.codegen.DefaultGenerator</name>
