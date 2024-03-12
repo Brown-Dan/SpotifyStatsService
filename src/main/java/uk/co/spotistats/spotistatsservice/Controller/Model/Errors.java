@@ -21,4 +21,8 @@ public record Errors(List<Error> errors, @JsonIgnore HttpStatus httpStatus) {
         }
         return new Errors(errors, HttpStatus.BAD_REQUEST);
     }
+
+    public boolean hasErrors(){
+        return !errors.isEmpty();
+    }
 }

@@ -2,6 +2,8 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import java.time.LocalDate;
 
+import static uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
+
 public record StreamingDataSearchRequest(
         String username,
         LocalDate start,
@@ -101,5 +103,21 @@ public record StreamingDataSearchRequest(
         public StreamingDataSearchRequest build() {
             return new StreamingDataSearchRequest(username, start, end, on, country, uri, trackName, artist, album, platform, orderBy, limit);
         }
+    }
+
+    public StreamingDataSearchRequest.Builder cloneBuilder(){
+        return aStreamingDataSearchRequest()
+                .withUsername(username)
+                .withStart(start)
+                .withEnd(end)
+                .withOn(on)
+                .withCountry(country)
+                .withUri(uri)
+                .withTrackName(trackName)
+                .withArtist(artist)
+                .withAlbum(album)
+                .withPlatform(platform)
+                .withOrderBy(orderBy)
+                .withLimit(limit);
     }
 }

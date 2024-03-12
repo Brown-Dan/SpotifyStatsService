@@ -43,7 +43,7 @@ public class SpotifyAuthService {
         return Optional.empty();
     }
 
-    public Result<SpotifyAuthData, Error> getAuthData(String username) {
+    public Result<SpotifyAuthData, Error> getSpotifyAuthData(String username) {
         Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(username);
         if (existingAuthData.isEmpty()) {
             return new Result.Failure<>(Error.notFound("spotifyAuthDetails", username));

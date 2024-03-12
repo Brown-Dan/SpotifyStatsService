@@ -1,21 +1,23 @@
 package uk.co.spotistats.spotistatsservice.Controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.util.List;
+import java.util.function.Function;
+
+import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
 
 @Controller
 @RequestMapping("{username}")
@@ -28,38 +30,33 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/recent")
-    public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username) {
-        Result<StreamingData, Error> result = streamingDataService.getRecentStreams(username);
-        return switch (result) {
-            case Result.Success(StreamingData streamingData) -> ok(streamingData);
-            case Result.Failure(Error error) -> badRequest(Errors.fromError(error));
-        };
+    public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username, @RequestParam(defaultValue = "10") Integer limit) {
+        return get(streamingDataService::getRecentStreams, aSpotifySearchRequest().withUsername(username).withLimit(limit).build());
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<List<RankedStreamData>, Errors>> getTopStreams(@PathVariable String username) {
-        Result<List<RankedStreamData>, Error> result = streamingDataService.getTopStreams(username);
-        return switch (result) {
-            case Result.Success(List<RankedStreamData> rankedStreamData) -> ok(rankedStreamData);
-            case Result.Failure(Error error) -> badRequest(Errors.fromError(error));
-        };
+    public ResponseEntity<ApiResult<List<RankedStreamData>, Errors>> getTopStreams(@PathVariable String username, @RequestParam(defaultValue = "10") Integer limit) {
+        return get(streamingDataService::getTopStreams, aSpotifySearchRequest().withUsername(username).withLimit(limit).build());
     }
 
     @GetMapping(value = "/search")
-    public ResponseEntity<ApiResult<StreamingData, Errors>> searchStreamingData(@PathVariable String username, StreamingDataSearchRequest streamingDataSearchRequest) {
-        Result<StreamingData, List<Error>> getStreamingDataResult = streamingDataService.search(username, streamingDataSearchRequest);
+    public ResponseEntity<ApiResult<StreamingData, Errors>> search(@PathVariable String username, StreamingDataSearchRequest streamingDataSearchRequest) {
+        return get(streamingDataService::search, streamingDataSearchRequest.cloneBuilder().withUsername(username).build());
+    }
 
-        return switch (getStreamingDataResult) {
-            case Result.Failure(List<Error> errors) -> badRequest(Errors.fromErrors(errors));
-            case Result.Success(StreamingData streamingData) -> ok(streamingData);
+    private <T, U> ResponseEntity<ApiResult<T, Errors>> get(Function<U, Result<T, Errors>> function, U parameters) {
+        Result<T, Errors> result = function.apply(parameters);
+        return switch (result) {
+            case Result.Success(T success) -> ok(success);
+            case Result.Failure(Errors errors) -> buildErrorResponse(errors);
         };
     }
 
-    private <T, U> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
+    private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
         return ResponseEntity.ok(ApiResult.success(body));
     }
 
-    private <T, U> ResponseEntity<ApiResult<T, Errors>> badRequest(Errors errors) {
+    private <T> ResponseEntity<ApiResult<T, Errors>> buildErrorResponse(Errors errors) {
         return new ResponseEntity<>(ApiResult.failure(errors), errors.httpStatus());
     }
 }

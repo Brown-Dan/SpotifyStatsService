@@ -98,9 +98,9 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.22.2</version>
                 <configuration>
-                    <url>${env.DB_URL}?user=${env.DB_USERNAME}&amp;password=${env.DB_PASSWORD}&amp;sslmode=require</url>
-                    <user>${env.DB_USERNAME}</user>
-                    <password>${env.DB_PASSWORD}</password>
+                    <url>${DB_URL}?user=${DB_USERNAME}&amp;password=${DB_PASSWORD}&amp;sslmode=require</url>
+                    <user>${DB_USERNAME}</user>
+                    <password>${DB_PASSWORD}</password>
                     <table>changelog</table>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
@@ -136,11 +136,8 @@
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <!--suppress UnresolvedMavenProperty -->
                         <url>${env.DB_URL}</url>
-                        <!--suppress UnresolvedMavenProperty -->
                         <username>${env.DB_USERNAME}</username>
-                        <!--suppress UnresolvedMavenProperty -->
                         <password>${env.DB_PASSWORD}</password>
                     </jdbc>
                     <generator>

@@ -37,19 +37,14 @@ public class StreamingDataRepository {
         return new Result.Success<>(StreamingData.fromStreamingDataEntity(streamingData));
     }
 
-    public StreamingData search(StreamingDataSearchRequest streamingDataSearchRequest, String username) {
+    public StreamingData search(StreamingDataSearchRequest streamingDataSearchRequest) {
         List<Condition> conditions = buildQueryConditions(streamingDataSearchRequest);
 
         List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData =
-                db.selectFrom(STREAM_DATA).where(conditions).and(STREAM_DATA.USERNAME.eq(username))
+                db.selectFrom(STREAM_DATA).where(conditions).and(STREAM_DATA.USERNAME.eq(streamingDataSearchRequest.username()))
                         .orderBy(StreamDataSearchRequestOrderBy.valueOf(streamingDataSearchRequest.orderBy()).getField())
                         .limit(streamingDataSearchRequest.limit()).fetchInto(uk.co.spotistats.generated.tables.pojos.StreamData.class);
-
         return buildStreamingData(streamData);
-    }
-
-    public StreamingData search(StreamingDataSearchRequest streamingDataSearchRequest) {
-        return search(streamingDataSearchRequest, streamingDataSearchRequest.username());
     }
 
     private List<Condition> buildQueryConditions(StreamingDataSearchRequest streamingDataSearchRequest) {

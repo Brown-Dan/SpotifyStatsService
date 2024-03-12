@@ -4,10 +4,11 @@ import com.alibaba.fastjson2.JSONObject;
 import org.springframework.stereotype.Repository;
 import uk.co.autotrader.traverson.Traverson;
 import uk.co.autotrader.traverson.http.Response;
+import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseJsonToStreamingDataMapper;
 
 import java.time.LocalDateTime;
@@ -27,28 +28,28 @@ public class SpotifyRepository {
         this.spotifyResponseJsonToStreamingDataMapper = spotifyResponseJsonToStreamingDataMapper;
     }
 
-    public Result<StreamingData, Error> getRecentStreamingData(SpotifyAuthData spotifyAuthData) {
+    public Result<StreamingData, Errors> getRecentStreamingData(SpotifySearchRequest spotifySearchRequest) {
         Response<JSONObject> response = traverson.from(RECENT_STREAMS_URL)
-                .withHeader("Authorization", "Bearer %s ".formatted(spotifyAuthData.accessToken()))
-                .withQueryParam("limit", "50")
+                .withHeader("Authorization", "Bearer %s ".formatted(spotifySearchRequest.authData().accessToken()))
+                .withQueryParam("limit", spotifySearchRequest.limit().toString())
                 .withQueryParam("before", LocalDateTime.now().toInstant(ZoneOffset.UTC).toString())
                 .get();
         if (response.isSuccessful()) {
             return spotifyResponseJsonToStreamingDataMapper.mapFromRecentStreamsJson(response.getResource());
         }
-        return new Result.Failure<>(responseToError(response, spotifyAuthData.username()));
+        return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().username())));
     }
 
-    public Result<StreamingData, Error> getTopTracks(SpotifyAuthData spotifyAuthData) {
+    public Result<StreamingData, Errors> getTopTracks(SpotifySearchRequest spotifySearchRequest) {
         Response<JSONObject> response = traverson.from(TOP_TRACKS_URL)
-                .withHeader("Authorization", "Bearer %s ".formatted(spotifyAuthData.accessToken()))
-                .withQueryParam("limit", "50")
+                .withHeader("Authorization", "Bearer %s ".formatted(spotifySearchRequest.authData().accessToken()))
+                .withQueryParam("limit", spotifySearchRequest.limit().toString())
                 .withQueryParam("time_range", "long_term")
                 .get();
         if (response.isSuccessful()) {
             return spotifyResponseJsonToStreamingDataMapper.mapFromTopStreamsJson(response.getResource());
         }
-        return new Result.Failure<>(responseToError(response, spotifyAuthData.username()));
+        return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().username())));
     }
 
     private Error responseToError(Response<JSONObject> response, String username) {

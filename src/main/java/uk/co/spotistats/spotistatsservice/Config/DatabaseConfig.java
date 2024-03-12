@@ -31,19 +31,19 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource(
             @Value("${spring.datasource.url}") String url,
-            @Value("${spring.datasource.username}") String userName,
+            @Value("${spring.datasource.username}") String username,
             @Value("${spring.datasource.password}") String password) {
 
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setSchema("StreamingData");
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUsername(userName);
+        dataSource.setUsername(username);
         dataSource.setPassword(password);
         dataSource.setJdbcUrl(url);
-        dataSource.setMaximumPoolSize(5);
+        dataSource.setMaximumPoolSize(1000);
         dataSource.setConnectionTimeout(300000);
-        dataSource.setIdleTimeout(600000);
-        dataSource.setMaxLifetime(1800000);
+        dataSource.setIdleTimeout(6000000);
+        dataSource.setMaxLifetime(18000000);
 
         return dataSource;
     }
