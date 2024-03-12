@@ -98,7 +98,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.22.2</version>
                 <configuration>
-                    <url>jdbc:postgresql://ep-shrill-snow-a2lajvf5.eu-central-1.aws.neon.tech/StreamingData?user=admin&amp;password=e9I5ysuZQXtn&amp;sslmode=require</url>
+                    <url>${env.DB_URL}?user=${env.DB_USERNAME}&amp;password=${env.DB_PASSWORD}&amp;sslmode=require</url>
                     <user>admin</user>
                     <password>e9I5ysuZQXtn</password>
                     <table>changelog</table>
@@ -136,9 +136,12 @@
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>${env.DB_URL} </url>
-                        <username>${env.DB_USERNAME} </username>
-                        <password>${env.DB_PASSWORD} </password>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <url>${env.DB_URL}</url>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <username>${env.DB_USERNAME}</username>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <password>${env.DB_PASSWORD}</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.codegen.DefaultGenerator</name>
