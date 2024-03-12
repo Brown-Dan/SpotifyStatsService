@@ -49,7 +49,7 @@ public class DatabaseConfig {
     @PostConstruct
     public void migrate() {
         Flyway.configure()
-                .dataSource(System.getenv("SPRING_DATASOURCE_URL"), System.getenv("SPRING_DATASOURCE_USERNAME"), System.getenv("SPRING_DATASOURCE_PASSWORD"))
+                .dataSource(System.getenv("JDBC_DATABASE_URL"), System.getenv("JDBC_DATABASE_USERNAME"), System.getenv("JDBC_DATABASE_PASSWORD"))
                 .schemas("StreamingData")
                 .baselineOnMigrate(true)
                 .locations("classpath:db/migration")
