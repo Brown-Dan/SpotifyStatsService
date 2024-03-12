@@ -40,6 +40,7 @@ public class DatabaseConfig {
         dataSource.setUsername(userName);
         dataSource.setPassword(password);
         dataSource.setJdbcUrl(url);
+        dataSource.setInitializationFailTimeout(0);
         dataSource.setMaximumPoolSize(5);
         dataSource.setConnectionTimeout(300000);
         dataSource.setIdleTimeout(600000);
