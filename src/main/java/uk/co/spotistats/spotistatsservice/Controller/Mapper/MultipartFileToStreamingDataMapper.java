@@ -36,7 +36,7 @@ public class MultipartFileToStreamingDataMapper {
                     .withStreamData(streamData)
                     .withFirstStreamDateTime(streamData.getFirst().streamDateTime())
                     .withLastStreamDateTime(streamData.getLast().streamDateTime())
-                    .withTotalStreams(streamData.size())
+                    .withSize(streamData.size())
                     .build());
         } catch (IOException ioException) {
             LOG.error("Exception accessing bytes of supplied file", ioException);

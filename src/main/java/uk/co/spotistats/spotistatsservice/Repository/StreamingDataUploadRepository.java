@@ -33,7 +33,7 @@ public class StreamingDataUploadRepository {
     public Optional<StreamingDataUpsertResult> insertStreamingData(StreamingData streamingData, String username) {
         uk.co.spotistats.generated.tables.pojos.StreamingData streamingDataEntity = db.insertInto(STREAMING_DATA)
                 .set(STREAMING_DATA.USERNAME, username)
-                .set(STREAMING_DATA.STREAM_COUNT, streamingData.streamCount())
+                .set(STREAMING_DATA.STREAM_COUNT, streamingData.size())
                 .set(STREAMING_DATA.FIRST_STREAM_DATE, streamingData.firstStreamDateTime())
                 .set(STREAMING_DATA.LAST_STREAM_DATA, streamingData.lastStreamDateTime())
                 .returning().fetchOneInto(uk.co.spotistats.generated.tables.pojos.StreamingData.class);
@@ -60,7 +60,7 @@ public class StreamingDataUploadRepository {
         uk.co.spotistats.generated.tables.pojos.StreamingData streamingDataEntity = db.update(STREAMING_DATA)
                 .set(STREAMING_DATA.FIRST_STREAM_DATE, streamingData.firstStreamDateTime())
                 .set(STREAMING_DATA.LAST_STREAM_DATA, streamingData.lastStreamDateTime())
-                .set(STREAMING_DATA.STREAM_COUNT, streamingData.streamCount())
+                .set(STREAMING_DATA.STREAM_COUNT, streamingData.size())
                 .where(STREAMING_DATA.USERNAME.eq(username))
                 .returning().fetchOneInto(uk.co.spotistats.generated.tables.pojos.StreamingData.class);
 
@@ -72,7 +72,7 @@ public class StreamingDataUploadRepository {
                 .withUsername(streamingDataEntity.getUsername())
                 .withFirstStreamDateTime(streamingDataEntity.getFirstStreamDate())
                 .withLastStreamDateTime(streamingDataEntity.getLastStreamData())
-                .withTotalStreams(streamingDataEntity.getStreamCount())
+                .withSize(streamingDataEntity.getStreamCount())
                 .build();
     }
 }

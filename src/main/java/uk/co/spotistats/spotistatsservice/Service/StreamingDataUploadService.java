@@ -57,7 +57,7 @@ public class StreamingDataUploadService {
                 ? originalData.lastStreamDateTime() : newData.lastStreamDateTime();
 
         return aStreamingData()
-                .withTotalStreams(originalData.streamCount() + newData.streamCount())
+                .withSize(originalData.size() + newData.size())
                 .withFirstStreamDateTime(firstStreamDateTime)
                 .withLastStreamDateTime(lastStreamDateTime)
                 .withStreamData(newData.streamData())

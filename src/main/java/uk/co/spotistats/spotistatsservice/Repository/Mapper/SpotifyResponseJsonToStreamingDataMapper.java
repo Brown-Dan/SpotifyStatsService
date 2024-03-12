@@ -40,7 +40,7 @@ public class SpotifyResponseJsonToStreamingDataMapper {
 
             return new Result.Success<>(aStreamingData()
                     .withStreamData(streamData)
-                    .withTotalStreams(streamData.size())
+                    .withSize(streamData.size())
                     .withFirstStreamDateTime(streamData.getLast().streamDateTime())
                     .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build());
         } catch (Exception e) {
@@ -57,7 +57,7 @@ public class SpotifyResponseJsonToStreamingDataMapper {
 
             return new Result.Success<>(aStreamingData()
                     .withStreamData(streamData)
-                    .withTotalStreams(streamData.size())
+                    .withSize(streamData.size())
                     .withFirstStreamDateTime(streamData.getLast().streamDateTime())
                     .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build());
         } catch (Exception e) {

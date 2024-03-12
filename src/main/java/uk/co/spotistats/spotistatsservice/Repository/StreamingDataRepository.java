@@ -80,7 +80,7 @@ public class StreamingDataRepository {
     private StreamingData buildStreamingData(List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData) {
         if (streamData.isEmpty()) {
             return aStreamingData()
-                    .withTotalStreams(0)
+                    .withSize(0)
                     .withStreamData(new ArrayList<>())
                     .build();
         }
@@ -88,7 +88,7 @@ public class StreamingDataRepository {
                 .withFirstStreamDateTime(streamData.getFirst().getDateTime())
                 .withStreamData(streamData.stream().map(this::mapStreamDataEntityToStreamData).toList())
                 .withLastStreamDateTime(streamData.getLast().getDateTime())
-                .withTotalStreams(streamData.size())
+                .withSize(streamData.size())
                 .build();
     }
 

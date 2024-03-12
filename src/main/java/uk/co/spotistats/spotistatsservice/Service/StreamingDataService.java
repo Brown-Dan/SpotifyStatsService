@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Controller.Validator.StreamDataSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamData.Builder.aRankedStreamData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamingData.Builder.aRankedStreamingData;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
 @Service
@@ -52,7 +54,7 @@ public class StreamingDataService {
         return getFromSpotify(spotifySearchRequest, spotifyRepository::getRecentStreamingData);
     }
 
-    public Result<List<RankedStreamData>, Errors> getTopStreams(SpotifySearchRequest spotifySearchRequest) {
+    public Result<RankedStreamingData, Errors> getTopStreams(SpotifySearchRequest spotifySearchRequest) {
         Result<StreamingData, Errors> apiResult = getFromSpotify(spotifySearchRequest, spotifyRepository::getTopTracks);
         if (apiResult.isFailure()) {
             return new Result.Failure<>(apiResult.getError());
@@ -68,7 +70,7 @@ public class StreamingDataService {
         return new Result.Success<>(streamingDataRepository.search(streamingDataSearchRequest));
     }
 
-    private Result<List<RankedStreamData>, Errors> mapStreamingDataToRankedStreamData(StreamingData streamingData, String username) {
+    private Result<RankedStreamingData, Errors> mapStreamingDataToRankedStreamData(StreamingData streamingData, String username) {
         Result<StreamingData, Error> getStreamingDataResult = streamingDataRepository.getStreamingData(username);
         if (getStreamingDataResult.isFailure()) {
             return new Result.Failure<>(Errors.fromError(getStreamingDataResult.getError()));
@@ -79,8 +81,14 @@ public class StreamingDataService {
                 .withStart(getStreamingDataResult.getValue().firstStreamDateTime().toLocalDate())
                 .withEnd(getStreamingDataResult.getValue().lastStreamDateTime().toLocalDate());
 
-        return new Result.Success<>(streamingData.streamData().stream().map(streamData ->
-                populateRankedStreamData(streamData, streamingDataSearchRequestBuilder, streamingData.streamData().indexOf(streamData))).toList());
+        List<RankedStreamData> rankedStreamData = streamingData.streamData().stream().map(streamData ->
+                populateRankedStreamData(streamData, streamingDataSearchRequestBuilder,
+                        streamingData.streamData().indexOf(streamData))).toList();
+
+        return new Result.Success<>(aRankedStreamingData()
+                .withRankedStreamData(rankedStreamData)
+                .withSize(rankedStreamData.size())
+                .build());
     }
 
     private RankedStreamData populateRankedStreamData(StreamData streamData, StreamingDataSearchRequest.Builder searchRequestBuilder, int rank) {
@@ -96,7 +104,7 @@ public class StreamingDataService {
                 .withArtistName(streamData.artist())
                 .withAlbumName(streamData.album())
                 .withTrackUri(streamData.trackUri())
-                .withTotalStreams(streamingData.streamCount());
+                .withTotalStreams(streamingData.size());
 
         return streamingData.streamData().isEmpty() ? rankedStreamData.build() :
                 rankedStreamData.withLastStreamDateTime(Optional.ofNullable(streamingData.streamData().getLast())

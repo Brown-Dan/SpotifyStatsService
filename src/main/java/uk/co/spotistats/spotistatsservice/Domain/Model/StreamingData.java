@@ -6,7 +6,7 @@ import java.util.List;
 import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
 
 public record StreamingData(List<StreamData> streamData,
-                            Integer streamCount,
+                            Integer size,
                             LocalDateTime firstStreamDateTime,
                             LocalDateTime lastStreamDateTime) {
 
@@ -14,13 +14,13 @@ public record StreamingData(List<StreamData> streamData,
         return aStreamingData()
                 .withFirstStreamDateTime(streamingDataEntity.getFirstStreamDate())
                 .withLastStreamDateTime(streamingDataEntity.getLastStreamData())
-                .withTotalStreams(streamingDataEntity.getStreamCount())
+                .withSize(streamingDataEntity.getStreamCount())
                 .build();
     }
 
     public static final class Builder {
         private List<StreamData> streamData;
-        private Integer streamCount;
+        private Integer size;
         private LocalDateTime firstStreamDateTime;
         private LocalDateTime lastStreamDateTime;
 
@@ -36,8 +36,8 @@ public record StreamingData(List<StreamData> streamData,
             return this;
         }
 
-        public Builder withTotalStreams(Integer streamCount) {
-            this.streamCount = streamCount;
+        public Builder withSize(Integer size) {
+            this.size = size;
             return this;
         }
 
@@ -52,7 +52,7 @@ public record StreamingData(List<StreamData> streamData,
         }
 
         public StreamingData build() {
-            return new StreamingData(streamData, streamCount, firstStreamDateTime, lastStreamDateTime);
+            return new StreamingData(streamData, size, firstStreamDateTime, lastStreamDateTime);
         }
     }
 }

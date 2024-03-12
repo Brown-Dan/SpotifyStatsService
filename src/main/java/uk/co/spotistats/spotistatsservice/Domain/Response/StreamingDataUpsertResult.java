@@ -2,14 +2,14 @@ package uk.co.spotistats.spotistatsservice.Domain.Response;
 
 import java.time.LocalDateTime;
 
-public record StreamingDataUpsertResult(String username, Integer totalStreams,
+public record StreamingDataUpsertResult(String username, Integer size,
                                         LocalDateTime firstStreamDateTime,
                                         LocalDateTime lastStreamDateTime) {
 
 
     public static final class Builder {
         private String username;
-        private Integer totalStreams;
+        private Integer size;
         private LocalDateTime firstStreamDateTime;
         private LocalDateTime lastStreamDateTime;
 
@@ -25,8 +25,8 @@ public record StreamingDataUpsertResult(String username, Integer totalStreams,
             return this;
         }
 
-        public Builder withTotalStreams(Integer totalStreams) {
-            this.totalStreams = totalStreams;
+        public Builder withSize(Integer size) {
+            this.size = size;
             return this;
         }
 
@@ -41,7 +41,7 @@ public record StreamingDataUpsertResult(String username, Integer totalStreams,
         }
 
         public StreamingDataUpsertResult build() {
-            return new StreamingDataUpsertResult(username, totalStreams, firstStreamDateTime, lastStreamDateTime);
+            return new StreamingDataUpsertResult(username, size, firstStreamDateTime, lastStreamDateTime);
         }
     }
 }

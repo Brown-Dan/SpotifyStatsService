@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
-import uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
-import java.util.List;
 import java.util.function.Function;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
@@ -35,7 +34,7 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<List<RankedStreamData>, Errors>> getTopStreams(@PathVariable String username, @RequestParam(defaultValue = "10") Integer limit) {
+    public ResponseEntity<ApiResult<RankedStreamingData, Errors>> getTopStreams(@PathVariable String username, @RequestParam(defaultValue = "10") Integer limit) {
         return get(streamingDataService::getTopStreams, aSpotifySearchRequest().withUsername(username).withLimit(limit).build());
     }
 
