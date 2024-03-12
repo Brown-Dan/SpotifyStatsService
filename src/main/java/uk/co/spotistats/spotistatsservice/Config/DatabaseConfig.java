@@ -9,7 +9,6 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.annotation.Retryable;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -17,11 +16,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Configuration
-@Retryable
 public class DatabaseConfig {
 
     @Bean
-    @Retryable
     public DSLContext dslContext() throws SQLException {
         Connection connection = DriverManager.getConnection(
                 System.getenv("DB_URL"),
@@ -32,7 +29,6 @@ public class DatabaseConfig {
     }
 
     @Bean
-    @Retryable
     public DataSource dataSource(
             @Value("${spring.datasource.url}") String url,
             @Value("${spring.datasource.username}") String userName,
@@ -53,7 +49,6 @@ public class DatabaseConfig {
     }
 
     @PostConstruct
-    @Retryable
     public void migrate() {
         Flyway.configure()
                 .dataSource(System.getenv("DB_URL"), System.getenv("DB_USERNAME"), System.getenv("DB_PASSWORD"))
