@@ -38,10 +38,10 @@ public class DatabaseConfig {
         dataSource.setUsername(username);
         dataSource.setPassword(password);
         dataSource.setJdbcUrl(url);
-        dataSource.setMaximumPoolSize(50);
+        dataSource.setMaximumPoolSize(5);
         dataSource.setConnectionTimeout(300000);
-        dataSource.setIdleTimeout(6000000);
-        dataSource.setMaxLifetime(18000000);
+        dataSource.setIdleTimeout(600000);
+        dataSource.setMaxLifetime(1800000);
 
         return dataSource;
     }
