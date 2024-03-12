@@ -2,6 +2,8 @@ package uk.co.spotistats.spotistatsservice.Repository;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.exception.DataAccessException;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Repository;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
@@ -27,6 +29,8 @@ public class StreamingDataRepository {
         this.db = db;
     }
 
+    @Retryable(value = { DataAccessException.class},
+            maxAttempts = 2)
     public Result<StreamingData, Error> getStreamingData(String username) {
         uk.co.spotistats.generated.tables.pojos.StreamingData streamingData =
                 db.selectFrom(STREAMING_DATA).where(STREAMING_DATA.USERNAME.eq(username))
@@ -36,7 +40,8 @@ public class StreamingDataRepository {
         }
         return new Result.Success<>(StreamingData.fromStreamingDataEntity(streamingData));
     }
-
+    @Retryable(value = { DataAccessException.class},
+            maxAttempts = 2)
     public StreamingData search(StreamingDataSearchRequest streamingDataSearchRequest, String username) {
         List<Condition> conditions = buildQueryConditions(streamingDataSearchRequest);
 
@@ -47,7 +52,8 @@ public class StreamingDataRepository {
 
         return buildStreamingData(streamData);
     }
-
+    @Retryable(value = { DataAccessException.class},
+            maxAttempts = 2)
     public StreamingData search(StreamingDataSearchRequest streamingDataSearchRequest) {
         return search(streamingDataSearchRequest, streamingDataSearchRequest.username());
     }
