@@ -136,9 +136,9 @@
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>{env.DB_URL}</url>
-                        <username>{env.DB_USERNAME}</username>
-                        <password>{env.DB_PASSWORD}</password>
+                        <url>jdbc:postgresql://ep-shrill-snow-a2lajvf5.eu-central-1.aws.neon.tech:5432/StreamingData?sslmode=require</url>
+                        <username>admin</username>
+                        <password>e9I5ysuZQXtn</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.codegen.DefaultGenerator</name>
