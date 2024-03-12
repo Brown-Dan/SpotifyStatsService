@@ -35,8 +35,8 @@ public class StreamDataSearchRequestValidator {
         if (Arrays.stream(StreamDataSearchRequestOrderBy.values()).map(StreamDataSearchRequestOrderBy::name).toList().contains(streamingDataSearchRequest.orderBy())) {
             return Optional.empty();
         } else {
-            return Optional.of(Error.requestParamContentViolation("orderBy", "'order' value must be equal to one of the following - %s - provided - %s"
-                    .formatted(Arrays.toString(StreamDataSearchRequestOrderBy.values()), streamingDataSearchRequest.orderBy())));
+            return Optional.of(Error.requestParamContentViolation("orderBy", "'order' value must be equal to one of the following - %s"
+                    .formatted(Arrays.toString(StreamDataSearchRequestOrderBy.values()))));
         }
     }
 

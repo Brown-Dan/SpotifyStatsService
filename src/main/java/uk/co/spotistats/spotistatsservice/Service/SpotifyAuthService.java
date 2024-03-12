@@ -72,7 +72,7 @@ public class SpotifyAuthService {
     }
 
     private TextBody buildRefreshTokenRequestBody(String refreshToken) {
-        String body = "grant_type=refresh_token&refresh_token=%s&client_id=2025b48d922a49099d665cbbd2563436".formatted(refreshToken);
+        String body = "grant_type=refresh_token&refresh_token=%s&client_id=%s".formatted(refreshToken, System.getenv("SPOTIFY_CLIENT_ID"));
         return new TextBody(body, "application/x-www-form-urlencoded");
     }
 }

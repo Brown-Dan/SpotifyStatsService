@@ -21,9 +21,9 @@ public class DatabaseConfig {
     @Bean
     public DSLContext dslContext() throws SQLException {
         Connection connection = DriverManager.getConnection(
-                "jdbc:postgresql://ep-shrill-snow-a2lajvf5.eu-central-1.aws.neon.tech:5432/StreamingData?sslmode=require",
-                "admin",
-                "e9I5ysuZQXtn"
+                System.getenv("DB_URL"),
+                System.getenv("DB_USERNAME"),
+                System.getenv("DB_PASSWORD")
         );
         return DSL.using(connection, SQLDialect.POSTGRES);
     }
@@ -51,7 +51,7 @@ public class DatabaseConfig {
     @PostConstruct
     public void migrate() {
         Flyway.configure()
-                .dataSource("jdbc:postgresql://ep-shrill-snow-a2lajvf5.eu-central-1.aws.neon.tech:5432/StreamingData?sslmode=require", "admin", "e9I5ysuZQXtn")
+                .dataSource(System.getenv("DB_URL"), System.getenv("DB_USERNAME"), System.getenv("DB_PASSWORD"))
                 .schemas("StreamingData")
                 .baselineOnMigrate(true)
                 .locations("classpath:db/migration")
