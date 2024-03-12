@@ -43,8 +43,8 @@ public class StreamingDataController {
         return get(streamingDataService::search, streamingDataSearchRequest.cloneBuilder().withUsername(username).build());
     }
 
-    private <T, U> ResponseEntity<ApiResult<T, Errors>> get(Function<U, Result<T, Errors>> function, U parameters) {
-        Result<T, Errors> result = function.apply(parameters);
+    private <T, U> ResponseEntity<ApiResult<T, Errors>> get(Function<U, Result<T, Errors>> function, U parameter) {
+        Result<T, Errors> result = function.apply(parameter);
         return switch (result) {
             case Result.Success(T success) -> ok(success);
             case Result.Failure(Errors errors) -> buildErrorResponse(errors);
