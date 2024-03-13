@@ -45,9 +45,8 @@ public class SpotifyAuthController {
     }
 
     @GetMapping(value = "/{username}/authorize")
-    public ResponseEntity<ApiResult<String, Errors>> authorize(@PathVariable String username) {
-        spotifyAuthService.authorize(username);
-        return ok("Success");
+    public String authorize(@PathVariable String username) {
+        return username;
     }
 
     private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
