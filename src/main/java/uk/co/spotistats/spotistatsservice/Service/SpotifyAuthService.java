@@ -28,7 +28,7 @@ public class SpotifyAuthService {
     private final ObjectMapper objectMapper;
 
     private static final String SPOTIFY_REFRESH_URL = "https://accounts.spotify.com/api/token";
-    private static final String SPOTIFY_PROFILE_DATA = "https://api.spotify.com/v1/me";
+    private static final String SPOTIFY_PROFILE_DATA_URL = "https://api.spotify.com/v1/me";
 
     private static final Logger LOG = LoggerFactory.getLogger(SpotifyAuthService.class);
 
@@ -69,7 +69,7 @@ public class SpotifyAuthService {
                     .setParameter("response_type", "code")
                     .setParameter("redirect_uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
                     .setParameter("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read user-read-private user-read-email")
-                    .build().toString());
+                    .build().toASCIIString());
         } catch (URISyntaxException ignored) {
         }
         return null;
@@ -86,7 +86,7 @@ public class SpotifyAuthService {
     }
 
     private String getUserId(SpotifyAuthData spotifyAuthData) {
-        Response<JSONObject> response = traverson.from(SPOTIFY_PROFILE_DATA)
+        Response<JSONObject> response = traverson.from(SPOTIFY_PROFILE_DATA_URL)
                 .withHeader("Authorization", "Bearer %s".formatted(spotifyAuthData.accessToken()))
                 .get();
         return response.getResource().get("id").toString();
