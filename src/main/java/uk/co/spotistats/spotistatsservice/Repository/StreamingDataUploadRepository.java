@@ -1,11 +1,14 @@
 package uk.co.spotistats.spotistatsservice.Repository;
 
 import org.jooq.DSLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,6 +21,9 @@ import static uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUp
 public class StreamingDataUploadRepository {
 
     private final DSLContext db;
+
+    private static final Logger LOG = LoggerFactory.getLogger(StreamingDataUploadRepository.class);
+
 
     public StreamingDataUploadRepository(DSLContext db) {
         this.db = db;
@@ -45,6 +51,7 @@ public class StreamingDataUploadRepository {
 
     @Async
     public void insertStreamData(StreamData streamData, String username) {
+        LOG.info("Inserting stream data async for user - {}", username);
         db.insertInto(STREAM_DATA)
                 .set(STREAM_DATA.USERNAME, username)
                 .set(STREAM_DATA.TIME_STREAMED, (int) streamData.timeStreamed())
