@@ -97,7 +97,7 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <configuration>
-                    <url>jdbc:postgresql://ec2-34-250-119-127.eu-west-1.compute.amazonaws.com:5432/db1u7m6u2v1m60?password=pdf4b7fc466948969fd029adb11a0cb3002d1a9e6a07d529e2503760f2a2da642&amp;sslmode=require&amp;user=ub3kreaapns63l</url>
+                    <url>${env.JDBC_DATABASE_URL}</url>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
