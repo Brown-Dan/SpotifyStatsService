@@ -56,6 +56,17 @@ public class SpotifyAuthController {
         return streamingDataService.getRecentStreams(aSpotifySearchRequest().withUsername("danbrown05").withLimit(10).build());
     }
 
+    @GetMapping(value = "/test")
+    public Result<StreamingData, Errors> tesht() {
+        return streamingDataService.getRecentStreams(aSpotifySearchRequest().withUsername("danbrown05").withLimit(10).build());
+    }
+
+    @PostMapping(value = "/post")
+    public Result<StreamingData, Errors> tes2ht() {
+        return streamingDataService.getRecentStreams(aSpotifySearchRequest().withUsername("danbrown05").withLimit(10).build());
+    }
+
+
     private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
         return ResponseEntity.ok(ApiResult.success(body));
     }
