@@ -65,7 +65,9 @@ public class SpotifyAuthService {
     public RedirectView redirect() {
         try {
             return new RedirectView(new URIBuilder()
-                    .setPath("https://accounts.spotify.com/authorize")
+                    .setScheme("https")
+                    .setHost("accounts.spotify.com")
+                    .setPath("/authorize")
                     .setParameter("client_id", System.getenv("SPOTIFY_CLIENT_ID"))
                     .setParameter("response_type", "code")
                     .setParameter("redirect_uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
