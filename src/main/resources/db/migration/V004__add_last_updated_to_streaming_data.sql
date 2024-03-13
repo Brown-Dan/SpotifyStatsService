@@ -1,1 +1,1 @@
-ALTER TABLE "StreamingData".stream_data ADD COLUMN last_updated timestamp
+ALTER TABLE "StreamingData".streaming_data ADD COLUMN if not exists last_updated timestamp
