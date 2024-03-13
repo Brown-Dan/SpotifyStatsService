@@ -62,6 +62,7 @@ public class StreamingDataUploadRepository {
                 .set(STREAM_DATA.TRACK_URI, streamData.trackUri())
                 .set(STREAM_DATA.TRACK_NAME, streamData.name())
                 .set(STREAM_DATA.PLATFORM, streamData.platform())
+                .set(STREAM_DATA.TIME, streamData.streamDateTime().toLocalTime())
                 .set(STREAM_DATA.COUNTRY, streamData.country()).execute();
     }
 

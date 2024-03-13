@@ -1,14 +1,15 @@
 package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
 public record StreamingDataSearchRequest(
         String username,
-        LocalDate start,
-        LocalDate end,
-        LocalDate on,
+        LocalDate startDate,
+        LocalDate endDate,
+        LocalDate onDate,
         String country,
         String uri,
         String trackName,
@@ -16,14 +17,17 @@ public record StreamingDataSearchRequest(
         String album,
         String platform,
         String orderBy,
-        Integer limit
+        Integer limit,
+        LocalTime startTime,
+        LocalTime endTime
 ) {
 
     public static final class Builder {
+
         private String username;
-        private LocalDate start;
-        private LocalDate end;
-        private LocalDate on;
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private LocalDate onDate;
         private String country;
         private String uri;
         private String trackName;
@@ -32,6 +36,8 @@ public record StreamingDataSearchRequest(
         private String platform;
         private String orderBy;
         private Integer limit;
+        private LocalTime startTime;
+        private LocalTime endTime;
 
         private Builder() {
         }
@@ -45,18 +51,18 @@ public record StreamingDataSearchRequest(
             return this;
         }
 
-        public Builder withStart(LocalDate start) {
-            this.start = start;
+        public Builder withStartDate(LocalDate startDate) {
+            this.startDate = startDate;
             return this;
         }
 
-        public Builder withEnd(LocalDate end) {
-            this.end = end;
+        public Builder withEndDate(LocalDate endDate) {
+            this.endDate = endDate;
             return this;
         }
 
-        public Builder withOn(LocalDate on) {
-            this.on = on;
+        public Builder withOnDate(LocalDate onDate) {
+            this.onDate = onDate;
             return this;
         }
 
@@ -100,17 +106,29 @@ public record StreamingDataSearchRequest(
             return this;
         }
 
+        public Builder withStartTime(LocalTime startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public Builder withEndTime(LocalTime endTime) {
+            this.endTime = endTime;
+            return this;
+        }
+
         public StreamingDataSearchRequest build() {
-            return new StreamingDataSearchRequest(username, start, end, on, country, uri, trackName, artist, album, platform, orderBy, limit);
+            return new StreamingDataSearchRequest(username, startDate, endDate, onDate, country, uri, trackName, artist, album, platform, orderBy, limit, startTime, endTime);
         }
     }
 
-    public StreamingDataSearchRequest.Builder cloneBuilder(){
+    public StreamingDataSearchRequest.Builder cloneBuilder() {
         return aStreamingDataSearchRequest()
                 .withUsername(username)
-                .withStart(start)
-                .withEnd(end)
-                .withOn(on)
+                .withStartDate(startDate)
+                .withEndDate(endDate)
+                .withOnDate(onDate)
+                .withStartTime(startTime)
+                .withEndTime(endTime)
                 .withCountry(country)
                 .withUri(uri)
                 .withTrackName(trackName)

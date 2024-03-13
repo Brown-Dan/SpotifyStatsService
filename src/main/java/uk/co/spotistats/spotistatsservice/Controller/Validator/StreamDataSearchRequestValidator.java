@@ -16,7 +16,8 @@ public class StreamDataSearchRequestValidator {
 
     public Errors validate(StreamingDataSearchRequest streamingDataSearchRequest) {
         List<Error> errors = new ArrayList<>();
-        validateQueryPeriod(streamingDataSearchRequest).ifPresent(errors::add);
+        validateQueryDatePeriod(streamingDataSearchRequest).ifPresent(errors::add);
+        validateQueryTimePeriod(streamingDataSearchRequest).ifPresent(errors::add);
         validateOrderBy(streamingDataSearchRequest).ifPresent(errors::add);
         validateLimit(streamingDataSearchRequest).ifPresent(errors::add);
         return Errors.fromErrors(errors);
@@ -41,19 +42,32 @@ public class StreamDataSearchRequestValidator {
         }
     }
 
-    private Optional<Error> validateQueryPeriod(StreamingDataSearchRequest streamingDataSearchRequest) {
-        if (streamingDataSearchRequest.on() != null) {
-            if (streamingDataSearchRequest.start() != null || streamingDataSearchRequest.end() != null) {
-                return Optional.of(Error.requestParamNotSupplied("queryPeriod", "must supply either 'on' or 'start' and 'end' parameters"));
+    private Optional<Error> validateQueryTimePeriod(StreamingDataSearchRequest streamingDataSearchRequest) {
+        if (streamingDataSearchRequest.startTime() == null && streamingDataSearchRequest.endTime() == null) {
+            return Optional.empty();
+        }
+        if (streamingDataSearchRequest.startTime() != null ^ streamingDataSearchRequest.endTime() != null) {
+            return Optional.of(Error.requestParamNotSupplied("queryTimePeriod", "must supply none or both of 'startTime' and 'endTime' parameters"));
+        }
+        if (streamingDataSearchRequest.endTime().isBefore(streamingDataSearchRequest.startTime())) {
+            return Optional.of(Error.requestParamContentViolation("queryTimePeriod", "'startTime' must occur before 'endTime' - provided - %s-%s".formatted(streamingDataSearchRequest.startTime(), streamingDataSearchRequest.endTime())));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Error> validateQueryDatePeriod(StreamingDataSearchRequest streamingDataSearchRequest) {
+        if (streamingDataSearchRequest.onDate() != null) {
+            if (streamingDataSearchRequest.startDate() != null || streamingDataSearchRequest.endDate() != null) {
+                return Optional.of(Error.requestParamNotSupplied("queryDatePeriod", "must supply either 'onDate' or 'startDate' and 'endDate' parameters"));
             }
             return Optional.empty();
         }
-        if (streamingDataSearchRequest.start() != null && streamingDataSearchRequest.end() != null) {
-            if (streamingDataSearchRequest.start().isAfter(streamingDataSearchRequest.end())) {
-                return Optional.of(Error.requestParamContentViolation("queryPeriod", "'start' must occur before 'end' - provided - %s-%s".formatted(streamingDataSearchRequest.start(), streamingDataSearchRequest.end())));
+        if (streamingDataSearchRequest.startDate() != null && streamingDataSearchRequest.endDate() != null) {
+            if (streamingDataSearchRequest.startDate().isAfter(streamingDataSearchRequest.endDate())) {
+                return Optional.of(Error.requestParamContentViolation("queryDatePeriod", "'startDate' must occur before 'endDate' - provided - %s-%s".formatted(streamingDataSearchRequest.startDate(), streamingDataSearchRequest.endDate())));
             }
             return Optional.empty();
         }
-        return Optional.of(Error.requestParamNotSupplied("queryPeriod", "must supply either 'on' or 'start' and 'end' parameters"));
+        return Optional.of(Error.requestParamNotSupplied("queryDatePeriod", "must supply either 'onDate' or 'startDate' and 'endDate' parameters"));
     }
 }
