@@ -29,7 +29,7 @@ public class StreamingDataSyncService {
     @Scheduled(fixedRate = 60000)
     public void sync() {
         List<StreamingData> streamingData = streamingDataRepository.getUnsyncedStreamingData();
-        streamingData.forEach(streamingDataService::syncFromRecent);
+        streamingData.forEach(streamingDataService::syncRecentStreamData);
         LOG.info("Syncing streaming data for users - {}", streamingData);
     }
 }

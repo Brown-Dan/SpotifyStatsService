@@ -21,14 +21,12 @@ import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamData.Builder.aRankedStreamData;
 import static uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamingData.Builder.aRankedStreamingData;
-import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
@@ -68,7 +66,7 @@ public class StreamingDataService {
     }
 
     @Async
-    public void syncFromRecent(StreamingData streamingData) {
+    public void syncRecentStreamData(StreamingData streamingData) {
         LOG.info("Syncing streaming data for user - {}", streamingData.username());
         SpotifySearchRequest spotifySearchRequest = aSpotifySearchRequest().withUsername(streamingData.username()).withLimit(50).build();
         Result<StreamingData, Errors> streamingDataResult = getFromSpotify(spotifySearchRequest, spotifyRepository::getRecentStreamingData);
