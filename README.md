@@ -1,2 +1,2 @@
 # [WIP] SpotiStatsService
-Simple web service enabling user's to perform advanced queries on their uploaded Spotify account data.
+Simple web service enabling user's to perform queries on their uploaded Spotify account data.
