@@ -58,13 +58,13 @@ public class SpotifyAuthService {
     }
 
     public void authorize(String username) {
-        Response<JSONObject> response = traverson.from(SPOTIFY_AUTHORIZE_URL)
-                .withQueryParam("client_id", "2025b48d922a49099d665cbbd2563436")
-                .withQueryParam("response-type", "code")
-                .withQueryParam("redirect-uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
-                .withQueryParam("state", username)
-                .withQueryParam("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read")
-                .get();
+//        Response<JSONObject> response = traverson.from(SPOTIFY_AUTHORIZE_URL)
+//                .withQueryParam("client_id", "2025b48d922a49099d665cbbd2563436")
+//                .withQueryParam("response-type", "code")
+//                .withQueryParam("redirect-uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
+//                .withQueryParam("state", username)
+//                .withQueryParam("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read")
+//                .get();
     }
 
     public Result<SpotifyAuthData, Errors> exchangeAccessToken(String username, String accessToken) {
