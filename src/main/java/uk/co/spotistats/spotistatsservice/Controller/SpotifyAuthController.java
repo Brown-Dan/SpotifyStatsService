@@ -3,16 +3,12 @@ package uk.co.spotistats.spotistatsservice.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
-import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
-
-import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
 
 @Controller
 @RequestMapping("spotify")
@@ -35,8 +31,8 @@ public class SpotifyAuthController {
     }
 
     @GetMapping(value = "/authenticate/callback")
-    public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticationCallback(@RequestParam String state, @RequestParam String code) {
-        Result<SpotifyAuthData, Errors> result = spotifyAuthService.exchangeAccessToken(state, code);
+    public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticationCallback(@RequestParam String code) {
+        Result<SpotifyAuthData, Errors> result = spotifyAuthService.exchangeAccessToken(code);
 
         if (result.isFailure()){
             return badRequest(result.getError());
@@ -44,9 +40,9 @@ public class SpotifyAuthController {
         return ok(result.getValue());
     }
 
-    @GetMapping(value = "/{username}/authorize")
-    public String authorize(@PathVariable String username) {
-        return username;
+    @GetMapping(value = "/authorize")
+    public RedirectView authorizationRedirect() {
+        return spotifyAuthService.redirect();
     }
 
     private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {

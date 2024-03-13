@@ -31,7 +31,7 @@ public class SpotifyAuthRepository {
 
     public SpotifyAuthData insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
         return mapUserAuthDataEntityToUserAuthData(Objects.requireNonNull(db.insertInto(USER_AUTH_DATA)
-                .set(USER_AUTH_DATA.USERNAME, spotifyAuthData.username())
+                .set(USER_AUTH_DATA.USERNAME, spotifyAuthData.userId())
                 .set(USER_AUTH_DATA.LAST_UPDATED, LocalDateTime.now())
                 .set(USER_AUTH_DATA.ACCESS_TOKEN, spotifyAuthData.accessToken())
                 .set(USER_AUTH_DATA.REFRESH_TOKEN, spotifyAuthData.refreshToken()).returning()
@@ -44,13 +44,13 @@ public class SpotifyAuthRepository {
                         .set(USER_AUTH_DATA.LAST_UPDATED, LocalDateTime.now())
                         .set(USER_AUTH_DATA.ACCESS_TOKEN, spotifyAuthData.accessToken())
                         .set(USER_AUTH_DATA.REFRESH_TOKEN, spotifyAuthData.refreshToken())
-                        .where(USER_AUTH_DATA.USERNAME.eq(spotifyAuthData.username())).returning()
+                        .where(USER_AUTH_DATA.USERNAME.eq(spotifyAuthData.userId())).returning()
                         .fetchOneInto(uk.co.spotistats.generated.tables.pojos.UserAuthData.class)));
     }
 
     private SpotifyAuthData mapUserAuthDataEntityToUserAuthData(uk.co.spotistats.generated.tables.pojos.UserAuthData userAuthDataEntity) {
         return someSpotifyAuthData()
-                .withUsername(userAuthDataEntity.getUsername())
+                .withUserId(userAuthDataEntity.getUsername())
                 .withLastUpdated(userAuthDataEntity.getLastUpdated())
                 .withRefreshToken(userAuthDataEntity.getRefreshToken())
                 .withAccessToken(userAuthDataEntity.getAccessToken())

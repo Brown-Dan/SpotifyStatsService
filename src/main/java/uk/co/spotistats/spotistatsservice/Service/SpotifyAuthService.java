@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.view.RedirectView;
 import uk.co.autotrader.traverson.Traverson;
 import uk.co.autotrader.traverson.http.Response;
 import uk.co.autotrader.traverson.http.TextBody;
@@ -25,7 +26,7 @@ public class SpotifyAuthService {
     private final ObjectMapper objectMapper;
 
     private static final String SPOTIFY_REFRESH_URL = "https://accounts.spotify.com/api/token";
-    private static final String SPOTIFY_AUTHORIZE_URL = "https://accounts.spotify.com/authorize";
+    private static final String SPOTIFY_PROFILE_DATA = "https://api.spotify.com/v1/me";
 
     private static final Logger LOG = LoggerFactory.getLogger(SpotifyAuthService.class);
 
@@ -36,10 +37,10 @@ public class SpotifyAuthService {
     }
 
     public Result<SpotifyAuthData, Errors> insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
-        Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(spotifyAuthData.username());
+        Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(spotifyAuthData.userId());
 
         if (existingAuthData.isPresent()) {
-            return new Result.Failure<>(Errors.fromError(Error.forbiddenToUpdate("spotifyAuthData", spotifyAuthData.username())));
+            return new Result.Failure<>(Errors.fromError(Error.forbiddenToUpdate("spotifyAuthData", spotifyAuthData.userId())));
         }
         return new Result.Success<>(spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData));
     }
@@ -57,24 +58,25 @@ public class SpotifyAuthService {
         return refreshToken(spotifyAuthData);
     }
 
-    public void authorize(String username) {
-        traverson.from(SPOTIFY_AUTHORIZE_URL)
-                .withQueryParam("client_id", System.getenv("SPOTIFY_CLIENT_ID"))
-                .withQueryParam("response-type", "code")
-                .withQueryParam("redirect-uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
-                .withQueryParam("state", username)
-                .withQueryParam("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read")
-                .get();
+    public RedirectView redirect() {
+        return new RedirectView("https://accounts.spotify.com/authorize?client_id=2025b48d922a49099d665cbbd2563436&response_type=code&redirect_uri=https://spotifystats.co.uk%2Fauthenticate%2Fcallback&scope=playlist-read-private%20user-follow-read%20user-top-read%20user-read-recently-played%20user-library-read%20user-read-private%20user-read-email");
     }
 
-    public Result<SpotifyAuthData, Errors> exchangeAccessToken(String username, String accessToken) {
+    public Result<SpotifyAuthData, Errors> exchangeAccessToken(String accessToken) {
         Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
                 .withHeader("content-type", "application/x-www-form-urlencoded")
                 .withHeader("Authorization", System.getenv("SPOTIFY_BASE_64_AUTH"))
                 .post(buildAccessTokenExchangeBody(accessToken));
 
         SpotifyAuthData spotifyAuthData = objectMapper.convertValue(response.getResource(), SpotifyAuthData.class);
-        return insertSpotifyAuthData(spotifyAuthData.cloneBuilder().withUsername(username).build());
+        return insertSpotifyAuthData(spotifyAuthData.cloneBuilder().withUserId(getUserId(spotifyAuthData)).build());
+    }
+
+    private String getUserId(SpotifyAuthData spotifyAuthData){
+        Response<JSONObject> response = traverson.from(SPOTIFY_PROFILE_DATA)
+                .withHeader("Authorization", "Bearer %s".formatted(spotifyAuthData.accessToken()))
+                .get();
+        return response.getResource().get("id").toString();
     }
 
     private Result<SpotifyAuthData, Error> refreshToken(SpotifyAuthData spotifyAuthData) {
@@ -83,10 +85,10 @@ public class SpotifyAuthService {
                 .withHeader("Authorization", System.getenv("SPOTIFY_BASE_64_AUTH"))
                 .post(buildRefreshTokenRequestBody(spotifyAuthData.refreshToken()));
         if (!response.isSuccessful()) {
-            LOG.info("Failed to refresh access token for user - {} received response - {}", spotifyAuthData.username(), response.getStatusCode());
-            return new Result.Failure<>(Error.failedToRefreshAccessToken(spotifyAuthData.username(), response.getStatusCode()));
+            LOG.info("Failed to refresh access token for user - {} received response - {}", spotifyAuthData.userId(), response.getStatusCode());
+            return new Result.Failure<>(Error.failedToRefreshAccessToken(spotifyAuthData.userId(), response.getStatusCode()));
         }
-        LOG.info("Refreshed access token for user - {}", spotifyAuthData.username());
+        LOG.info("Refreshed access token for user - {}", spotifyAuthData.userId());
         SpotifyRefreshTokenResponse spotifyRefreshTokenResponse = objectMapper.convertValue(response.getResource(), SpotifyRefreshTokenResponse.class);
         return new Result.Success<>(spotifyAuthRepository.updateUserAuthData
                 (spotifyAuthData.updateFromRefreshResponse(spotifyRefreshTokenResponse)));

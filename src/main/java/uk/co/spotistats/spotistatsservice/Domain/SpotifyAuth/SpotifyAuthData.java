@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData.Builder.someSpotifyAuthData;
 
-public record SpotifyAuthData(String username, @JsonProperty("refresh_token") String refreshToken, @JsonProperty("access_token") String accessToken, LocalDateTime lastUpdated) {
+public record SpotifyAuthData(String userId, @JsonProperty("refresh_token") String refreshToken, @JsonProperty("access_token") String accessToken, LocalDateTime lastUpdated) {
 
     public boolean hasValidAccessToken() {
         return !lastUpdated.isBefore(LocalDateTime.now().minusHours(1));
@@ -14,7 +14,7 @@ public record SpotifyAuthData(String username, @JsonProperty("refresh_token") St
 
     public SpotifyAuthData updateFromRefreshResponse(SpotifyRefreshTokenResponse spotifyRefreshTokenResponse) {
         return someSpotifyAuthData()
-                .withUsername(username)
+                .withUserId(userId)
                 .withLastUpdated(lastUpdated)
                 .withRefreshToken(refreshToken)
                 .withAccessToken(spotifyRefreshTokenResponse.accessToken())
@@ -22,7 +22,7 @@ public record SpotifyAuthData(String username, @JsonProperty("refresh_token") St
     }
 
     public static final class Builder {
-        private String username;
+        private String userId;
         private String refreshToken;
         private String accessToken;
         private LocalDateTime lastUpdated;
@@ -34,8 +34,8 @@ public record SpotifyAuthData(String username, @JsonProperty("refresh_token") St
             return new Builder();
         }
 
-        public Builder withUsername(String username) {
-            this.username = username;
+        public Builder withUserId(String userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -55,7 +55,7 @@ public record SpotifyAuthData(String username, @JsonProperty("refresh_token") St
         }
 
         public SpotifyAuthData build() {
-            return new SpotifyAuthData(username, refreshToken, accessToken, lastUpdated);
+            return new SpotifyAuthData(userId, refreshToken, accessToken, lastUpdated);
         }
     }
 
@@ -63,7 +63,7 @@ public record SpotifyAuthData(String username, @JsonProperty("refresh_token") St
         return someSpotifyAuthData()
                 .withAccessToken(accessToken)
                 .withLastUpdated(lastUpdated)
-                .withUsername(username)
+                .withUserId(userId)
                 .withRefreshToken(refreshToken);
     }
 }

@@ -33,7 +33,7 @@ public class StreamingDataUploadService {
             Optional<StreamingDataUpsertResult> updateResult = streamingDataUploadRepository
                     .updateStreamingData(combineStreamingData(existingStreamingData.get(), streamingData), username);
             if (updateResult.isEmpty()) {
-                return new Result.Failure<>(Error.unknownError(null, "Failure updating streaming data - %s for username - %s ".formatted(streamingData, username)));
+                return new Result.Failure<>(Error.unknownError(null, "Failure updating streaming data - %s for userId - %s ".formatted(streamingData, username)));
             }
             streamingDataUpsertResult = updateResult.get();
             LOG.info("Updated streaming data for user - {}", username);
@@ -41,7 +41,7 @@ public class StreamingDataUploadService {
             Optional<StreamingDataUpsertResult> insertResult = streamingDataUploadRepository
                     .insertStreamingData(streamingData, username);
             if (insertResult.isEmpty()) {
-                return new Result.Failure<>(Error.unknownError(null, "Failure inserting streaming data - %s for username - %s ".formatted(streamingData, username)));
+                return new Result.Failure<>(Error.unknownError(null, "Failure inserting streaming data - %s for userId - %s ".formatted(streamingData, username)));
             }
             streamingDataUpsertResult = insertResult.get();
             LOG.info("Inserted streaming data for user - {}", username);

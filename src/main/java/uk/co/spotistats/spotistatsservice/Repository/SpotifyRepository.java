@@ -37,7 +37,7 @@ public class SpotifyRepository {
         if (response.isSuccessful()) {
             return spotifyResponseJsonToStreamingDataMapper.mapFromRecentStreamsJson(response.getResource());
         }
-        return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().username())));
+        return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().userId())));
     }
 
     public Result<StreamingData, Errors> getTopTracks(SpotifySearchRequest spotifySearchRequest) {
@@ -49,7 +49,7 @@ public class SpotifyRepository {
         if (response.isSuccessful()) {
             return spotifyResponseJsonToStreamingDataMapper.mapFromTopStreamsJson(response.getResource());
         }
-        return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().username())));
+        return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().userId())));
     }
 
     private Error responseToError(Response<JSONObject> response, String username) {
