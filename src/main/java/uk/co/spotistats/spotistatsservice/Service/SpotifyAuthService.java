@@ -58,7 +58,7 @@ public class SpotifyAuthService {
     }
 
     public void authorize(String username) {
-        traverson.from(SPOTIFY_AUTHORIZE_URL)
+        traverson.from(SPOTIFY_REFRESH_URL)
 //                .withQueryParam("client_id", System.getenv("SPOTIFY_CLIENT_ID"))
 //                .withQueryParam("response-type", "code")
 //                .withQueryParam("redirect-uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
