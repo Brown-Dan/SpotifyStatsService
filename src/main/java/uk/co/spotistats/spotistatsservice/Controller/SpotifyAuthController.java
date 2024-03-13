@@ -5,14 +5,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
-import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
-
-import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
 
 @Controller
 @RequestMapping("spotify")
@@ -28,7 +23,7 @@ public class SpotifyAuthController {
     public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticate(@RequestBody SpotifyAuthData spotifyAuthData) {
         Result<SpotifyAuthData, Errors> result = spotifyAuthService.insertSpotifyAuthData(spotifyAuthData);
 
-        if (result.isFailure()){
+        if (result.isFailure()) {
             return badRequest(result.getError());
         }
         return ok(result.getValue());
@@ -38,14 +33,14 @@ public class SpotifyAuthController {
     public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticationCallback(@RequestParam String state, @RequestParam String code) {
         Result<SpotifyAuthData, Errors> result = spotifyAuthService.exchangeAccessToken(state, code);
 
-        if (result.isFailure()){
+        if (result.isFailure()) {
             return badRequest(result.getError());
         }
         return ok(result.getValue());
     }
 
-    @GetMapping(value = "/{username}/authorize")
-    public ResponseEntity<ApiResult<String, Errors>> authorize(@PathVariable String username) {
+    @GetMapping(value = "/authorize")
+    public ResponseEntity<ApiResult<String, Errors>> authorize(@RequestParam String username) {
         spotifyAuthService.authorize(username);
         return ok("Success");
     }
