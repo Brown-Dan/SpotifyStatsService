@@ -11,6 +11,10 @@ public record Error(String field, String message, ErrorKey key) {
         return new Error(field, "%s not found for user - %s".formatted(field, username), ErrorKey.ENTITY_NOT_FOUND);
     }
 
+    public static Error userNotRegisteredDev(String username) {
+        return new Error("user", "user - %s - is not registered in the developer dashboard".formatted(username), ErrorKey.AUTHORIZATION_FAILURE);
+    }
+
     public static Error requestParamContentViolation(String field, String message) {
         return new Error(field, message, ErrorKey.REQUEST_PARAM_CONSTRAINT_VIOLATION);
     }

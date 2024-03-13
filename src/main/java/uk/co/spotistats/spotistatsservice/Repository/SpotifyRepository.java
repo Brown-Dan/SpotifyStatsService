@@ -29,13 +29,13 @@ public class SpotifyRepository {
     }
 
     public Result<StreamingData, Errors> getRecentStreamingData(SpotifySearchRequest spotifySearchRequest) {
-        Response<JSONObject> response = traverson.from(RECENT_STREAMS_URL)
+        Response<String> response = traverson.from(RECENT_STREAMS_URL)
                 .withHeader("Authorization", "Bearer %s ".formatted(spotifySearchRequest.authData().accessToken()))
                 .withQueryParam("limit", spotifySearchRequest.limit().toString())
                 .withQueryParam("before", LocalDateTime.now().toInstant(ZoneOffset.UTC).toString())
-                .get();
+                .get(String.class);
         if (response.isSuccessful()) {
-            return spotifyResponseJsonToStreamingDataMapper.mapFromRecentStreamsJson(response.getResource());
+            return spotifyResponseJsonToStreamingDataMapper.mapFromRecentStreamsJson(JSONObject.parseObject(response.getResource(), JSONObject.class));
         }
         return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().userId())));
     }
@@ -52,9 +52,10 @@ public class SpotifyRepository {
         return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().userId())));
     }
 
-    private Error responseToError(Response<JSONObject> response, String username) {
+    private Error responseToError(Response<?> response, String username) {
         return switch (response.getStatusCode()) {
-            case 401, 403 -> Error.notFound("spotifyAuthDetails", username);
+            case 401 -> Error.notFound("spotifyAuthDetails", username);
+            case 403 -> Error.userNotRegisteredDev(username);
             case 429 -> Error.spotifyRateLimitExceeded();
             default -> Error.unknownError("streamingData", "Failed to get streamingData");
         };
