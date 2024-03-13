@@ -75,9 +75,9 @@ public class StreamingDataService {
             LOG.error("Failure syncing streaming data for user - {}", streamingData.username());
             return;
         }
-        streamingDataUploadRepository.updateStreamingData(streamingData.updateStreamingDataFromSync(streamingDataResult.getValue()), streamingData.username());
-        streamingDataResult.getValue().streamData().stream().filter(streamData -> streamData.timeStreamed() > streamingData.lastUpdated().toEpochSecond(ZoneOffset.UTC))
-                .forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, streamingData.username()));
+        List<StreamData> filteredStreamData = streamingDataResult.getValue().streamData().stream().filter(streamData -> streamData.timeStreamed() > streamingData.lastUpdated().toEpochSecond(ZoneOffset.UTC)).toList();
+        streamingDataUploadRepository.updateStreamingData(streamingData.updateStreamingDataFromSync(streamingDataResult.getValue()).cloneBuilder().withSize(filteredStreamData.size()).build(), streamingData.username());
+        filteredStreamData.forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, streamingData.username()));
     }
 
     public Result<RankedStreamingData, Errors> getTopStreams(SpotifySearchRequest spotifySearchRequest) {

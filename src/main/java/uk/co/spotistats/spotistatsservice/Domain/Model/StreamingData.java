@@ -89,4 +89,14 @@ public record StreamingData(List<StreamData> streamData,
             return new StreamingData(streamData, size, firstStreamDateTime, lastStreamDateTime, lastUpdated, username);
         }
     }
+
+    public StreamingData.Builder cloneBuilder(){
+        return aStreamingData()
+                .withUsername(username)
+                .withLastUpdated(lastUpdated)
+                .withStreamData(streamData)
+                .withSize(size)
+                .withLastStreamDateTime(lastStreamDateTime)
+                .withFirstStreamDateTime(firstStreamDateTime);
+    }
 }
