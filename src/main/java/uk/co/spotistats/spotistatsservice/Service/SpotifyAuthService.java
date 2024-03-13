@@ -58,14 +58,15 @@ public class SpotifyAuthService {
     }
 
     public void authorize(String username) {
-        Response<JSONObject> response = traverson.from(SPOTIFY_AUTHORIZE_URL)
-                .withQueryParam("client_id", "2025b48d922a49099d665cbbd2563436")
-                .withQueryParam("response-type", "code")
-                .withQueryParam("redirect-uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
-                .withQueryParam("state", username)
-                .withQueryParam("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read")
-                .get();
-        System.out.println(response.getResource().toJSONString());
+//        Response<JSONObject> response = traverson.from(SPOTIFY_AUTHORIZE_URL)
+//                .withQueryParam("client_id", "2025b48d922a49099d665cbbd2563436")
+//                .withQueryParam("response-type", "code")
+//                .withQueryParam("redirect-uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
+//                .withQueryParam("state", username)
+//                .withQueryParam("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read")
+//                .get();
+        traverson.from("https://accounts.spotify.com/authorize?client_id=2025b48d922a49099d665cbbd2563436&response_type=code&redirect_uri=https%3A%2F%2Fspotifystats.co.uk%2Fspotify%2Fauthenticate%2Fcallback&scope=playlist-read-private%20user-follow-read%20user-top-read%20user-read-recently-played%20user-library-read&state=danbrown05").get();
+//        System.out.println(response.getResource().toJSONString());
     }
 
     public Result<SpotifyAuthData, Errors> exchangeAccessToken(String username, String accessToken) {
