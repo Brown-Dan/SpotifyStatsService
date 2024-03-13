@@ -60,6 +60,7 @@ public class SpotifyAuthService {
         return refreshToken(spotifyAuthData);
     }
 
+    // TODO extract uri
     public RedirectView redirect() {
         try {
             return new RedirectView(new URIBuilder()
