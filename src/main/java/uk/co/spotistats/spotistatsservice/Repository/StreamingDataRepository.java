@@ -47,6 +47,11 @@ public class StreamingDataRepository {
         return buildStreamingData(streamData);
     }
 
+    public List<StreamingData> getUnsyncedStreamingData(){
+        return db.selectFrom(STREAMING_DATA).fetchInto(uk.co.spotistats.generated.tables.pojos.StreamingData.class).stream()
+                .map(StreamingData::fromStreamingDataEntity).filter(StreamingData::shouldSync).toList();
+    }
+
     private List<Condition> buildQueryConditions(StreamingDataSearchRequest streamingDataSearchRequest) {
         List<Condition> conditions = new ArrayList<>();
 

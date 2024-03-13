@@ -1,5 +1,9 @@
 package uk.co.spotistats.spotistatsservice.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Controller.Validator.StreamDataSearchRequestValidator;
@@ -15,28 +19,37 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
+import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamData.Builder.aRankedStreamData;
 import static uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamingData.Builder.aRankedStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
 @Service
+@EnableAsync
 public class StreamingDataService {
 
     private final SpotifyAuthService spotifyAuthService;
     private final SpotifyRepository spotifyRepository;
     private final StreamDataSearchRequestValidator streamDataSearchRequestValidator;
     private final StreamingDataRepository streamingDataRepository;
+    private final StreamingDataUploadRepository streamingDataUploadRepository;
 
-    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamDataSearchRequestValidator streamDataSearchRequestValidator, StreamingDataRepository streamingDataRepository) {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
+
+    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamDataSearchRequestValidator streamDataSearchRequestValidator, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository) {
         this.spotifyAuthService = spotifyAuthService;
         this.spotifyRepository = spotifyRepository;
         this.streamDataSearchRequestValidator = streamDataSearchRequestValidator;
         this.streamingDataRepository = streamingDataRepository;
+        this.streamingDataUploadRepository = streamingDataUploadRepository;
     }
 
     public <T> Result<T, Errors> getFromSpotify(SpotifySearchRequest spotifySearchRequest, Function<SpotifySearchRequest, Result<T, Errors>> spotifyRepositoryGetter) {
@@ -52,6 +65,19 @@ public class StreamingDataService {
 
     public Result<StreamingData, Errors> getRecentStreams(SpotifySearchRequest spotifySearchRequest) {
         return getFromSpotify(spotifySearchRequest, spotifyRepository::getRecentStreamingData);
+    }
+
+    @Async
+    public void syncFromRecent(StreamingData streamingData) {
+        LOG.info("Syncing streaming data for user - {}", streamingData.username());
+        SpotifySearchRequest spotifySearchRequest = aSpotifySearchRequest().withUsername(streamingData.username()).withLimit(50).build();
+        Result<StreamingData, Errors> streamingDataResult = getFromSpotify(spotifySearchRequest, spotifyRepository::getRecentStreamingData);
+        if (streamingDataResult.isFailure()){
+            LOG.error("Failure syncing streaming data for user - {}", streamingData.username());
+            return;
+        }
+        streamingDataUploadRepository.updateStreamingData(streamingData.updateStreamingDataFromSync(streamingDataResult.getValue()), streamingData.username());
+        streamingDataResult.getValue().streamData().forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, streamingData.username()));
     }
 
     public Result<RankedStreamingData, Errors> getTopStreams(SpotifySearchRequest spotifySearchRequest) {

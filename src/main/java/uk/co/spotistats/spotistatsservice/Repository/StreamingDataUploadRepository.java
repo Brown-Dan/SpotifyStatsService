@@ -7,6 +7,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertRes
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static uk.co.spotistats.generated.Tables.STREAM_DATA;
@@ -36,6 +37,7 @@ public class StreamingDataUploadRepository {
                 .set(STREAMING_DATA.STREAM_COUNT, streamingData.size())
                 .set(STREAMING_DATA.FIRST_STREAM_DATE, streamingData.firstStreamDateTime())
                 .set(STREAMING_DATA.LAST_STREAM_DATA, streamingData.lastStreamDateTime())
+                .set(STREAMING_DATA.LAST_UPDATED, streamingData.lastUpdated())
                 .returning().fetchOneInto(uk.co.spotistats.generated.tables.pojos.StreamingData.class);
 
         return Optional.ofNullable(streamingDataEntity).map(this::mapStreamingDataEntityToStreamingDataInsertResult);
@@ -61,6 +63,7 @@ public class StreamingDataUploadRepository {
                 .set(STREAMING_DATA.FIRST_STREAM_DATE, streamingData.firstStreamDateTime())
                 .set(STREAMING_DATA.LAST_STREAM_DATA, streamingData.lastStreamDateTime())
                 .set(STREAMING_DATA.STREAM_COUNT, streamingData.size())
+                .set(STREAMING_DATA.LAST_UPDATED, LocalDateTime.now())
                 .where(STREAMING_DATA.USERNAME.eq(username))
                 .returning().fetchOneInto(uk.co.spotistats.generated.tables.pojos.StreamingData.class);
 

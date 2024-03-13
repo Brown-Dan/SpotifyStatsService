@@ -1,0 +1,1 @@
+ALTER TABLE "StreamingData".stream_data ADD COLUMN last_updated timestamp
