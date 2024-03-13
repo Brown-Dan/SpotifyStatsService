@@ -63,11 +63,8 @@ public class StreamingDataRepository {
         } else {
             conditions.add(STREAM_DATA.DATE.between(streamingDataSearchRequest.startDate(), streamingDataSearchRequest.endDate()));
         }
-        if (streamingDataSearchRequest.startTime() != null){
-            conditions.add(STREAM_DATA.TIME.after(streamingDataSearchRequest.startTime()));
-        }
-        if (streamingDataSearchRequest.endTime() != null){
-            conditions.add(STREAM_DATA.TIME.before(streamingDataSearchRequest.endTime()));
+        if (streamingDataSearchRequest.startTime() != null && streamingDataSearchRequest.endTime() != null){
+            conditions.add(STREAM_DATA.TIME.between(streamingDataSearchRequest.startTime(), streamingDataSearchRequest.endTime()));
         }
         if (streamingDataSearchRequest.uri() != null) {
             conditions.add(STREAM_DATA.TRACK_URI.eq(streamingDataSearchRequest.uri()));
