@@ -65,6 +65,7 @@ public class SpotifyAuthService {
                 .withQueryParam("state", username)
                 .withQueryParam("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read")
                 .get();
+        System.out.println(response.getResource().toJSONString());
     }
 
     public Result<SpotifyAuthData, Errors> exchangeAccessToken(String username, String accessToken) {
