@@ -5,18 +5,25 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
+import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
+import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
+
+import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
 
 @Controller
 @RequestMapping("spotify")
 public class SpotifyAuthController {
 
     private final SpotifyAuthService spotifyAuthService;
+    private final StreamingDataService streamingDataService;
 
-    public SpotifyAuthController(SpotifyAuthService spotifyAuthService) {
+    public SpotifyAuthController(SpotifyAuthService spotifyAuthService, StreamingDataService streamingDataService) {
         this.spotifyAuthService = spotifyAuthService;
+        this.streamingDataService = streamingDataService;
     }
 
     @PostMapping(value = "/authenticate")
@@ -40,8 +47,8 @@ public class SpotifyAuthController {
     }
 
     @GetMapping(value = "/{username}/authorize")
-    public String authorize(@PathVariable String username) {
-        return spotifyAuthService.authorize(username);
+    public Result<StreamingData, Errors> authorize(@PathVariable String username) {
+        return streamingDataService.getRecentStreams(aSpotifySearchRequest().withUsername(username).withLimit(10).build());
     }
 
     private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
