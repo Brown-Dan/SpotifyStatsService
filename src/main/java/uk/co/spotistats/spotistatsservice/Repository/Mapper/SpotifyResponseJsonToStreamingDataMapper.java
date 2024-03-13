@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
@@ -20,6 +21,7 @@ import java.util.stream.StreamSupport;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder.aStreamData;
 import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Request.Playlist.Builder.aPlaylist;
 
 @Component
 public class SpotifyResponseJsonToStreamingDataMapper {
@@ -64,6 +66,15 @@ public class SpotifyResponseJsonToStreamingDataMapper {
             LOG.error("Failed to parse streaming data");
             return new Result.Failure<>(Errors.fromError(Error.failedToParseData("topStreams", "failed to read streaming data")));
         }
+    }
+
+    public Playlist mapFromPlaylistJson(JSONObject json) {
+        return aPlaylist()
+                .withId(json.get("id").toString())
+                .withUri(json.get("uri").toString())
+                .withName(json.get("name").toString())
+                .withOwner(json.getJSONObject("owner").get("id").toString())
+                .build();
     }
 
     private StreamData.Builder mapStreamData(JsonNode track) {

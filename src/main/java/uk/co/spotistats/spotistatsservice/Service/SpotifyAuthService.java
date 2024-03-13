@@ -43,7 +43,7 @@ public class SpotifyAuthService {
         Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(spotifyAuthData.userId());
 
         if (existingAuthData.isPresent()) {
-            return new Result.Failure<>(Errors.fromError(Error.forbiddenToUpdate("spotifyAuthData", spotifyAuthData.userId())));
+            return new Result.Failure<>(Errors.fromError(Error.forbiddenToUpdate("authData", spotifyAuthData.userId())));
         }
         return new Result.Success<>(spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData));
     }
@@ -71,7 +71,7 @@ public class SpotifyAuthService {
                     .setParameter("client_id", System.getenv("SPOTIFY_CLIENT_ID"))
                     .setParameter("response_type", "code")
                     .setParameter("redirect_uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
-                    .setParameter("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read user-read-private user-read-email")
+                    .setParameter("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read user-read-private user-read-email playlist-modify-public playlist-modify-private")
                     .build().toURL().toString());
         } catch (URISyntaxException | MalformedURLException ignored) {
             throw new RuntimeException("Failure constructing URI");
