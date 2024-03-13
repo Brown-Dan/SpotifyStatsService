@@ -24,6 +24,7 @@ public class SpotifyAuthService {
     private final ObjectMapper objectMapper;
 
     private static final String SPOTIFY_REFRESH_URL = "https://accounts.spotify.com/api/token";
+    private static final String SPOTIFY_AUTHORIZE_URL = "https://accounts.spotify.com/authorize";
 
     private static final Logger LOG = LoggerFactory.getLogger(SpotifyAuthService.class);
 
@@ -56,6 +57,26 @@ public class SpotifyAuthService {
         return refreshToken(spotifyAuthData);
     }
 
+    public void authorize(String username){
+        traverson.from(SPOTIFY_AUTHORIZE_URL)
+                .withQueryParam("client_id", "2025b48d922a49099d665cbbd2563436")
+                .withQueryParam("response-type", "code")
+                .withQueryParam("redirect-uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
+                .withQueryParam("state", username)
+                .withQueryParam("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read")
+                .get();
+    }
+
+    public void exchangeAccessToken(String username, String accessToken){
+        Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
+                .withHeader("content-type", "application/x-www-form-urlencoded")
+                .withHeader("Authorization", System.getenv("SPOTIFY_BASE_64_AUTH"))
+                .post(buildAccessTokenExchangeBody(accessToken));
+
+        SpotifyAuthData spotifyAuthData = objectMapper.convertValue(response.getResource(), SpotifyAuthData.class);
+        insertSpotifyAuthData(spotifyAuthData.cloneBuilder().withUsername(username).build());
+    }
+
     private Result<SpotifyAuthData, Error> refreshToken(SpotifyAuthData spotifyAuthData) {
         Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
                 .withHeader("content-type", "application/x-www-form-urlencoded")
@@ -73,6 +94,11 @@ public class SpotifyAuthService {
 
     private TextBody buildRefreshTokenRequestBody(String refreshToken) {
         String body = "grant_type=refresh_token&refresh_token=%s&client_id=%s".formatted(refreshToken, System.getenv("SPOTIFY_CLIENT_ID"));
+        return new TextBody(body, "application/x-www-form-urlencoded");
+    }
+
+    private TextBody buildAccessTokenExchangeBody(String accessToken) {
+        String body = "grant_type=authorization_code&code=%s&redirect_uri=https://spotifystats.co.uk/spotify/authenticate/callback".formatted(accessToken);
         return new TextBody(body, "application/x-www-form-urlencoded");
     }
 }

@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static uk.co.spotistats.generated.Tables.USER_AUTH_DATA;
-import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData.Builder.someUserAuthData;
+import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData.Builder.someSpotifyAuthData;
 
 @Repository
 public class SpotifyAuthRepository {
@@ -48,7 +48,7 @@ public class SpotifyAuthRepository {
     }
 
     private SpotifyAuthData mapUserAuthDataEntityToUserAuthData(uk.co.spotistats.generated.tables.pojos.UserAuthData userAuthDataEntity) {
-        return someUserAuthData()
+        return someSpotifyAuthData()
                 .withUsername(userAuthDataEntity.getUsername())
                 .withLastUpdated(userAuthDataEntity.getLastUpdated())
                 .withRefreshToken(userAuthDataEntity.getRefreshToken())

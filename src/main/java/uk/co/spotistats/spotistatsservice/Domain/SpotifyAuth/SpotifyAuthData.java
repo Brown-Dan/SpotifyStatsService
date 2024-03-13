@@ -1,17 +1,19 @@
 package uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 
-import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData.Builder.someUserAuthData;
+import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData.Builder.someSpotifyAuthData;
 
-public record SpotifyAuthData(String username, String refreshToken, String accessToken, LocalDateTime lastUpdated) {
+public record SpotifyAuthData(String username, @JsonProperty("refresh_token") String refreshToken, @JsonProperty("access_token") String accessToken, LocalDateTime lastUpdated) {
 
     public boolean hasValidAccessToken() {
         return !lastUpdated.isBefore(LocalDateTime.now().minusHours(1));
     }
 
     public SpotifyAuthData updateFromRefreshResponse(SpotifyRefreshTokenResponse spotifyRefreshTokenResponse) {
-        return someUserAuthData()
+        return someSpotifyAuthData()
                 .withUsername(username)
                 .withLastUpdated(lastUpdated)
                 .withRefreshToken(refreshToken)
@@ -28,7 +30,7 @@ public record SpotifyAuthData(String username, String refreshToken, String acces
         private Builder() {
         }
 
-        public static Builder someUserAuthData() {
+        public static Builder someSpotifyAuthData() {
             return new Builder();
         }
 
@@ -55,5 +57,13 @@ public record SpotifyAuthData(String username, String refreshToken, String acces
         public SpotifyAuthData build() {
             return new SpotifyAuthData(username, refreshToken, accessToken, lastUpdated);
         }
+    }
+
+    public SpotifyAuthData.Builder cloneBuilder(){
+        return someSpotifyAuthData()
+                .withAccessToken(accessToken)
+                .withLastUpdated(lastUpdated)
+                .withUsername(username)
+                .withRefreshToken(refreshToken);
     }
 }

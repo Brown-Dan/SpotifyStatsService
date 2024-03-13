@@ -2,9 +2,7 @@ package uk.co.spotistats.spotistatsservice.Controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
@@ -24,6 +22,16 @@ public class SpotifyAuthController {
     public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticate(@RequestBody SpotifyAuthData spotifyAuthData) {
         return spotifyAuthService.insertSpotifyAuthData(spotifyAuthData).<ResponseEntity<ApiResult<SpotifyAuthData, Errors>>>
                 map(error -> badRequest(Errors.fromError(error))).orElseGet(() -> ok(spotifyAuthData));
+    }
+
+    @GetMapping(value = "/authenticate/callback")
+    public void authenticationCallback(@RequestParam String state, @RequestParam String code) {
+        spotifyAuthService.exchangeAccessToken(state, code);
+    }
+
+    @GetMapping(value = "/{username}/authorize")
+    public void authorize(@PathVariable String username) {
+        spotifyAuthService.authorize(username);
     }
 
     private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
