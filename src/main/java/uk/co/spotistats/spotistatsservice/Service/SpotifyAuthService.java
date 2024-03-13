@@ -17,6 +17,7 @@ import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyAuthRepository;
 
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
@@ -69,10 +70,10 @@ public class SpotifyAuthService {
                     .setParameter("response_type", "code")
                     .setParameter("redirect_uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
                     .setParameter("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read user-read-private user-read-email")
-                    .build().toASCIIString());
-        } catch (URISyntaxException ignored) {
+                    .build().toURL().toString());
+        } catch (URISyntaxException | MalformedURLException ignored) {
+            throw new RuntimeException("Failure constructing URI");
         }
-        return null;
     }
 
     public Result<SpotifyAuthData, Errors> exchangeAccessToken(String accessToken) {
