@@ -75,7 +75,7 @@ public class StreamingDataService {
             LOG.error("Failure syncing streaming data for user - {}", streamingData.username());
             return;
         }
-        List<StreamData> filteredStreamData = streamingDataResult.getValue().streamData().stream().filter(streamData -> streamData.timeStreamed() > streamingData.lastUpdated().toEpochSecond(ZoneOffset.UTC)).toList();
+        List<StreamData> filteredStreamData = streamingDataResult.getValue().streamData().stream().filter(streamData -> streamData.streamDateTime().isAfter(streamingData.lastStreamDateTime())).toList();
         streamingDataUploadRepository.updateStreamingData(streamingData.updateStreamingDataFromSync(streamingDataResult.getValue()).cloneBuilder().withSize(filteredStreamData.size() + streamingData.size()).build(), streamingData.username());
         filteredStreamData.forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, streamingData.username()));
     }
