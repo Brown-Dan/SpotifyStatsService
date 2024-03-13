@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
 
@@ -20,13 +21,22 @@ public class SpotifyAuthController {
 
     @PostMapping(value = "/authenticate")
     public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticate(@RequestBody SpotifyAuthData spotifyAuthData) {
-        return spotifyAuthService.insertSpotifyAuthData(spotifyAuthData).<ResponseEntity<ApiResult<SpotifyAuthData, Errors>>>
-                map(error -> badRequest(Errors.fromError(error))).orElseGet(() -> ok(spotifyAuthData));
+        Result<SpotifyAuthData, Errors> result = spotifyAuthService.insertSpotifyAuthData(spotifyAuthData);
+
+        if (result.isFailure()){
+            return badRequest(result.getError());
+        }
+        return ok(result.getValue());
     }
 
     @GetMapping(value = "/authenticate/callback")
-    public void authenticationCallback(@RequestParam String state, @RequestParam String code) {
-        spotifyAuthService.exchangeAccessToken(state, code);
+    public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticationCallback(@RequestParam String state, @RequestParam String code) {
+        Result<SpotifyAuthData, Errors> result = spotifyAuthService.exchangeAccessToken(state, code);
+
+        if (result.isFailure()){
+            return badRequest(result.getError());
+        }
+        return ok(result.getValue());
     }
 
     @GetMapping(value = "/{username}/authorize")

@@ -2,6 +2,7 @@ package uk.co.spotistats.spotistatsservice.Repository;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
+import uk.co.spotistats.generated.tables.pojos.UserAuthData;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
 import java.time.LocalDateTime;
@@ -28,13 +29,13 @@ public class SpotifyAuthRepository {
         return Optional.ofNullable(userAuthDataEntity).map(this::mapUserAuthDataEntityToUserAuthData);
     }
 
-    public void insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
-        db.insertInto(USER_AUTH_DATA)
+    public SpotifyAuthData insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
+        return mapUserAuthDataEntityToUserAuthData(Objects.requireNonNull(db.insertInto(USER_AUTH_DATA)
                 .set(USER_AUTH_DATA.USERNAME, spotifyAuthData.username())
                 .set(USER_AUTH_DATA.LAST_UPDATED, LocalDateTime.now())
                 .set(USER_AUTH_DATA.ACCESS_TOKEN, spotifyAuthData.accessToken())
-                .set(USER_AUTH_DATA.REFRESH_TOKEN, spotifyAuthData.refreshToken())
-                .execute();
+                .set(USER_AUTH_DATA.REFRESH_TOKEN, spotifyAuthData.refreshToken()).returning()
+                .fetchOneInto(UserAuthData.class)));
     }
 
     public SpotifyAuthData updateUserAuthData(SpotifyAuthData spotifyAuthData) {

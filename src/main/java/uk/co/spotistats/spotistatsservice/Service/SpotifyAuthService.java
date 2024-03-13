@@ -8,10 +8,11 @@ import org.springframework.stereotype.Service;
 import uk.co.autotrader.traverson.Traverson;
 import uk.co.autotrader.traverson.http.Response;
 import uk.co.autotrader.traverson.http.TextBody;
+import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyAuthRepository;
 
 import java.util.Optional;
@@ -34,14 +35,13 @@ public class SpotifyAuthService {
         this.objectMapper = objectMapper;
     }
 
-    public Optional<Error> insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
+    public Result<SpotifyAuthData, Errors> insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
         Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(spotifyAuthData.username());
 
         if (existingAuthData.isPresent()) {
-            return Optional.of(Error.forbiddenToUpdate("spotifyAuthData", spotifyAuthData.username()));
+            return new Result.Failure<>(Errors.fromError(Error.forbiddenToUpdate("spotifyAuthData", spotifyAuthData.username())));
         }
-        spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData);
-        return Optional.empty();
+        return new Result.Success<>(spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData));
     }
 
     public Result<SpotifyAuthData, Error> getSpotifyAuthData(String username) {
@@ -57,8 +57,7 @@ public class SpotifyAuthService {
         return refreshToken(spotifyAuthData);
     }
 
-    public void authorize(String username){
-        LOG.info("Sending authorization request to spotify");
+    public void authorize(String username) {
         Response<JSONObject> response = traverson.from(SPOTIFY_AUTHORIZE_URL)
                 .withQueryParam("client_id", "2025b48d922a49099d665cbbd2563436")
                 .withQueryParam("response-type", "code")
@@ -66,19 +65,16 @@ public class SpotifyAuthService {
                 .withQueryParam("state", username)
                 .withQueryParam("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read")
                 .get();
-        LOG.info(String.valueOf(response.getResource()));
     }
 
-    public void exchangeAccessToken(String username, String accessToken){
+    public Result<SpotifyAuthData, Errors> exchangeAccessToken(String username, String accessToken) {
         Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
                 .withHeader("content-type", "application/x-www-form-urlencoded")
                 .withHeader("Authorization", System.getenv("SPOTIFY_BASE_64_AUTH"))
                 .post(buildAccessTokenExchangeBody(accessToken));
 
-        LOG.info(String.valueOf(response.getResource()));
-
         SpotifyAuthData spotifyAuthData = objectMapper.convertValue(response.getResource(), SpotifyAuthData.class);
-        insertSpotifyAuthData(spotifyAuthData.cloneBuilder().withUsername(username).build());
+        return insertSpotifyAuthData(spotifyAuthData.cloneBuilder().withUsername(username).build());
     }
 
     private Result<SpotifyAuthData, Error> refreshToken(SpotifyAuthData spotifyAuthData) {
