@@ -81,7 +81,6 @@ public class StreamingDataRepository {
         if (streamingDataSearchRequest.platform() != null) {
             conditions.add(STREAM_DATA.PLATFORM.eq(streamingDataSearchRequest.platform()));
         }
-
         return conditions;
     }
 

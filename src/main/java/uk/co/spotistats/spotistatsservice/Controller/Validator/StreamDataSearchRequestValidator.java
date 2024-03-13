@@ -49,9 +49,9 @@ public class StreamDataSearchRequestValidator {
         if (streamingDataSearchRequest.startTime() != null ^ streamingDataSearchRequest.endTime() != null) {
             return Optional.of(Error.requestParamNotSupplied("queryTimePeriod", "must supply none or both of 'startTime' and 'endTime' parameters"));
         }
-        if (streamingDataSearchRequest.endTime().isBefore(streamingDataSearchRequest.startTime())) {
-            return Optional.of(Error.requestParamContentViolation("queryTimePeriod", "'startTime' must occur before 'endTime' - provided - %s-%s".formatted(streamingDataSearchRequest.startTime(), streamingDataSearchRequest.endTime())));
-        }
+//        if (streamingDataSearchRequest.endTime().isBefore(streamingDataSearchRequest.startTime())) {
+//            return Optional.of(Error.requestParamContentViolation("queryTimePeriod", "'startTime' must occur before 'endTime' - provided - %s-%s".formatted(streamingDataSearchRequest.startTime(), streamingDataSearchRequest.endTime())));
+//        }
         return Optional.empty();
     }
 
