@@ -58,6 +58,7 @@ public class SpotifyAuthService {
     }
 
     public void authorize(String username){
+        LOG.info("Sending authorization request to spotify");
         Response<JSONObject> response = traverson.from(SPOTIFY_AUTHORIZE_URL)
                 .withQueryParam("client_id", "2025b48d922a49099d665cbbd2563436")
                 .withQueryParam("response-type", "code")
