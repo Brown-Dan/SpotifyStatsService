@@ -42,12 +42,6 @@ public class StreamingDataUploadController {
         };
     }
 
-    // TODO will remove when frontend implemented
-    @GetMapping(value = "/callback")
-    public ResponseEntity<ApiResult<String, Errors>> temporaryCallback(@PathVariable String username, @RequestParam String code) {
-        return ok("TEST ENDPOINT");
-    }
-
     private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
         return ResponseEntity.ok(ApiResult.success(body));
     }
