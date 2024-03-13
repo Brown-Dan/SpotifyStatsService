@@ -20,10 +20,9 @@ public class SpotifyAuthController {
         this.spotifyAuthService = spotifyAuthService;
     }
 
-
-    // TODO will be obsolete when authorize endpoint is functional
+    // TODO remove will be obsolete once auth synced
     @PostMapping(value = "/authenticate")
-    public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticate(@RequestBody SpotifyAuthData spotifyAuthData) {
+    public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> manualPostAuth(@RequestBody SpotifyAuthData spotifyAuthData) {
         Result<SpotifyAuthData, Errors> result = spotifyAuthService.insertSpotifyAuthData(spotifyAuthData);
 
         if (result.isFailure()){

@@ -2,6 +2,7 @@ package uk.co.spotistats.spotistatsservice.Service;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyAuthRepository;
 
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 @Service
@@ -59,7 +61,17 @@ public class SpotifyAuthService {
     }
 
     public RedirectView redirect() {
-        return new RedirectView("https://accounts.spotify.com/authorize?client_id=2025b48d922a49099d665cbbd2563436&response_type=code&redirect_uri=https://spotifystats.co.uk%2Fspotify%2Fauthenticate%2Fcallback&scope=playlist-read-private%20user-follow-read%20user-top-read%20user-read-recently-played%20user-library-read%20user-read-private%20user-read-email");
+        try {
+            return new RedirectView(new URIBuilder()
+                    .setPath("https://accounts.spotify.com/authorize")
+                    .setParameter("client_id", System.getenv("SPOTIFY_CLIENT_ID"))
+                    .setParameter("response_type", "code")
+                    .setParameter("redirect_uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
+                    .setParameter("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read user-read-private user-read-email")
+                    .build().toString());
+        } catch (URISyntaxException ignored) {
+        }
+        return null;
     }
 
     public Result<SpotifyAuthData, Errors> exchangeAccessToken(String accessToken) {
@@ -72,7 +84,7 @@ public class SpotifyAuthService {
         return insertSpotifyAuthData(spotifyAuthData.cloneBuilder().withUserId(getUserId(spotifyAuthData)).build());
     }
 
-    private String getUserId(SpotifyAuthData spotifyAuthData){
+    private String getUserId(SpotifyAuthData spotifyAuthData) {
         Response<JSONObject> response = traverson.from(SPOTIFY_PROFILE_DATA)
                 .withHeader("Authorization", "Bearer %s".formatted(spotifyAuthData.accessToken()))
                 .get();
