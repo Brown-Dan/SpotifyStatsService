@@ -21,6 +21,7 @@ import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -70,12 +71,13 @@ public class StreamingDataService {
         LOG.info("Syncing streaming data for user - {}", streamingData.username());
         SpotifySearchRequest spotifySearchRequest = aSpotifySearchRequest().withUsername(streamingData.username()).withLimit(50).build();
         Result<StreamingData, Errors> streamingDataResult = getFromSpotify(spotifySearchRequest, spotifyRepository::getRecentStreamingData);
-        if (streamingDataResult.isFailure()){
+        if (streamingDataResult.isFailure()) {
             LOG.error("Failure syncing streaming data for user - {}", streamingData.username());
             return;
         }
         streamingDataUploadRepository.updateStreamingData(streamingData.updateStreamingDataFromSync(streamingDataResult.getValue()), streamingData.username());
-        streamingDataResult.getValue().streamData().forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, streamingData.username()));
+        streamingDataResult.getValue().streamData().stream().filter(streamData -> streamData.timeStreamed() > streamingData.lastUpdated().toEpochSecond(ZoneOffset.UTC))
+                .forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, streamingData.username()));
     }
 
     public Result<RankedStreamingData, Errors> getTopStreams(SpotifySearchRequest spotifySearchRequest) {
