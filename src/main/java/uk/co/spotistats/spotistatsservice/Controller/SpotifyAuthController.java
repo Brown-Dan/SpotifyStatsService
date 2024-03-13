@@ -19,11 +19,9 @@ import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchReq
 public class SpotifyAuthController {
 
     private final SpotifyAuthService spotifyAuthService;
-    private final StreamingDataService streamingDataService;
 
-    public SpotifyAuthController(SpotifyAuthService spotifyAuthService, StreamingDataService streamingDataService) {
+    public SpotifyAuthController(SpotifyAuthService spotifyAuthService) {
         this.spotifyAuthService = spotifyAuthService;
-        this.streamingDataService = streamingDataService;
     }
 
     @PostMapping(value = "/authenticate")
@@ -47,25 +45,10 @@ public class SpotifyAuthController {
     }
 
     @GetMapping(value = "/{username}/authorize")
-    public Result<StreamingData, Errors> authorize(@PathVariable String username) {
-        return streamingDataService.getRecentStreams(aSpotifySearchRequest().withUsername(username).withLimit(10).build());
+    public ResponseEntity<ApiResult<String, Errors>> authorize(@PathVariable String username) {
+        spotifyAuthService.authorize(username);
+        return ok("Success");
     }
-
-    @GetMapping(value = "/test/test")
-    public Result<StreamingData, Errors> test() {
-        return streamingDataService.getRecentStreams(aSpotifySearchRequest().withUsername("danbrown05").withLimit(10).build());
-    }
-
-    @GetMapping(value = "/test")
-    public Result<StreamingData, Errors> tesht() {
-        return streamingDataService.getRecentStreams(aSpotifySearchRequest().withUsername("danbrown05").withLimit(10).build());
-    }
-
-    @PostMapping(value = "/post")
-    public Result<StreamingData, Errors> tes2ht() {
-        return streamingDataService.getRecentStreams(aSpotifySearchRequest().withUsername("danbrown05").withLimit(10).build());
-    }
-
 
     private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
         return ResponseEntity.ok(ApiResult.success(body));
