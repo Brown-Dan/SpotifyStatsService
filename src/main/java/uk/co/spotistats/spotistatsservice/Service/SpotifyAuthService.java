@@ -63,18 +63,16 @@ public class SpotifyAuthService {
     }
 
     public Result<SpotifyAuthData, Errors> exchangeAccessToken(String accessToken) {
-        Response<String> response = traverson.from(SPOTIFY_REFRESH_URL)
+        Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
                 .withHeader("content-type", "application/x-www-form-urlencoded")
                 .withHeader("Authorization", System.getenv("SPOTIFY_BASE_64_AUTH"))
-                .get(String.class);
-//                .post(buildAccessTokenExchangeBody(accessToken));
-        LOG.info(response.getResource());
+                .post(buildAccessTokenExchangeBody(accessToken));
+
         SpotifyAuthData spotifyAuthData = objectMapper.convertValue(response.getResource(), SpotifyAuthData.class);
         return insertSpotifyAuthData(spotifyAuthData.cloneBuilder().withUserId(getUserId(spotifyAuthData)).build());
     }
 
     private String getUserId(SpotifyAuthData spotifyAuthData){
-        LOG.info("Retrieving userId");
         Response<JSONObject> response = traverson.from(SPOTIFY_PROFILE_DATA)
                 .withHeader("Authorization", "Bearer %s".formatted(spotifyAuthData.accessToken()))
                 .get();
