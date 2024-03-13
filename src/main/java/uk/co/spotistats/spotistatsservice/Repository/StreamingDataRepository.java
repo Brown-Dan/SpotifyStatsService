@@ -2,6 +2,7 @@ package uk.co.spotistats.spotistatsservice.Repository;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.LocalDateAsLocalDateTimeBinding;
 import org.springframework.stereotype.Repository;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
@@ -10,6 +11,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequ
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,8 +65,11 @@ public class StreamingDataRepository {
         } else {
             conditions.add(STREAM_DATA.DATE.between(streamingDataSearchRequest.startDate(), streamingDataSearchRequest.endDate()));
         }
-        if (streamingDataSearchRequest.startTime() != null && streamingDataSearchRequest.endTime() != null){
-            conditions.add(STREAM_DATA.TIME.between(streamingDataSearchRequest.startTime(), streamingDataSearchRequest.endTime()));
+        if (streamingDataSearchRequest.startTime() != null){
+            conditions.add(STREAM_DATA.TIME.cast(LocalTime.class).greaterOrEqual(streamingDataSearchRequest.startTime()));
+        }
+        if (streamingDataSearchRequest.endTime() != null){
+            conditions.add(STREAM_DATA.TIME.cast(LocalTime.class).lessOrEqual(streamingDataSearchRequest.endTime()));
         }
         if (streamingDataSearchRequest.uri() != null) {
             conditions.add(STREAM_DATA.TRACK_URI.eq(streamingDataSearchRequest.uri()));
