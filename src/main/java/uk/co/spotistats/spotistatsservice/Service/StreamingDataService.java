@@ -104,8 +104,8 @@ public class StreamingDataService {
         StreamingDataSearchRequest.Builder streamingDataSearchRequestBuilder = aStreamingDataSearchRequest()
                 .withUsername(username)
                 .withOrderBy(StreamDataSearchRequestOrderBy.STREAM_DATE_TIME.name())
-                .withStart(getStreamingDataResult.getValue().firstStreamDateTime().toLocalDate())
-                .withEnd(getStreamingDataResult.getValue().lastStreamDateTime().toLocalDate());
+                .withStartDate(getStreamingDataResult.getValue().firstStreamDateTime().toLocalDate())
+                .withEndDate(getStreamingDataResult.getValue().lastStreamDateTime().toLocalDate());
 
         List<RankedStreamData> rankedStreamData = streamingData.streamData().stream().map(streamData ->
                 populateRankedStreamData(streamData, streamingDataSearchRequestBuilder,
