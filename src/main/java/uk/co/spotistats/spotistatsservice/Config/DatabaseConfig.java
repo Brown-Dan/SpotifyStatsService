@@ -46,15 +46,15 @@ public class DatabaseConfig {
         return dataSource;
     }
 
-    @PostConstruct
-    public void migrate() {
-        Flyway.configure()
-                .dataSource(System.getenv("JDBC_DATABASE_URL"), System.getenv("JDBC_DATABASE_USERNAME"), System.getenv("JDBC_DATABASE_PASSWORD"))
-                .schemas("StreamingData")
-                .baselineOnMigrate(true)
-                .locations("classpath:db/migration")
-                .table("changelog")
-                .load()
-                .migrate();
-    }
+//    @PostConstruct
+//    public void migrate() {
+//        Flyway.configure()
+//                .dataSource(System.getenv("JDBC_DATABASE_URL"), System.getenv("JDBC_DATABASE_USERNAME"), System.getenv("JDBC_DATABASE_PASSWORD"))
+//                .schemas("StreamingData")
+//                .baselineOnMigrate(true)
+//                .locations("classpath:db/migration")
+//                .table("changelog")
+//                .load()
+//                .migrate();
+//    }
 }
