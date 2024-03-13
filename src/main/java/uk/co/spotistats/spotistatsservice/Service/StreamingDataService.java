@@ -76,7 +76,7 @@ public class StreamingDataService {
             return;
         }
         List<StreamData> filteredStreamData = streamingDataResult.getValue().streamData().stream().filter(streamData -> streamData.timeStreamed() > streamingData.lastUpdated().toEpochSecond(ZoneOffset.UTC)).toList();
-        streamingDataUploadRepository.updateStreamingData(streamingData.updateStreamingDataFromSync(streamingDataResult.getValue()).cloneBuilder().withSize(filteredStreamData.size()).build(), streamingData.username());
+        streamingDataUploadRepository.updateStreamingData(streamingData.updateStreamingDataFromSync(streamingDataResult.getValue()).cloneBuilder().withSize(filteredStreamData.size() + streamingData.size()).build(), streamingData.username());
         filteredStreamData.forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, streamingData.username()));
     }
 
