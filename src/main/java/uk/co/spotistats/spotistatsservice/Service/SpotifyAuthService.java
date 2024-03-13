@@ -59,7 +59,7 @@ public class SpotifyAuthService {
     }
 
     public RedirectView redirect() {
-        return new RedirectView("https://accounts.spotify.com/authorize?client_id=2025b48d922a49099d665cbbd2563436&response_type=code&redirect_uri=https://spotifystats.co.uk%2Fauthenticate%2Fcallback&scope=playlist-read-private%20user-follow-read%20user-top-read%20user-read-recently-played%20user-library-read%20user-read-private%20user-read-email");
+        return new RedirectView("https://accounts.spotify.com/authorize?client_id=2025b48d922a49099d665cbbd2563436&response_type=code&redirect_uri=https://spotifystats.co.uk%2Fspotify%2Fauthenticate%2Fcallback&scope=playlist-read-private%20user-follow-read%20user-top-read%20user-read-recently-played%20user-library-read%20user-read-private%20user-read-email");
     }
 
     public Result<SpotifyAuthData, Errors> exchangeAccessToken(String accessToken) {
