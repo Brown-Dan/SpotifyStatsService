@@ -14,15 +14,13 @@ import java.util.Map;
 @Component
 public class SpotifyClient {
 
-    private Traverson traverson;
+    private final Traverson traverson;
     private final Map<String, String> headers = new HashMap<>();
     private final Map<String, String> queryParams = new HashMap<>();
 
     private static final String RECENT_STREAMS_URL = "https://api.spotify.com/v1/me/player/recently-played";
     private static final String TOP_TRACKS_URL = "https://api.spotify.com/v1/me/top/tracks";
 
-    public SpotifyClient() {
-    }
 
     public SpotifyClient(Traverson traverson) {
         this.traverson = traverson;
