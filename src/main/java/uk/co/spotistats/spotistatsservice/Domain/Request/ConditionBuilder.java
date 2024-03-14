@@ -15,6 +15,7 @@ public enum ConditionBuilder {
     URI(uri -> STREAM_DATA.TRACK_URI.eq((String) uri), StreamingDataSearchRequest::uri),
     ALBUM(album -> STREAM_DATA.ALBUM_NAME.eq((String) album), StreamingDataSearchRequest::album),
     ARIST(artist -> STREAM_DATA.ARTIST_NAME.eq((String) artist), StreamingDataSearchRequest::artist),
+    COUNTRY(country -> STREAM_DATA.COUNTRY.eq((String) country), StreamingDataSearchRequest::country),
     TRACK_NAME(trackName -> STREAM_DATA.TRACK_NAME.eq((String) trackName), StreamingDataSearchRequest::trackName),
     PLATFORM(platform -> STREAM_DATA.PLATFORM.eq((String) platform), StreamingDataSearchRequest::platform),
     START_DATE(startDate -> STREAM_DATA.DATE.ge((LocalDate) startDate), StreamingDataSearchRequest::startDate),
