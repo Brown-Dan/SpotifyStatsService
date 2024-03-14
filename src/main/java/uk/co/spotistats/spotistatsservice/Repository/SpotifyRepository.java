@@ -5,88 +5,95 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import uk.co.autotrader.traverson.Traverson;
-import uk.co.autotrader.traverson.http.Response;
 import uk.co.autotrader.traverson.http.TextBody;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.CreatePlaylistRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
 import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseJsonToStreamingDataMapper;
+import uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum.QueryParamValue;
+import uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum.SpotifyRequestError;
+import uk.co.spotistats.spotistatsservice.SpotifyClientApi.SpotifyClient;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
+import static uk.co.spotistats.spotistatsservice.Controller.Model.Errors.fromSpotifyRequestError;
+import static uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum.QueryParamValue.NOW;
 
 @Repository
 public class SpotifyRepository {
 
     private final Traverson traverson;
-    private final SpotifyResponseJsonToStreamingDataMapper spotifyResponseJsonToStreamingDataMapper;
+    private final SpotifyResponseJsonToStreamingDataMapper spotifyResponseMapper;
     private final ObjectMapper objectMapper;
+    private final SpotifyClient spotifyClient;
 
-    private static final String RECENT_STREAMS_URL = "https://api.spotify.com/v1/me/player/recently-played";
-    private static final String TOP_TRACKS_URL = "https://api.spotify.com/v1/me/top/tracks";
     private static final String USERS_URL = "https://api.spotify.com/v1/users/";
     private static final String PLAYLISTS_URL = "https://api.spotify.com/v1/playlists/";
 
-    public SpotifyRepository(Traverson traverson, SpotifyResponseJsonToStreamingDataMapper spotifyResponseJsonToStreamingDataMapper, ObjectMapper objectMapper) {
+    public SpotifyRepository(Traverson traverson, SpotifyResponseJsonToStreamingDataMapper spotifyResponseMapper, ObjectMapper objectMapper, SpotifyClient spotifyClient) {
         this.traverson = traverson;
-        this.spotifyResponseJsonToStreamingDataMapper = spotifyResponseJsonToStreamingDataMapper;
+        this.spotifyResponseMapper = spotifyResponseMapper;
         this.objectMapper = objectMapper;
+        this.spotifyClient = spotifyClient;
     }
 
     public Result<StreamingData, Errors> getRecentStreamingData(SpotifySearchRequest spotifySearchRequest) {
-        Response<String> response = traverson.from(RECENT_STREAMS_URL)
-                .withHeader("Authorization", "Bearer %s ".formatted(spotifySearchRequest.authData().accessToken()))
-                .withQueryParam("limit", spotifySearchRequest.limit().toString())
-                .withQueryParam("before", LocalDateTime.now().toInstant(ZoneOffset.UTC).toString())
-                .get(String.class);
-        if (response.isSuccessful()) {
-            return spotifyResponseJsonToStreamingDataMapper.mapFromRecentStreamsJson(JSONObject.parseObject(response.getResource(), JSONObject.class));
+        Result<StreamingData, SpotifyRequestError> result = spotifyClient
+                .withAccessToken(spotifySearchRequest.authData().accessToken())
+                .withContentType(APPLICATION_JSON)
+                .getRecentStreamingData()
+                .withBefore(NOW)
+                .withLimit(spotifySearchRequest.limit())
+                .fetchInto(JSONObject.class)
+                .map(spotifyResponseMapper::fromRecentStreams);
+
+        if (result.isFailure()) {
+            return failure(spotifySearchRequest.userId(), result.getError());
         }
-        return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().userId())));
+        return new Result.Success<>(result.getValue());
     }
 
     public Result<StreamingData, Errors> getTopTracks(SpotifySearchRequest spotifySearchRequest) {
-        Response<JSONObject> response = traverson.from(TOP_TRACKS_URL)
-                .withHeader("Authorization", "Bearer %s ".formatted(spotifySearchRequest.authData().accessToken()))
-                .withQueryParam("limit", spotifySearchRequest.limit().toString())
-                .withQueryParam("time_range", "long_term")
-                .get();
-        if (response.isSuccessful()) {
-            return spotifyResponseJsonToStreamingDataMapper.mapFromTopStreamsJson(response.getResource());
+        Result<StreamingData, SpotifyRequestError> result = spotifyClient
+                .withAccessToken(spotifySearchRequest.authData().accessToken())
+                .getTopTracks()
+                .withTimeRange(QueryParamValue.LONG_TERM)
+                .withLimit(spotifySearchRequest.limit())
+                .fetchInto(JSONObject.class)
+                .map(spotifyResponseMapper::fromTopTracks);
+
+        if (result.isFailure()) {
+            return failure(spotifySearchRequest.userId(), result.getError());
         }
-        return new Result.Failure<>(Errors.fromError(responseToError(response, spotifySearchRequest.authData().userId())));
+        return new Result.Success<>(result.getValue());
     }
 
-    public Result<Playlist, Error> createPlaylist(CreatePlaylistRequest createPlaylistRequest) {
-        Response<JSONObject> playlistCreationResponse = traverson.from(USERS_URL + createPlaylistRequest.authData().userId() + "/playlists")
-                .withHeader("Authorization", "Bearer %s ".formatted(createPlaylistRequest.authData().accessToken()))
-                .withHeader("Content-Type", "application/json")
-                .post(buildPlaylistCreationRequestBody(createPlaylistRequest));
-
-        if (!playlistCreationResponse.isSuccessful()) {
-            return new Result.Failure<>(responseToError(playlistCreationResponse, createPlaylistRequest.authData().userId()));
-        }
-        Playlist playlist = spotifyResponseJsonToStreamingDataMapper.mapFromPlaylistJson(playlistCreationResponse.getResource());
-
-        Response<JSONObject> addTracksResponse = traverson.from(PLAYLISTS_URL + playlist.id() + "/tracks")
-                .withHeader("Authorization", "Bearer %s ".formatted(createPlaylistRequest.authData().accessToken()))
-                .withHeader("Content-Type", "application/json")
-                .post(buildPlaylistAddTracksRequestBody(createPlaylistRequest));
-
-        if (!addTracksResponse.isSuccessful()) {
-            return new Result.Failure<>(responseToError(addTracksResponse, createPlaylistRequest.authData().userId()));
-        }
-
-        return new Result.Success<>(playlist.cloneBuilder().withTracks(createPlaylistRequest.trackUris()).build());
-    }
-
+//    public Result<Playlist, Errors> createPlaylist(CreatePlaylistRequest createPlaylistRequest) {
+//        Response<JSONObject> playlistCreationResponse = traverson.from(USERS_URL + createPlaylistRequest.authData().userId() + "/playlists")
+//                .withHeader("Authorization", createPlaylistRequest.authData().getHeader())
+//                .withHeader("Content-Type", "application/json")
+//                .post(buildPlaylistCreationRequestBody(createPlaylistRequest));
+//
+//        if (!playlistCreationResponse.isSuccessful()) {
+//            return failure(createPlaylistRequest.authData().userId(), playlistCreationResponse.getStatusCode());
+//        }
+//        Playlist playlist = spotifyResponseMapper.toPlaylist(playlistCreationResponse.getResource());
+//
+//        Response<JSONObject> addTracksResponse = traverson.from(PLAYLISTS_URL + playlist.id() + "/tracks")
+//                .withHeader("Authorization", createPlaylistRequest.authData().getHeader())
+//                .withHeader("Content-Type", "application/json")
+//                .post(buildPlaylistAddTracksRequestBody(createPlaylistRequest));
+//
+//        if (!addTracksResponse.isSuccessful()) {
+//            return failure(createPlaylistRequest.authData().userId(), addTracksResponse.getStatusCode());
+//        }
+//        return new Result.Success<>(playlist.cloneBuilder().withTracks(createPlaylistRequest.trackUris()).build());
+//    }
 
     private TextBody buildPlaylistCreationRequestBody(CreatePlaylistRequest createPlaylistRequest) {
         Map<String, String> body = new HashMap<>();
@@ -109,12 +116,7 @@ public class SpotifyRepository {
         }
     }
 
-    private Error responseToError(Response<?> response, String username) {
-        return switch (response.getStatusCode()) {
-            case 401 -> Error.notFound("spotifyAuthDetails", username);
-            case 403 -> Error.userNotRegisteredDev(username);
-            case 429 -> Error.spotifyRateLimitExceeded();
-            default -> Error.unknownError("spotify.api", "Failed to get streamingData");
-        };
+    private <T> Result<T, Errors> failure(String userId, SpotifyRequestError spotifyRequestError) {
+        return new Result.Failure<>(fromSpotifyRequestError(userId, spotifyRequestError));
     }
 }

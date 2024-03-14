@@ -6,12 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.time.ZonedDateTime;
@@ -34,41 +31,39 @@ public class SpotifyResponseJsonToStreamingDataMapper {
         this.objectMapper = objectMapper;
     }
 
-    public Result<StreamingData, Errors> mapFromRecentStreamsJson(JSONObject json) {
+    public StreamingData fromRecentStreams(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
-            List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> mapStreamData(item.get("track"))
+            List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toStreamData(item.get("track"))
                     .withStreamDateTime(Optional.ofNullable(item.get("played_at")).map(JsonNode::asText).map(ZonedDateTime::parse).map(ZonedDateTime::toLocalDateTime).orElse(null)).build()).toList();
-
-            return new Result.Success<>(aStreamingData()
+            return aStreamingData()
                     .withStreamData(streamData)
                     .withSize(streamData.size())
                     .withFirstStreamDateTime(streamData.getLast().streamDateTime())
-                    .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build());
+                    .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build();
         } catch (Exception e) {
             LOG.error("Failed to parse streaming data");
-            return new Result.Failure<>(Errors.fromError(Error.failedToParseData("recentStreams", "failed to read streaming data")));
+            throw new RuntimeException();
         }
     }
 
-    public Result<StreamingData, Errors> mapFromTopStreamsJson(JSONObject json) {
+    public StreamingData fromTopTracks(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
-            List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> mapStreamData(item)
+            List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toStreamData(item)
                     .withStreamDateTime(Optional.ofNullable(item.get("played_at")).map(JsonNode::asText).map(ZonedDateTime::parse).map(ZonedDateTime::toLocalDateTime).orElse(null)).build()).toList();
-
-            return new Result.Success<>(aStreamingData()
+            return aStreamingData()
                     .withStreamData(streamData)
                     .withSize(streamData.size())
                     .withFirstStreamDateTime(streamData.getLast().streamDateTime())
-                    .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build());
+                    .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build();
         } catch (Exception e) {
             LOG.error("Failed to parse streaming data");
-            return new Result.Failure<>(Errors.fromError(Error.failedToParseData("topStreams", "failed to read streaming data")));
+            throw new RuntimeException();
         }
     }
 
-    public Playlist mapFromPlaylistJson(JSONObject json) {
+    public Playlist toPlaylist(JSONObject json) {
         return aPlaylist()
                 .withId(json.get("id").toString())
                 .withUri(json.get("uri").toString())
@@ -77,7 +72,7 @@ public class SpotifyResponseJsonToStreamingDataMapper {
                 .build();
     }
 
-    private StreamData.Builder mapStreamData(JsonNode track) {
+    private StreamData.Builder toStreamData(JsonNode track) {
         return aStreamData()
                 .withAlbum(track.get("album").get("name").asText())
                 .withArtist(track.get("artists").get(0).get("name").asText())

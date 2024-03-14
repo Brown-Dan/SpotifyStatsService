@@ -2,8 +2,7 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
-public record SpotifySearchRequest(String username, Integer limit, SpotifyAuthData authData) {
-
+public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData) {
 
     public static final class Builder {
 
@@ -41,7 +40,7 @@ public record SpotifySearchRequest(String username, Integer limit, SpotifyAuthDa
 
     public Builder cloneBuilder() {
         return Builder.aSpotifySearchRequest()
-                .withUsername(username)
+                .withUsername(userId)
                 .withLimit(limit)
                 .withAuthData(authData);
     }

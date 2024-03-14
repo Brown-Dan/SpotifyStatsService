@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.http.HttpStatus;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.ErrorKey;
+import uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum.SpotifyRequestError;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -22,7 +23,16 @@ public record Errors(List<Error> errors, @JsonIgnore HttpStatus httpStatus) {
         return new Errors(errors, HttpStatus.BAD_REQUEST);
     }
 
-    public boolean hasErrors(){
+    public static Errors fromSpotifyRequestError(String username, SpotifyRequestError spotifyRequestError) {
+        return fromError(switch (spotifyRequestError) {
+            case FORBIDDEN -> Error.userNotRegisteredDev(username);
+            case NOT_FOUND -> Error.notFound("spotifyAuthDetails", username);
+            case TOO_MANY_REQUESTS -> Error.spotifyRateLimitExceeded();
+            default -> Error.unknownError("spotify", "Exception occurred within spotify client");
+        });
+    }
+
+    public boolean hasErrors() {
         return !errors.isEmpty();
     }
 }
