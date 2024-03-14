@@ -8,7 +8,7 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
         private String userId;
         private Integer limit;
         private SpotifyAuthData authData;
-        private Boolean createPlaylist;
+        private boolean createPlaylist;
 
         private Builder() {
         }
