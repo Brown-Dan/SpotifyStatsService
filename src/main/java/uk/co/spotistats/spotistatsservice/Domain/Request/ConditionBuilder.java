@@ -3,7 +3,6 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 import org.jooq.Condition;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.function.Function;
 
