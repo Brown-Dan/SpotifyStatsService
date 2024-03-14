@@ -2,6 +2,8 @@ package uk.co.spotistats.spotistatsservice.SpotifyApiWrapper;
 
 import com.alibaba.fastjson2.JSON;
 import org.apache.hc.core5.http.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.co.autotrader.traverson.Traverson;
 import uk.co.autotrader.traverson.TraversonBuilder;
@@ -23,6 +25,8 @@ public class SpotifyClient {
     private static final String TOP_TRACKS_URL = "https://api.spotify.com/v1/me/top/tracks";
     private static final String USERS_URL = "https://api.spotify.com/v1/users/";
     private static final String ADD_TRACKS = "https://api.spotify.com/v1/playlists/%s/tracks";
+
+    private static final Logger LOG = LoggerFactory.getLogger(SpotifyClient.class);
 
     public SpotifyClient(Traverson traverson) {
         this.traverson = traverson;
@@ -87,6 +91,10 @@ public class SpotifyClient {
         addHeaders(traversonBuilder);
         addQueryParams(traversonBuilder);
 
+        LOG.info(USERS_URL + createPlaylistRequest.getUserId() + "/playlists");
+        LOG.info(JSON.toJSONString(headers));
+        LOG.info(JSON.toJSONString(queryParams));
+
         return new SpotifyResponseWrapper<>(traversonBuilder.post(createPlaylistRequest.getBody(), type));
     }
 
@@ -94,6 +102,10 @@ public class SpotifyClient {
         TraversonBuilder traversonBuilder = traverson.from(ADD_TRACKS.formatted(addTracksRequest.getPlaylistId()));
         addHeaders(traversonBuilder);
         addQueryParams(traversonBuilder);
+
+        LOG.info(ADD_TRACKS.formatted(addTracksRequest.getPlaylistId()));
+        LOG.info(JSON.toJSONString(headers));
+        LOG.info(JSON.toJSONString(queryParams));
 
         return new SpotifyResponseWrapper<>(traversonBuilder.post(addTracksRequest.getBody(), type));
     }

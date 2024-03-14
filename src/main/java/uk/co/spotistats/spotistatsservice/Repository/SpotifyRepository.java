@@ -12,7 +12,6 @@ import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
 import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseJsonToStreamingDataMapper;
-import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParamValue;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.SpotifyClient;
@@ -50,7 +49,7 @@ public class SpotifyRepository {
         if (result.isFailure()) {
             return failure(spotifySearchRequest.userId(), result.getError());
         }
-        if (spotifySearchRequest.createPlaylist()){
+        if (spotifySearchRequest.createPlaylist()) {
             LOG.info("Creating playlist from recent songs");
             createPlaylist(aCreatePlaylistRequest()
                     .withName(spotifySearchRequest.userId() + " : %s".formatted(LocalDateTime.now()))
