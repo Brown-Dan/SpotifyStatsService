@@ -51,7 +51,7 @@ public class StreamingDataService {
     }
 
     public <T> Result<T, Errors> getFromSpotify(SpotifySearchRequest spotifySearchRequest, Function<SpotifySearchRequest, Result<T, Errors>> spotifyRepositoryGetter) {
-        Result<SpotifyAuthData, Error> getSpotifyAuthDataResult = spotifyAuthService.getSpotifyAuthData(spotifySearchRequest.username());
+        Result<SpotifyAuthData, Error> getSpotifyAuthDataResult = spotifyAuthService.getSpotifyAuthData(spotifySearchRequest.userId());
 
         if (getSpotifyAuthDataResult.isFailure()) {
             return new Result.Failure<>(Errors.fromError(getSpotifyAuthDataResult.getError()));
@@ -84,7 +84,7 @@ public class StreamingDataService {
         if (apiResult.isFailure()) {
             return new Result.Failure<>(apiResult.getError());
         }
-        return mapStreamingDataToRankedStreamData(apiResult.getValue(), spotifySearchRequest.username());
+        return mapStreamingDataToRankedStreamData(apiResult.getValue(), spotifySearchRequest.userId());
     }
 
     public Result<StreamingData, Errors> search(StreamingDataSearchRequest streamingDataSearchRequest) {

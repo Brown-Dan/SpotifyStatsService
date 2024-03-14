@@ -90,7 +90,7 @@ public record StreamingData(List<StreamData> streamData,
         }
     }
 
-    public StreamingData.Builder cloneBuilder(){
+    public StreamingData.Builder cloneBuilder() {
         return aStreamingData()
                 .withUsername(username)
                 .withLastUpdated(lastUpdated)
