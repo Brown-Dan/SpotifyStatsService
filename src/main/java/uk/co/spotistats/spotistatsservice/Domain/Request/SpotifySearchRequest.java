@@ -32,7 +32,7 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
             return this;
         }
 
-        public Builder withCreatePlaylist(Boolean createPlaylist) {
+        public Builder withCreatePlaylist(boolean createPlaylist) {
             this.createPlaylist = createPlaylist;
             return this;
         }

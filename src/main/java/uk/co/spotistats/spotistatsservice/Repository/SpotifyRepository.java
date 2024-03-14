@@ -83,6 +83,7 @@ public class SpotifyRepository {
                 .createPlaylist()
                 .withName(createPlaylistRequest.name())
                 .withDescription(createPlaylistRequest.description())
+                .withUserId(createPlaylistRequest.authData().userId())
                 .withTracks(createPlaylistRequest.trackUris())
                 .fetchInto(JSONObject.class)
                 .map(spotifyResponseMapper::toPlaylist);
