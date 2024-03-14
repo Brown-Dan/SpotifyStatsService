@@ -66,7 +66,7 @@ public class SpotifyClient {
 
     <T> SpotifyResponseWrapper<T> fetch(TopTracksRequest topTracksRequest, Class<T> type) {
         queryParams.put("limit", topTracksRequest.getLimit());
-        queryParams.put("before", topTracksRequest.getTimeRange());
+        queryParams.put("time_range", topTracksRequest.getTimeRange());
 
         TraversonBuilder traversonBuilder = traverson.from(TOP_TRACKS_URL);
         addHeaders(traversonBuilder);
