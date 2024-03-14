@@ -61,10 +61,13 @@ public class StreamingDataRepository {
         if (streamingDataSearchRequest.onDate() != null) {
             conditions.add(STREAM_DATA.DATE.eq(streamingDataSearchRequest.onDate()));
         } else {
-            conditions.add(STREAM_DATA.DATE.between(streamingDataSearchRequest.startDate(), streamingDataSearchRequest.endDate()));
+//            conditions.add(STREAM_DATA.DATE.between(streamingDataSearchRequest.startDate(), streamingDataSearchRequest.endDate()));
+            conditions.add(STREAM_DATA.DATE.ge(streamingDataSearchRequest.startDate()));
+            conditions.add(STREAM_DATA.DATE.le(streamingDataSearchRequest.endDate()));
         }
         if (streamingDataSearchRequest.startTime() != null && streamingDataSearchRequest.endTime() != null) {
-            conditions.add(STREAM_DATA.TIME.between(streamingDataSearchRequest.startTime(), streamingDataSearchRequest.endTime()));
+            conditions.add(STREAM_DATA.TIME.ge(streamingDataSearchRequest.startTime()));
+            conditions.add(STREAM_DATA.TIME.le(streamingDataSearchRequest.endTime()));
         }
         if (streamingDataSearchRequest.uri() != null) {
             conditions.add(STREAM_DATA.TRACK_URI.eq(streamingDataSearchRequest.uri()));

@@ -6,7 +6,7 @@ import uk.co.spotistats.generated.tables.records.StreamDataRecord;
 import static uk.co.spotistats.generated.Tables.STREAM_DATA;
 
 public enum StreamDataSearchRequestOrderBy {
-    STREAM_DATE_TIME(STREAM_DATA.DATE_TIME);
+    DATE(STREAM_DATA.DATE_TIME);
 
     private final TableField<StreamDataRecord, ?> field;
 

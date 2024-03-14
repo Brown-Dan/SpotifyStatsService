@@ -102,7 +102,7 @@ public class StreamingDataService {
         }
         StreamingDataSearchRequest.Builder streamingDataSearchRequestBuilder = aStreamingDataSearchRequest()
                 .withUsername(username)
-                .withOrderBy(StreamDataSearchRequestOrderBy.STREAM_DATE_TIME.name())
+                .withOrderBy(StreamDataSearchRequestOrderBy.DATE.name())
                 .withStartDate(getStreamingDataResult.getValue().firstStreamDateTime().toLocalDate())
                 .withEndDate(getStreamingDataResult.getValue().lastStreamDateTime().toLocalDate());
 
