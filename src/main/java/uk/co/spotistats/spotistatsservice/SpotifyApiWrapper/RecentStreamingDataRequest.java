@@ -1,6 +1,6 @@
-package uk.co.spotistats.spotistatsservice.SpotifyClientApi;
+package uk.co.spotistats.spotistatsservice.SpotifyApiWrapper;
 
-import uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum.QueryParamValue;
+import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParamValue;
 
 public class RecentStreamingDataRequest {
     private String limit;
@@ -16,7 +16,7 @@ public class RecentStreamingDataRequest {
         return this;
     }
 
-    public <T> RecentStreamingDataRequest withBefore(QueryParamValue before) {
+    public RecentStreamingDataRequest withBefore(QueryParamValue before) {
         this.before = before.getValue();
         return this;
     }

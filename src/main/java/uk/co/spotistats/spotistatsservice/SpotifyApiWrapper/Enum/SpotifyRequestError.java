@@ -1,4 +1,4 @@
-package uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum;
+package uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum;
 
 public enum SpotifyRequestError {
     BAD_REQUEST(400),

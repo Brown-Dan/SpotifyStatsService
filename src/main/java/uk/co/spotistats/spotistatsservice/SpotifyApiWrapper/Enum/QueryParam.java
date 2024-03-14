@@ -1,4 +1,4 @@
-package uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum;
+package uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum;
 
 public enum QueryParam {
     LIMIT("limit"),

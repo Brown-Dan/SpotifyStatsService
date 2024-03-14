@@ -1,8 +1,8 @@
-package uk.co.spotistats.spotistatsservice.SpotifyClientApi;
+package uk.co.spotistats.spotistatsservice.SpotifyApiWrapper;
 
 import uk.co.autotrader.traverson.http.Response;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum.SpotifyRequestError;
+import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -14,7 +14,15 @@ public class SpotifyResponseWrapper<T> {
         this.response = response;
     }
 
-    Response<T> execute() {
+    public Response<T> execute() {
+        return response;
+    }
+
+    boolean isFailure(){
+        return !response.isSuccessful();
+    }
+
+    Response<T> getResponse(){
         return response;
     }
 

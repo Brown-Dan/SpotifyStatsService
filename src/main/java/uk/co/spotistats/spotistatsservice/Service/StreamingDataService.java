@@ -68,7 +68,7 @@ public class StreamingDataService {
     @Async
     public void syncRecentStreamData(StreamingData streamingData) {
         LOG.info("Syncing streaming data for user - {}", streamingData.username());
-        SpotifySearchRequest spotifySearchRequest = aSpotifySearchRequest().withUsername(streamingData.username()).withLimit(50).build();
+        SpotifySearchRequest spotifySearchRequest = aSpotifySearchRequest().withUserId(streamingData.username()).withLimit(50).build();
         Result<StreamingData, Errors> streamingDataResult = getFromSpotify(spotifySearchRequest, spotifyRepository::getRecentStreamingData);
         if (streamingDataResult.isFailure()) {
             LOG.error("Failure syncing streaming data for user - {}", streamingData.username());

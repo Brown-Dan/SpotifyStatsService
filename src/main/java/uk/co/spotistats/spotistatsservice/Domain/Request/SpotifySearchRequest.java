@@ -2,13 +2,13 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
-public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData) {
+public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, Boolean createPlaylist) {
 
     public static final class Builder {
-
-        private String username;
+        private String userId;
         private Integer limit;
         private SpotifyAuthData authData;
+        private Boolean createPlaylist;
 
         private Builder() {
         }
@@ -17,8 +17,8 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
             return new Builder();
         }
 
-        public Builder withUsername(String username) {
-            this.username = username;
+        public Builder withUserId(String userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -32,16 +32,20 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
             return this;
         }
 
-        public SpotifySearchRequest build() {
-            return new SpotifySearchRequest(username, limit, authData);
+        public Builder withCreatePlaylist(Boolean createPlaylist) {
+            this.createPlaylist = createPlaylist;
+            return this;
         }
 
+        public SpotifySearchRequest build() {
+            return new SpotifySearchRequest(userId, limit, authData, createPlaylist);
+        }
     }
-
     public Builder cloneBuilder() {
         return Builder.aSpotifySearchRequest()
-                .withUsername(userId)
+                .withUserId(userId)
                 .withLimit(limit)
+                .withCreatePlaylist(createPlaylist)
                 .withAuthData(authData);
     }
 }

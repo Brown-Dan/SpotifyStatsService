@@ -1,6 +1,6 @@
-package uk.co.spotistats.spotistatsservice.SpotifyClientApi;
+package uk.co.spotistats.spotistatsservice.SpotifyApiWrapper;
 
-import uk.co.spotistats.spotistatsservice.SpotifyClientApi.Enum.QueryParamValue;
+import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParamValue;
 
 public class TopTracksRequest {
     String limit;
