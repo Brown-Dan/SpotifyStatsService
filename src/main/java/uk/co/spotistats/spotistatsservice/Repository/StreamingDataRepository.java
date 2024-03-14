@@ -5,12 +5,14 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.ConditionBuilder;
 import uk.co.spotistats.spotistatsservice.Domain.Request.StreamDataSearchRequestOrderBy;
 import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static uk.co.spotistats.generated.tables.StreamData.STREAM_DATA;
@@ -53,38 +55,10 @@ public class StreamingDataRepository {
     }
 
     private List<Condition> buildQueryConditions(StreamingDataSearchRequest streamingDataSearchRequest) {
-        List<Condition> conditions = new ArrayList<>();
-
-        if (streamingDataSearchRequest.country() != null) {
-            conditions.add(STREAM_DATA.COUNTRY.eq(streamingDataSearchRequest.country()));
-        }
-        if (streamingDataSearchRequest.onDate() != null) {
-            conditions.add(STREAM_DATA.DATE.eq(streamingDataSearchRequest.onDate()));
-        } else {
-//            conditions.add(STREAM_DATA.DATE.between(streamingDataSearchRequest.startDate(), streamingDataSearchRequest.endDate()));
-            conditions.add(STREAM_DATA.DATE.ge(streamingDataSearchRequest.startDate()));
-            conditions.add(STREAM_DATA.DATE.le(streamingDataSearchRequest.endDate()));
-        }
-        if (streamingDataSearchRequest.startTime() != null && streamingDataSearchRequest.endTime() != null) {
-            conditions.add(STREAM_DATA.TIME.ge(streamingDataSearchRequest.startTime()));
-            conditions.add(STREAM_DATA.TIME.le(streamingDataSearchRequest.endTime()));
-        }
-        if (streamingDataSearchRequest.uri() != null) {
-            conditions.add(STREAM_DATA.TRACK_URI.eq(streamingDataSearchRequest.uri()));
-        }
-        if (streamingDataSearchRequest.album() != null) {
-            conditions.add(STREAM_DATA.ALBUM_NAME.eq(streamingDataSearchRequest.album()));
-        }
-        if (streamingDataSearchRequest.artist() != null) {
-            conditions.add(STREAM_DATA.ARTIST_NAME.eq(streamingDataSearchRequest.artist()));
-        }
-        if (streamingDataSearchRequest.trackName() != null) {
-            conditions.add(STREAM_DATA.TRACK_NAME.eq(streamingDataSearchRequest.trackName()));
-        }
-        if (streamingDataSearchRequest.platform() != null) {
-            conditions.add(STREAM_DATA.PLATFORM.eq(streamingDataSearchRequest.platform()));
-        }
-        return conditions;
+        return Arrays.stream(ConditionBuilder.values())
+                .filter(condition -> condition.getGetter().apply(streamingDataSearchRequest) != null)
+                .map(condition -> condition.getCondition().apply(condition.getGetter().apply(streamingDataSearchRequest)))
+                .toList();
     }
 
     private StreamingData buildStreamingData(List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData) {
