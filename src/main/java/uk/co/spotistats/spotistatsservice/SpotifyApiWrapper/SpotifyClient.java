@@ -34,7 +34,7 @@ public class SpotifyClient {
     }
 
     public SpotifyClient withContentType(ContentType contentType) {
-        headers.put("content-type", contentType.toString());
+        headers.put("content-type", contentType.getMimeType());
         return this;
     }
 
