@@ -2,7 +2,7 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
-public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, Boolean createPlaylist) {
+public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, boolean createPlaylist) {
 
     public static final class Builder {
         private String userId;
