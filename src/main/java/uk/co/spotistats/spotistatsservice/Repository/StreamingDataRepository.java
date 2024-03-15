@@ -5,9 +5,9 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Request.ConditionBuilder;
-import uk.co.spotistats.spotistatsservice.Domain.Request.StreamDataSearchRequestOrderBy;
-import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.ConditionBuilder;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamDataSearchRequestOrderBy;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 

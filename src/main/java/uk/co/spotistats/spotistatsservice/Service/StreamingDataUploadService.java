@@ -25,28 +25,33 @@ public class StreamingDataUploadService {
         this.streamingDataUploadRepository = streamingDataUploadRepository;
     }
 
-    public Result<StreamingDataUpsertResult, Error> upsert(StreamingData streamingData, String username) {
-        Optional<StreamingData> existingStreamingData = streamingDataUploadRepository.getStreamingDataByUsername(username);
+    public boolean hasStreamingData(String userId){
+        Optional<StreamingData> existingStreamingData = streamingDataUploadRepository.getStreamingDataByUsername(userId);
+        return existingStreamingData.isPresent();
+    }
+
+    public Result<StreamingDataUpsertResult, Error> upsert(StreamingData streamingData, String userId) {
+        Optional<StreamingData> existingStreamingData = streamingDataUploadRepository.getStreamingDataByUsername(userId);
 
         StreamingDataUpsertResult streamingDataUpsertResult;
         if (existingStreamingData.isPresent()) {
             Optional<StreamingDataUpsertResult> updateResult = streamingDataUploadRepository
-                    .updateStreamingData(combineStreamingData(existingStreamingData.get(), streamingData), username);
+                    .updateStreamingData(combineStreamingData(existingStreamingData.get(), streamingData), userId);
             if (updateResult.isEmpty()) {
-                return new Result.Failure<>(Error.unknownError(null, "Failure updating streaming data - %s for userId - %s ".formatted(streamingData, username)));
+                return new Result.Failure<>(Error.unknownError(null, "Failure updating streaming data - %s for userId - %s ".formatted(streamingData, userId)));
             }
             streamingDataUpsertResult = updateResult.get();
-            LOG.info("Updated streaming data for user - {}", username);
+            LOG.info("Updated streaming data for user - {}", userId);
         } else {
             Optional<StreamingDataUpsertResult> insertResult = streamingDataUploadRepository
-                    .insertStreamingData(streamingData, username);
+                    .insertStreamingData(streamingData, userId);
             if (insertResult.isEmpty()) {
-                return new Result.Failure<>(Error.unknownError(null, "Failure inserting streaming data - %s for userId - %s ".formatted(streamingData, username)));
+                return new Result.Failure<>(Error.unknownError(null, "Failure inserting streaming data - %s for userId - %s ".formatted(streamingData, userId)));
             }
             streamingDataUpsertResult = insertResult.get();
-            LOG.info("Inserted streaming data for user - {}", username);
+            LOG.info("Inserted streaming data for user - {}", userId);
         }
-        streamingData.streamData().forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, username));
+        streamingData.streamData().forEach(streamData -> streamingDataUploadRepository.insertStreamData(streamData, userId));
         return new Result.Success<>(streamingDataUpsertResult);
     }
 

@@ -2,20 +2,24 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
-public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, boolean createPlaylist,
-                                   Integer page) {
+import static uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest.Builder.aTopTracksSearchRequest;
+
+public record TopTracksSearchRequest(String userId, int limit, SpotifyAuthData authData, boolean createPlaylist,
+                                   int page, boolean ranked) {
+
 
     public static final class Builder {
         private String userId;
-        private Integer limit;
+        private int limit;
         private SpotifyAuthData authData;
         private boolean createPlaylist;
-        private Integer page;
+        private int page;
+        private boolean ranked;
 
         private Builder() {
         }
 
-        public static Builder aSpotifySearchRequest() {
+        public static Builder aTopTracksSearchRequest() {
             return new Builder();
         }
 
@@ -24,7 +28,7 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
             return this;
         }
 
-        public Builder withLimit(Integer limit) {
+        public Builder withLimit(int limit) {
             this.limit = limit;
             return this;
         }
@@ -39,22 +43,28 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
             return this;
         }
 
-        public Builder withPage(Integer page) {
+        public Builder withPage(int page) {
             this.page = page;
             return this;
         }
 
-        public SpotifySearchRequest build() {
-            return new SpotifySearchRequest(userId, limit, authData, createPlaylist, page);
+        public Builder withRanked(boolean ranked) {
+            this.ranked = ranked;
+            return this;
+        }
+
+        public TopTracksSearchRequest build() {
+            return new TopTracksSearchRequest(userId, limit, authData, createPlaylist, page, ranked);
         }
     }
 
-    public Builder cloneBuilder() {
-        return Builder.aSpotifySearchRequest()
+    public TopTracksSearchRequest.Builder cloneBuilder(){
+        return aTopTracksSearchRequest()
                 .withUserId(userId)
                 .withLimit(limit)
-                .withPage(page)
+                .withAuthData(authData)
                 .withCreatePlaylist(createPlaylist)
-                .withAuthData(authData);
+                .withPage(page)
+                .withRanked(ranked);
     }
 }

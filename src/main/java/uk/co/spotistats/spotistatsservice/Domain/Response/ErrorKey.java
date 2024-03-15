@@ -10,6 +10,7 @@ public enum ErrorKey {
     FAILED_TO_PARSE_DATA(HttpStatus.INTERNAL_SERVER_ERROR),
     UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
     SPOTIFY_RATE_LIMIT_EXCEEDED(HttpStatus.TOO_MANY_REQUESTS),
+    STREAMING_DATA_NOT_UPLOADED(HttpStatus.FORBIDDEN),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND);
 
     private final HttpStatus httpStatus;

@@ -1,9 +1,9 @@
-package uk.co.spotistats.spotistatsservice.Controller.Validator;
+package uk.co.spotistats.spotistatsservice.Service.Validator;
 
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
-import uk.co.spotistats.spotistatsservice.Domain.Request.StreamDataSearchRequestOrderBy;
-import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamDataSearchRequestOrderBy;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 
 import java.util.ArrayList;

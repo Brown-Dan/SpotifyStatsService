@@ -7,10 +7,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
-import uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.TopTracksResource;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
@@ -32,8 +33,8 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<RankedStreamingData, Errors>> getTopStreams(@PathVariable String username, SpotifySearchRequest spotifySearchRequest) {
-        return get(streamingDataService::getTopStreams, spotifySearchRequest.cloneBuilder().withUserId(username).build());
+    public ResponseEntity<ApiResult<TopTracksResource, Errors>> top(@PathVariable String username, TopTracksSearchRequest searchRequest) {
+        return get(streamingDataService::getTopTracks, searchRequest.cloneBuilder().withUserId(username).build());
     }
 
     @GetMapping(value = "/search")

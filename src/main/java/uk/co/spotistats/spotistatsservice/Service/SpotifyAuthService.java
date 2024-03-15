@@ -45,10 +45,10 @@ public class SpotifyAuthService {
         return new Result.Success<>(spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData));
     }
 
-    public Result<SpotifyAuthData, Errors> getSpotifyAuthData(String username) {
-        Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(username);
+    public Result<SpotifyAuthData, Errors> getSpotifyAuthData(String userId) {
+        Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(userId);
         if (existingAuthData.isEmpty()) {
-            return new Result.Failure<>(Errors.fromError(Error.notFound("spotifyAuthDetails", username)));
+            return new Result.Failure<>(Errors.fromError(Error.notFound("spotifyAuthDetails", userId)));
         }
         SpotifyAuthData spotifyAuthData = existingAuthData.get();
 

@@ -2,10 +2,10 @@ package uk.co.spotistats.spotistatsservice.Domain.Model;
 
 import java.util.List;
 
-public record RankedStreamingData(List<RankedStreamData> rankedStreamData, Integer size) {
+public record RankedStreamingData(List<RankedTrackData> rankedTrackData, Integer size) {
 
     public static final class Builder {
-        private List<RankedStreamData> rankedStreamData;
+        private List<RankedTrackData> rankedTrackData;
         private Integer size;
 
         private Builder() {
@@ -15,8 +15,8 @@ public record RankedStreamingData(List<RankedStreamData> rankedStreamData, Integ
             return new Builder();
         }
 
-        public Builder withRankedStreamData(List<RankedStreamData> rankedStreamData) {
-            this.rankedStreamData = rankedStreamData;
+        public Builder withRankedStreamData(List<RankedTrackData> rankedTrackData) {
+            this.rankedTrackData = rankedTrackData;
             return this;
         }
 
@@ -26,7 +26,7 @@ public record RankedStreamingData(List<RankedStreamData> rankedStreamData, Integ
         }
 
         public RankedStreamingData build() {
-            return new RankedStreamingData(rankedStreamData, size);
+            return new RankedStreamingData(rankedTrackData, size);
         }
     }
 }

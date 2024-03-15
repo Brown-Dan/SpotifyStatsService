@@ -57,23 +57,23 @@ public class SpotifyResponseMapper {
             return aStreamingData()
                     .withStreamData(streamData)
                     .withSize(streamData.size())
-                    .withFirstStreamDateTime(streamData.getLast().streamDateTime())
-                    .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build();
+                    .withFirstStreamDateTime(streamData.isEmpty() ? null : streamData.getLast().streamDateTime())
+                    .withLastStreamDateTime(streamData.isEmpty() ? null : streamData.getFirst().streamDateTime()).build();
         } catch (Exception e) {
             LOG.error("Failed to parse streaming data");
             throw new RuntimeException();
         }
     }
 
-    public SpotifyRefreshTokenResponse toRefreshTokenResponse(JSONObject resource){
+    public SpotifyRefreshTokenResponse toRefreshTokenResponse(JSONObject resource) {
         return objectMapper.convertValue(resource, SpotifyRefreshTokenResponse.class);
     }
 
-    public SpotifyAuthData toSpotifyAuthData(JSONObject jsonObject){
+    public SpotifyAuthData toSpotifyAuthData(JSONObject jsonObject) {
         return objectMapper.convertValue(jsonObject, SpotifyAuthData.class);
     }
 
-    public String toUserProfile(JSONObject jsonObject){
+    public String toUserProfile(JSONObject jsonObject) {
         return jsonObject.get("id").toString();
     }
 

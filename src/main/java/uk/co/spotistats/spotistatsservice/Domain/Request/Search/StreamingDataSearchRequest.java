@@ -1,9 +1,9 @@
-package uk.co.spotistats.spotistatsservice.Domain.Request;
+package uk.co.spotistats.spotistatsservice.Domain.Request.Search;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
+import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
 public record StreamingDataSearchRequest(
         String username,

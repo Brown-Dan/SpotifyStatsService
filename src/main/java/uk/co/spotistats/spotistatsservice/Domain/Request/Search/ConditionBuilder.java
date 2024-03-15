@@ -1,4 +1,4 @@
-package uk.co.spotistats.spotistatsservice.Domain.Request;
+package uk.co.spotistats.spotistatsservice.Domain.Request.Search;
 
 import org.jooq.Condition;
 
