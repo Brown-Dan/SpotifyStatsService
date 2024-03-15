@@ -20,7 +20,6 @@ public class SpotifyAuthController {
         this.spotifyAuthService = spotifyAuthService;
     }
 
-    // TODO remove will be obsolete once auth synced
     @PostMapping(value = "/authenticate")
     public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> manualPostAuth(@RequestBody SpotifyAuthData spotifyAuthData) {
         Result<SpotifyAuthData, Errors> result = spotifyAuthService.insertSpotifyAuthData(spotifyAuthData);
