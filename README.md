@@ -3,9 +3,9 @@ Simple web service enabling user's to perform advanced queries on their uploaded
 
 FINISHED 
 
-www.spotifystats.co.uk/username/recent
-www.spotifystats.co.uk/username/top
-www.spotifystats.co.uk/username/upload
+www.spotifystats.co.uk/username/recent Params -> limit (default=10, max=50), createPlaylist(default=false) 
+www.spotifystats.co.uk/username/top   Params -> limit (default=10, max=50), createPlaylist(default=false) 
+www.spotifystats.co.uk/username/upload MultipartRequest -> upload spotify streaming history json file < 20mb with name "StreamingDataFile" 
 
 <H1> SEARCH </H1> 
 
@@ -14,8 +14,6 @@ www.spotifystats.co.uk/username/upload
 <H3> filters <H3>
 
 <ul>
-  
- 
   <li> startDate </li>
     <li> endDate </li>
   <li> orderBy </li>
@@ -30,7 +28,4 @@ www.spotifystats.co.uk/username/upload
   <li> limit </li>
   <li> startTime </li>
   <li> endTime </li>
-
-
-
 </ul>
