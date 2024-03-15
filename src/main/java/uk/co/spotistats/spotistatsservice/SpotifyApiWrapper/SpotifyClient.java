@@ -2,8 +2,6 @@ package uk.co.spotistats.spotistatsservice.SpotifyApiWrapper;
 
 import com.alibaba.fastjson2.JSON;
 import org.apache.hc.core5.http.ContentType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.co.autotrader.traverson.Traverson;
 import uk.co.autotrader.traverson.TraversonBuilder;
@@ -12,7 +10,6 @@ import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParam;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 @Component
 public class SpotifyClient {
@@ -25,8 +22,6 @@ public class SpotifyClient {
     private static final String TOP_TRACKS_URL = "https://api.spotify.com/v1/me/top/tracks";
     private static final String USERS_URL = "https://api.spotify.com/v1/users/";
     private static final String ADD_TRACKS = "https://api.spotify.com/v1/playlists/%s/tracks";
-
-    private static final Logger LOG = LoggerFactory.getLogger(SpotifyClient.class);
 
     public SpotifyClient(Traverson traverson) {
         this.traverson = traverson;
