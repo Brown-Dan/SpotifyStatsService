@@ -1,42 +1,39 @@
 package uk.co.spotistats.spotistatsservice.Service;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.net.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
-import uk.co.autotrader.traverson.Traverson;
-import uk.co.autotrader.traverson.http.Response;
-import uk.co.autotrader.traverson.http.TextBody;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
+import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseMapper;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyAuthRepository;
+import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
+import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.SpotifyClient;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+import static uk.co.spotistats.spotistatsservice.Controller.Model.Errors.fromSpotifyRequestError;
+
 @Service
 public class SpotifyAuthService {
 
+    private final SpotifyResponseMapper spotifyResponseMapper;
     private final SpotifyAuthRepository spotifyAuthRepository;
-    private final Traverson traverson;
-    private final ObjectMapper objectMapper;
+    private final SpotifyClient spotifyClient;
 
-    private static final String SPOTIFY_REFRESH_URL = "https://accounts.spotify.com/api/token";
-    private static final String SPOTIFY_PROFILE_DATA_URL = "https://api.spotify.com/v1/me";
+    private static final String REDIRECT_URL = "https://spotifystats.co.uk/spotify/authenticate/callback";
 
-    private static final Logger LOG = LoggerFactory.getLogger(SpotifyAuthService.class);
-
-    public SpotifyAuthService(SpotifyAuthRepository spotifyAuthRepository, Traverson traverson, ObjectMapper objectMapper) {
+    public SpotifyAuthService(SpotifyResponseMapper spotifyResponseMapper, SpotifyAuthRepository spotifyAuthRepository, SpotifyClient spotifyClient) {
+        this.spotifyResponseMapper = spotifyResponseMapper;
         this.spotifyAuthRepository = spotifyAuthRepository;
-        this.traverson = traverson;
-        this.objectMapper = objectMapper;
+        this.spotifyClient = spotifyClient;
     }
 
     public Result<SpotifyAuthData, Errors> insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
@@ -48,10 +45,10 @@ public class SpotifyAuthService {
         return new Result.Success<>(spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData));
     }
 
-    public Result<SpotifyAuthData, Error> getSpotifyAuthData(String username) {
+    public Result<SpotifyAuthData, Errors> getSpotifyAuthData(String username) {
         Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(username);
         if (existingAuthData.isEmpty()) {
-            return new Result.Failure<>(Error.notFound("spotifyAuthDetails", username));
+            return new Result.Failure<>(Errors.fromError(Error.notFound("spotifyAuthDetails", username)));
         }
         SpotifyAuthData spotifyAuthData = existingAuthData.get();
 
@@ -78,44 +75,65 @@ public class SpotifyAuthService {
     }
 
     public Result<SpotifyAuthData, Errors> exchangeAccessToken(String accessToken) {
-        Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
-                .withHeader("content-type", "application/x-www-form-urlencoded")
-                .withHeader("Authorization", System.getenv("SPOTIFY_BASE_64_AUTH"))
-                .post(buildAccessTokenExchangeBody(accessToken));
+        Result<SpotifyAuthData, SpotifyRequestError> exchangeAccessTokenResult = spotifyClient.withAuthorization(System.getenv("SPOTIFY_BASE_64_AUTH"))
+                .withContentType(ContentType.APPLICATION_FORM_URLENCODED)
+                .exchangeAccessToken()
+                .usingAccessToken(accessToken)
+                .redirectTo(REDIRECT_URL)
+                .fetchInto(JSONObject.class)
+                .map(spotifyResponseMapper::toSpotifyAuthData);
 
-        SpotifyAuthData spotifyAuthData = objectMapper.convertValue(response.getResource(), SpotifyAuthData.class);
-        return insertSpotifyAuthData(spotifyAuthData.cloneBuilder().withUserId(getUserId(spotifyAuthData)).build());
-    }
-
-    private String getUserId(SpotifyAuthData spotifyAuthData) {
-        Response<JSONObject> response = traverson.from(SPOTIFY_PROFILE_DATA_URL)
-                .withHeader("Authorization", "Bearer %s".formatted(spotifyAuthData.accessToken()))
-                .get();
-        return response.getResource().get("id").toString();
-    }
-
-    private Result<SpotifyAuthData, Error> refreshToken(SpotifyAuthData spotifyAuthData) {
-        Response<JSONObject> response = traverson.from(SPOTIFY_REFRESH_URL)
-                .withHeader("content-type", "application/x-www-form-urlencoded")
-                .withHeader("Authorization", System.getenv("SPOTIFY_BASE_64_AUTH"))
-                .post(buildRefreshTokenRequestBody(spotifyAuthData.refreshToken()));
-        if (!response.isSuccessful()) {
-            LOG.info("Failed to refresh access token for user - {} received response - {}", spotifyAuthData.userId(), response.getStatusCode());
-            return new Result.Failure<>(Error.failedToRefreshAccessToken(spotifyAuthData.userId(), response.getStatusCode()));
+        if (exchangeAccessTokenResult.isFailure()) {
+            return failure(Errors.fromSpotifyRequestError(exchangeAccessTokenResult.getError()));
         }
-        LOG.info("Refreshed access token for user - {}", spotifyAuthData.userId());
-        SpotifyRefreshTokenResponse spotifyRefreshTokenResponse = objectMapper.convertValue(response.getResource(), SpotifyRefreshTokenResponse.class);
-        return new Result.Success<>(spotifyAuthRepository.updateUserAuthData
-                (spotifyAuthData.updateFromRefreshResponse(spotifyRefreshTokenResponse)));
+
+        return switch (getUserId(exchangeAccessTokenResult.getValue())) {
+            case Result.Failure(Errors errors) -> failure(errors);
+            case Result.Success(String userId) ->
+                    insertSpotifyAuthData(exchangeAccessTokenResult.getValue().cloneBuilder()
+                            .withUserId(userId).build());
+        };
     }
 
-    private TextBody buildRefreshTokenRequestBody(String refreshToken) {
-        String body = "grant_type=refresh_token&refresh_token=%s&client_id=%s".formatted(refreshToken, System.getenv("SPOTIFY_CLIENT_ID"));
-        return new TextBody(body, "application/x-www-form-urlencoded");
+    private Result<String, Errors> getUserId(SpotifyAuthData spotifyAuthData) {
+        Result<String, SpotifyRequestError> result = spotifyClient
+                .withAccessToken(spotifyAuthData.accessToken())
+                .getUserProfile()
+                .fetchInto(JSONObject.class)
+                .map(spotifyResponseMapper::toUserProfile);
+
+        return switch (result) {
+            case Result.Failure(SpotifyRequestError error) -> failure(error);
+            case Result.Success(String userId) -> success(userId);
+        };
     }
 
-    private TextBody buildAccessTokenExchangeBody(String accessToken) {
-        String body = "grant_type=authorization_code&code=%s&redirect_uri=https://spotifystats.co.uk/spotify/authenticate/callback".formatted(accessToken);
-        return new TextBody(body, "application/x-www-form-urlencoded");
+    private Result<SpotifyAuthData, Errors> refreshToken(SpotifyAuthData spotifyAuthData) {
+        Result<SpotifyRefreshTokenResponse, SpotifyRequestError> result = spotifyClient.withAuthorization(System.getenv("SPOTIFY_BASE_64_AUTH"))
+                .withContentType(ContentType.APPLICATION_FORM_URLENCODED)
+                .refreshToken()
+                .usingRefreshToken(spotifyAuthData.refreshToken())
+                .withClientId(System.getenv("SPOTIFY_CLIENT_ID"))
+                .fetchInto(JSONObject.class)
+                .map(spotifyResponseMapper::toRefreshTokenResponse);
+
+        return switch (result) {
+            case Result.Failure(SpotifyRequestError error) ->
+                    failure(Errors.fromSpotifyRequestError(spotifyAuthData.userId(), error));
+            case Result.Success(SpotifyRefreshTokenResponse success) ->
+                    success(spotifyAuthRepository.updateUserAuthData(spotifyAuthData.updateFromRefreshResponse(success)));
+        };
+    }
+
+    private <T> Result<T, Errors> failure(SpotifyRequestError spotifyRequestError) {
+        return new Result.Failure<>(fromSpotifyRequestError(spotifyRequestError));
+    }
+
+    private <T> Result<T, Errors> failure(Errors errors) {
+        return new Result.Failure<>(errors);
+    }
+
+    private <T> Result<T, Errors> success(T success) {
+        return new Result.Success<>(success);
     }
 }

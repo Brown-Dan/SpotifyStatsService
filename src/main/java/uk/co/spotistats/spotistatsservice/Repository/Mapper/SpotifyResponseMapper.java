@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
+import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.time.ZonedDateTime;
@@ -21,17 +23,17 @@ import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Buil
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Playlist.Builder.aPlaylist;
 
 @Component
-public class SpotifyResponseJsonToStreamingDataMapper {
+public class SpotifyResponseMapper {
 
     private final ObjectMapper objectMapper;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
-    public SpotifyResponseJsonToStreamingDataMapper(ObjectMapper objectMapper) {
+    public SpotifyResponseMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public StreamingData fromRecentStreams(JSONObject json) {
+    public StreamingData toStreamingData(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toStreamData(item.get("track"))
@@ -47,7 +49,7 @@ public class SpotifyResponseJsonToStreamingDataMapper {
         }
     }
 
-    public StreamingData fromTopTracks(JSONObject json) {
+    public StreamingData toRankedStreamingData(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toStreamData(item)
@@ -61,6 +63,18 @@ public class SpotifyResponseJsonToStreamingDataMapper {
             LOG.error("Failed to parse streaming data");
             throw new RuntimeException();
         }
+    }
+
+    public SpotifyRefreshTokenResponse toRefreshTokenResponse(JSONObject resource){
+        return objectMapper.convertValue(resource, SpotifyRefreshTokenResponse.class);
+    }
+
+    public SpotifyAuthData toSpotifyAuthData(JSONObject jsonObject){
+        return objectMapper.convertValue(jsonObject, SpotifyAuthData.class);
+    }
+
+    public String toUserProfile(JSONObject jsonObject){
+        return jsonObject.get("id").toString();
     }
 
     public Playlist toPlaylist(JSONObject json) {

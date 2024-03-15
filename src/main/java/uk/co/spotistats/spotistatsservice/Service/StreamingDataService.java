@@ -51,10 +51,10 @@ public class StreamingDataService {
     }
 
     public <T> Result<T, Errors> getFromSpotify(SpotifySearchRequest spotifySearchRequest, Function<SpotifySearchRequest, Result<T, Errors>> spotifyRepositoryGetter) {
-        Result<SpotifyAuthData, Error> getSpotifyAuthDataResult = spotifyAuthService.getSpotifyAuthData(spotifySearchRequest.userId());
+        Result<SpotifyAuthData, Errors> getSpotifyAuthDataResult = spotifyAuthService.getSpotifyAuthData(spotifySearchRequest.userId());
 
         if (getSpotifyAuthDataResult.isFailure()) {
-            return new Result.Failure<>(Errors.fromError(getSpotifyAuthDataResult.getError()));
+            return new Result.Failure<>(getSpotifyAuthDataResult.getError());
         }
         return spotifyRepositoryGetter.apply(spotifySearchRequest.cloneBuilder()
                 .withAuthData(getSpotifyAuthDataResult.getValue())

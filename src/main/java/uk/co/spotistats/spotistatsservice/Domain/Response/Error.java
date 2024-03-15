@@ -3,7 +3,7 @@ package uk.co.spotistats.spotistatsservice.Domain.Response;
 public record Error(String field, String message, ErrorKey key) {
 
     public static Error forbiddenToUpdate(String field, String username) {
-        return new Error("field", "Forbidden to update '%s' for user - %s"
+        return new Error(field, "Forbidden to update '%s' for user - %s"
                 .formatted(field, username), ErrorKey.FORBIDDEN_TO_UPDATE);
     }
 
@@ -11,8 +11,8 @@ public record Error(String field, String message, ErrorKey key) {
         return new Error(field, "%s not found for user - %s".formatted(field, username), ErrorKey.ENTITY_NOT_FOUND);
     }
 
-    public static Error userNotRegisteredDev(String username) {
-        return new Error("user", "user - %s - is not registered in the developer dashboard".formatted(username), ErrorKey.AUTHORIZATION_FAILURE);
+    public static Error userNotWhitelisted() {
+        return new Error("user", "user is not registered in the developer dashboard", ErrorKey.AUTHORIZATION_FAILURE);
     }
 
     public static Error requestParamContentViolation(String field, String message) {

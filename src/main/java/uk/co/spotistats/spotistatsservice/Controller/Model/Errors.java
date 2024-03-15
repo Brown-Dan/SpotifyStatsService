@@ -25,8 +25,16 @@ public record Errors(List<Error> errors, @JsonIgnore HttpStatus httpStatus) {
 
     public static Errors fromSpotifyRequestError(String username, SpotifyRequestError spotifyRequestError) {
         return fromError(switch (spotifyRequestError) {
-            case FORBIDDEN -> Error.userNotRegisteredDev(username);
+            case FORBIDDEN -> Error.userNotWhitelisted();
             case NOT_FOUND -> Error.notFound("spotifyAuthDetails", username);
+            case TOO_MANY_REQUESTS -> Error.spotifyRateLimitExceeded();
+            default -> Error.unknownError("spotify", "Exception occurred within spotify client");
+        });
+    }
+
+    public static Errors fromSpotifyRequestError(SpotifyRequestError spotifyRequestError) {
+        return fromError(switch (spotifyRequestError) {
+            case FORBIDDEN -> Error.userNotWhitelisted();
             case TOO_MANY_REQUESTS -> Error.spotifyRateLimitExceeded();
             default -> Error.unknownError("spotify", "Exception occurred within spotify client");
         });

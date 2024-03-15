@@ -8,7 +8,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Request.CreatePlaylistRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
 import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseJsonToStreamingDataMapper;
+import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseMapper;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.SpotifyClient;
 
@@ -20,10 +20,10 @@ import static uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryPar
 @Repository
 public class SpotifyRepository {
 
-    private final SpotifyResponseJsonToStreamingDataMapper spotifyResponseMapper;
+    private final SpotifyResponseMapper spotifyResponseMapper;
     private final SpotifyClient spotifyClient;
 
-    public SpotifyRepository(SpotifyResponseJsonToStreamingDataMapper spotifyResponseMapper, SpotifyClient spotifyClient) {
+    public SpotifyRepository(SpotifyResponseMapper spotifyResponseMapper, SpotifyClient spotifyClient) {
         this.spotifyResponseMapper = spotifyResponseMapper;
         this.spotifyClient = spotifyClient;
     }
@@ -36,7 +36,7 @@ public class SpotifyRepository {
                 .withBefore(NOW)
                 .withLimit(spotifySearchRequest.limit())
                 .fetchInto(JSONObject.class)
-                .map(spotifyResponseMapper::fromRecentStreams);
+                .map(spotifyResponseMapper::toStreamingData);
 
         if (result.isFailure()) {
             return failure(spotifySearchRequest.userId(), result.getError());
@@ -54,7 +54,7 @@ public class SpotifyRepository {
                 .withTimeRange(LONG_TERM)
                 .withLimit(spotifySearchRequest.limit())
                 .fetchInto(JSONObject.class)
-                .map(spotifyResponseMapper::fromTopTracks);
+                .map(spotifyResponseMapper::toRankedStreamingData);
 
         if (result.isFailure()) {
             return failure(spotifySearchRequest.userId(), result.getError());

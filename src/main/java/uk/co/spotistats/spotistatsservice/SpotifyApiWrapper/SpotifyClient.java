@@ -27,6 +27,10 @@ public class SpotifyClient {
         headers.put("Authorization", "Bearer %s ".formatted(accessToken));
         return this;
     }
+    public SpotifyClient withAuthorization(String value) {
+        headers.put("Authorization", value);
+        return this;
+    }
 
     public SpotifyClient withContentType(ContentType contentType) {
         headers.put("content-type", contentType.getMimeType());
@@ -43,6 +47,10 @@ public class SpotifyClient {
         return this;
     }
 
+    public UserProfileRequest getUserProfile(){
+        return new UserProfileRequest(this);
+    }
+
     public RecentStreamingDataRequest getRecentStreamingData() {
         return new RecentStreamingDataRequest(this);
     }
@@ -53,6 +61,14 @@ public class SpotifyClient {
 
     public CreatePlaylistRequest createPlaylist() {
         return new CreatePlaylistRequest(this);
+    }
+
+    public RefreshTokenRequest refreshToken(){
+        return new RefreshTokenRequest(this);
+    }
+
+    public ExchangeAccessTokenRequest exchangeAccessToken(){
+        return new ExchangeAccessTokenRequest(this);
     }
 
     <T> SpotifyResponseWrapper<T> fetch(AbstractSpotifyGetRequest abstractSpotifyGetRequest, Class<T> clazz){
