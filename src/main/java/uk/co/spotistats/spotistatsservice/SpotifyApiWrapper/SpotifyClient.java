@@ -91,10 +91,6 @@ public class SpotifyClient {
         addHeaders(traversonBuilder);
         addQueryParams(traversonBuilder);
 
-        LOG.info(USERS_URL + createPlaylistRequest.getUserId() + "/playlists");
-        LOG.info(JSON.toJSONString(headers));
-        LOG.info(JSON.toJSONString(queryParams));
-
         return new SpotifyResponseWrapper<>(traversonBuilder.post(createPlaylistRequest.getBody(), type));
     }
 
@@ -102,10 +98,6 @@ public class SpotifyClient {
         TraversonBuilder traversonBuilder = traverson.from(ADD_TRACKS.formatted(addTracksRequest.getPlaylistId()));
         addHeaders(traversonBuilder);
         addQueryParams(traversonBuilder);
-
-        LOG.info(ADD_TRACKS.formatted(addTracksRequest.getPlaylistId()));
-        LOG.info(JSON.toJSONString(headers));
-        LOG.info(JSON.toJSONString(queryParams));
 
         return new SpotifyResponseWrapper<>(traversonBuilder.post(addTracksRequest.getBody(), type));
     }
@@ -118,7 +110,6 @@ public class SpotifyClient {
         }
         String playlistId = JSON.parseObject(spotifyResponseWrapper.getResponse().getResource().toString()).getString("id");
         addTracksRequest.withPlaylistId(playlistId);
-
         fetch(addTracksRequest.withPlaylistId(playlistId), type);
 
         return spotifyResponseWrapper;
