@@ -20,16 +20,6 @@ public class SpotifyAuthController {
         this.spotifyAuthService = spotifyAuthService;
     }
 
-    @PostMapping(value = "/authenticate")
-    public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> manualPostAuth(@RequestBody SpotifyAuthData spotifyAuthData) {
-        Result<SpotifyAuthData, Errors> result = spotifyAuthService.insertSpotifyAuthData(spotifyAuthData);
-
-        if (result.isFailure()){
-            return badRequest(result.getError());
-        }
-        return ok(result.getValue());
-    }
-
     @GetMapping(value = "/authenticate/callback")
     public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticationCallback(@RequestParam String code) {
         Result<SpotifyAuthData, Errors> result = spotifyAuthService.exchangeAccessToken(code);

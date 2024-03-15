@@ -25,6 +25,11 @@ public class TopTracksGetRequest implements AbstractSpotifyGetRequest {
         return this;
     }
 
+    public <T> TopTracksGetRequest withOffset(T offset) {
+        queryParams.put("offset", String.valueOf(offset));
+        return this;
+    }
+
     public <T> SpotifyResponseWrapper<T> fetchInto(Class<T> type) {
         return spotifyClient.fetch(this, type);
     }

@@ -24,6 +24,11 @@ public class RecentStreamingDataRequest implements AbstractSpotifyGetRequest {
         return this;
     }
 
+    public <T> RecentStreamingDataRequest withOffset(T offset) {
+        queryParams.put("offset", String.valueOf(offset));
+        return this;
+    }
+
     public <T> SpotifyResponseWrapper<T> fetchInto(Class<T> type) {
         return spotifyClient.fetch(this, type);
     }

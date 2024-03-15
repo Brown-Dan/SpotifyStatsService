@@ -35,6 +35,7 @@ public class SpotifyRepository {
                 .getRecentStreamingData()
                 .withBefore(NOW)
                 .withLimit(spotifySearchRequest.limit())
+                .withOffset((spotifySearchRequest.page() -  1) * spotifySearchRequest.limit())
                 .fetchInto(JSONObject.class)
                 .map(spotifyResponseMapper::toStreamingData);
 
@@ -53,6 +54,7 @@ public class SpotifyRepository {
                 .getTopTracks()
                 .withTimeRange(LONG_TERM)
                 .withLimit(spotifySearchRequest.limit())
+                .withOffset((spotifySearchRequest.page() -  1) * spotifySearchRequest.limit())
                 .fetchInto(JSONObject.class)
                 .map(spotifyResponseMapper::toRankedStreamingData);
 

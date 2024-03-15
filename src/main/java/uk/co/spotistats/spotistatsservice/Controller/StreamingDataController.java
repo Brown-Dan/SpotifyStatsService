@@ -5,18 +5,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.RankedStreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.util.function.Function;
-
-import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
 
 @Controller
 @RequestMapping("{username}")
@@ -29,13 +27,13 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/recent")
-    public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username, @RequestParam(defaultValue = "10") Integer limit, @RequestParam(defaultValue = "false") boolean createPlaylist) {
-        return get(streamingDataService::getRecentStreams, aSpotifySearchRequest().withUserId(username).withLimit(limit).withCreatePlaylist(createPlaylist).build());
+    public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username, SpotifySearchRequest spotifySearchRequest) {
+        return get(streamingDataService::getRecentStreams, spotifySearchRequest.cloneBuilder().withUserId(username).build());
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<RankedStreamingData, Errors>> getTopStreams(@PathVariable String username, @RequestParam(defaultValue = "10") Integer limit, @RequestParam(defaultValue = "false") boolean createPlaylist) {
-        return get(streamingDataService::getTopStreams, aSpotifySearchRequest().withUserId(username).withLimit(limit).withCreatePlaylist(createPlaylist).build());
+    public ResponseEntity<ApiResult<RankedStreamingData, Errors>> getTopStreams(@PathVariable String username, SpotifySearchRequest spotifySearchRequest) {
+        return get(streamingDataService::getTopStreams, spotifySearchRequest.cloneBuilder().withUserId(username).build());
     }
 
     @GetMapping(value = "/search")

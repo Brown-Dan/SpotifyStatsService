@@ -2,13 +2,15 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
-public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, boolean createPlaylist) {
+public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, boolean createPlaylist,
+                                   Integer page) {
 
     public static final class Builder {
         private String userId;
         private Integer limit;
         private SpotifyAuthData authData;
         private boolean createPlaylist;
+        private Integer page;
 
         private Builder() {
         }
@@ -37,10 +39,16 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
             return this;
         }
 
+        public Builder withPage(Integer page) {
+            this.page = page;
+            return this;
+        }
+
         public SpotifySearchRequest build() {
-            return new SpotifySearchRequest(userId, limit, authData, createPlaylist);
+            return new SpotifySearchRequest(userId, limit, authData, createPlaylist, page);
         }
     }
+
     public Builder cloneBuilder() {
         return Builder.aSpotifySearchRequest()
                 .withUserId(userId)
