@@ -16,12 +16,11 @@ www.spotifystats.co.uk/username/upload
 <ul>
   
  
-  <li> start </li>
-    <li> end </li>
+  <li> startDate </li>
+    <li> endDate </li>
   <li> orderBy </li>
   <li> platform </li>
   <li> country </li>
-  <li> START </li>
   <li> artist </li>
   <li> trackUri </li>
   <li> trackName </li>
@@ -29,6 +28,8 @@ www.spotifystats.co.uk/username/upload
   <li> album </li>
   <li> artist </li>
   <li> limit </li>
+  <li> startTime </li>
+  <li> endTime </li>
 
 
 
