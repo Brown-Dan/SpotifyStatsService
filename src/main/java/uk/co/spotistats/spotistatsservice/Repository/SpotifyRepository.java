@@ -59,6 +59,9 @@ public class SpotifyRepository {
         if (result.isFailure()) {
             return failure(spotifySearchRequest.userId(), result.getError());
         }
+        if (spotifySearchRequest.createPlaylist()) {
+            createPlaylist(CreatePlaylistRequest.fromTopStreamsSearchRequest(spotifySearchRequest, result.getValue().streamData()));
+        }
         return success(result.getValue());
     }
 

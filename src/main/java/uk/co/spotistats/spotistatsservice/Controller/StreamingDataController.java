@@ -34,8 +34,8 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<RankedStreamingData, Errors>> getTopStreams(@PathVariable String username, @RequestParam(defaultValue = "10") Integer limit) {
-        return get(streamingDataService::getTopStreams, aSpotifySearchRequest().withUserId(username).withLimit(limit).build());
+    public ResponseEntity<ApiResult<RankedStreamingData, Errors>> getTopStreams(@PathVariable String username, @RequestParam(defaultValue = "10") Integer limit, @RequestParam(defaultValue = "false") boolean createPlaylist) {
+        return get(streamingDataService::getTopStreams, aSpotifySearchRequest().withUserId(username).withLimit(limit).withCreatePlaylist(createPlaylist).build());
     }
 
     @GetMapping(value = "/search")

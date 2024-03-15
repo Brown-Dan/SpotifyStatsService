@@ -43,8 +43,8 @@ public class SpotifyClient {
         return this;
     }
 
-    public RecentStreamingDataGetRequest getRecentStreamingData() {
-        return new RecentStreamingDataGetRequest(this);
+    public RecentStreamingDataRequest getRecentStreamingData() {
+        return new RecentStreamingDataRequest(this);
     }
 
     public TopTracksGetRequest getTopTracks() {
