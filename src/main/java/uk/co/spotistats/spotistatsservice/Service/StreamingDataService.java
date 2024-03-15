@@ -6,7 +6,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
-import uk.co.spotistats.spotistatsservice.Service.Validator.StreamDataSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.TopTracksResource;
@@ -19,6 +18,7 @@ import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 import uk.co.spotistats.spotistatsservice.Service.Mapper.StreamingDataToTopTracksMapper;
+import uk.co.spotistats.spotistatsservice.Service.Validator.StreamDataSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Service.Validator.TopTracksSearchRequestValidator;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class StreamingDataService {
 
     public Result<TopTracksResource, Errors> getTopTracks(TopTracksSearchRequest searchRequest) {
         Errors validationErrors = topTracksSearchRequestValidator.validate(searchRequest);
-        if (validationErrors.hasErrors()){
+        if (validationErrors.hasErrors()) {
             return failure(validationErrors);
         }
 

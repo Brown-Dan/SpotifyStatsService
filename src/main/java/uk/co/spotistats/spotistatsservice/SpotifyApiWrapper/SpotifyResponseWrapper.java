@@ -18,11 +18,11 @@ public class SpotifyResponseWrapper<T> {
         return response;
     }
 
-    boolean isFailure(){
+    boolean isFailure() {
         return !response.isSuccessful();
     }
 
-    Response<T> getResponse(){
+    Response<T> getResponse() {
         return response;
     }
 

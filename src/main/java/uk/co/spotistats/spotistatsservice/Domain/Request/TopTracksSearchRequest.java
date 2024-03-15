@@ -5,7 +5,7 @@ import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest.Builder.aTopTracksSearchRequest;
 
 public record TopTracksSearchRequest(String userId, int limit, SpotifyAuthData authData, boolean createPlaylist,
-                                   int page, boolean ranked) {
+                                     int page, boolean ranked) {
 
 
     public static final class Builder {
@@ -58,7 +58,7 @@ public record TopTracksSearchRequest(String userId, int limit, SpotifyAuthData a
         }
     }
 
-    public TopTracksSearchRequest.Builder cloneBuilder(){
+    public TopTracksSearchRequest.Builder cloneBuilder() {
         return aTopTracksSearchRequest()
                 .withUserId(userId)
                 .withLimit(limit)

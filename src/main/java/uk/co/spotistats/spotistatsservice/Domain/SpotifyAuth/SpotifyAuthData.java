@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 
 import static uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData.Builder.someSpotifyAuthData;
 
-public record SpotifyAuthData(String userId, @JsonProperty("refresh_token") String refreshToken, @JsonProperty("access_token") String accessToken, LocalDateTime lastUpdated) {
+public record SpotifyAuthData(String userId, @JsonProperty("refresh_token") String refreshToken,
+                              @JsonProperty("access_token") String accessToken, LocalDateTime lastUpdated) {
 
     public boolean hasValidAccessToken() {
         return !lastUpdated.isBefore(LocalDateTime.now().minusHours(1));
@@ -59,7 +60,7 @@ public record SpotifyAuthData(String userId, @JsonProperty("refresh_token") Stri
         }
     }
 
-    public SpotifyAuthData.Builder cloneBuilder(){
+    public SpotifyAuthData.Builder cloneBuilder() {
         return someSpotifyAuthData()
                 .withAccessToken(accessToken)
                 .withLastUpdated(lastUpdated)

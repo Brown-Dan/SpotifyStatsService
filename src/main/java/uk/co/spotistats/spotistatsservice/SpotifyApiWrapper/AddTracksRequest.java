@@ -30,7 +30,7 @@ public class AddTracksRequest implements AbstractSpotifyPostRequest {
         return this;
     }
 
-    public <T> AddTracksRequest withPlaylistId(T playlistId){
+    public <T> AddTracksRequest withPlaylistId(T playlistId) {
         this.playlistId = String.valueOf(playlistId);
         return this;
     }

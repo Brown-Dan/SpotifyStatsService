@@ -4,7 +4,8 @@ import uk.co.spotistats.spotistatsservice.Domain.Model.RankedTrackData;
 
 import java.util.List;
 
-public record RankedTopTracksResource(List<RankedTrackData> rankedTrackData, int totalResults, int page) implements TopTracksResource {
+public record RankedTopTracksResource(List<RankedTrackData> rankedTrackData, int totalResults,
+                                      int page) implements TopTracksResource {
 
     public static final class Builder {
         private List<RankedTrackData> rankedTrackData;

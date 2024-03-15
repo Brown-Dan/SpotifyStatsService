@@ -54,7 +54,7 @@ public class SpotifyRepository {
                 .getTopTracks()
                 .withTimeRange(LONG_TERM)
                 .withLimit(searchRequest.limit())
-                .withOffset((searchRequest.page() -  1) * searchRequest.limit())
+                .withOffset((searchRequest.page() - 1) * searchRequest.limit())
                 .fetchInto(JSONObject.class)
                 .map(spotifyResponseMapper::toRankedStreamingData);
 

@@ -27,6 +27,7 @@ public class SpotifyClient {
         headers.put("Authorization", "Bearer %s ".formatted(accessToken));
         return this;
     }
+
     public SpotifyClient withAuthorization(String value) {
         headers.put("Authorization", value);
         return this;
@@ -47,7 +48,7 @@ public class SpotifyClient {
         return this;
     }
 
-    public UserProfileRequest getUserProfile(){
+    public UserProfileRequest getUserProfile() {
         return new UserProfileRequest(this);
     }
 
@@ -63,15 +64,15 @@ public class SpotifyClient {
         return new CreatePlaylistRequest(this);
     }
 
-    public RefreshTokenRequest refreshToken(){
+    public RefreshTokenRequest refreshToken() {
         return new RefreshTokenRequest(this);
     }
 
-    public ExchangeAccessTokenRequest exchangeAccessToken(){
+    public ExchangeAccessTokenRequest exchangeAccessToken() {
         return new ExchangeAccessTokenRequest(this);
     }
 
-    <T> SpotifyResponseWrapper<T> fetch(AbstractSpotifyGetRequest abstractSpotifyGetRequest, Class<T> clazz){
+    <T> SpotifyResponseWrapper<T> fetch(AbstractSpotifyGetRequest abstractSpotifyGetRequest, Class<T> clazz) {
         queryParams.putAll(abstractSpotifyGetRequest.getQueryParams());
 
         TraversonBuilder traversonBuilder = fromUrl(abstractSpotifyGetRequest.getUrl());
@@ -97,7 +98,7 @@ public class SpotifyClient {
         return spotifyResponseWrapper;
     }
 
-    TraversonBuilder fromUrl(String url){
+    TraversonBuilder fromUrl(String url) {
         TraversonBuilder traversonBuilder = traverson.from(url);
         addHeaders(traversonBuilder);
         addQueryParams(traversonBuilder);

@@ -25,7 +25,7 @@ public class StreamingDataUploadService {
         this.streamingDataUploadRepository = streamingDataUploadRepository;
     }
 
-    public boolean hasStreamingData(String userId){
+    public boolean hasStreamingData(String userId) {
         Optional<StreamingData> existingStreamingData = streamingDataUploadRepository.getStreamingDataByUsername(userId);
         return existingStreamingData.isPresent();
     }

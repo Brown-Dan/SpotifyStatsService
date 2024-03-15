@@ -39,10 +39,10 @@ public class TopTracksSearchRequestValidator {
     }
 
     private Optional<Error> validatePage(TopTracksSearchRequest topTracksSearchRequest) {
-        if (topTracksSearchRequest.limit() * topTracksSearchRequest.page() > 100){
+        if (topTracksSearchRequest.limit() * topTracksSearchRequest.page() > 100) {
             return Optional.of(Error.requestParamContentViolation("page", "maximum 100 results available - page multiplied by limit must be <= 100"));
         }
-        if (topTracksSearchRequest.page() > 100 || topTracksSearchRequest.page() < 1){
+        if (topTracksSearchRequest.page() > 100 || topTracksSearchRequest.page() < 1) {
             return Optional.of(Error.requestParamContentViolation("page", "'page' must be between 1-100 - provided - %s".formatted(topTracksSearchRequest.page())));
         }
         return Optional.empty();

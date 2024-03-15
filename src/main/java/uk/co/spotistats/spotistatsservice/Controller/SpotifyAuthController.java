@@ -2,7 +2,9 @@ package uk.co.spotistats.spotistatsservice.Controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
@@ -24,7 +26,7 @@ public class SpotifyAuthController {
     public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticationCallback(@RequestParam String code) {
         Result<SpotifyAuthData, Errors> result = spotifyAuthService.exchangeAccessToken(code);
 
-        if (result.isFailure()){
+        if (result.isFailure()) {
             return badRequest(result.getError());
         }
         return ok(result.getValue());
