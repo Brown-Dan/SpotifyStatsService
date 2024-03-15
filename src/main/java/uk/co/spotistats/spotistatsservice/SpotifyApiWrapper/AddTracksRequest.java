@@ -47,6 +47,6 @@ public class AddTracksRequest {
     public TextBody getBody() {
         Map<String, List<String>> body = new HashMap<>();
         body.put("uris", trackUris);
-        return new TextBody(JSON.toJSONString(body), ContentType.APPLICATION_JSON.toString());
+        return new TextBody(JSON.toJSONString(body), ContentType.APPLICATION_JSON.getMimeType());
     }
 }

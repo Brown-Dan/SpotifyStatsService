@@ -53,6 +53,6 @@ public class CreatePlaylistRequest {
         Map<String, String> body = new HashMap<>();
         body.put("name", name);
         body.put("description", description);
-        return new TextBody(JSON.toJSONString(body), ContentType.APPLICATION_JSON.toString());
+        return new TextBody(JSON.toJSONString(body), ContentType.APPLICATION_JSON.getMimeType());
     }
 }
