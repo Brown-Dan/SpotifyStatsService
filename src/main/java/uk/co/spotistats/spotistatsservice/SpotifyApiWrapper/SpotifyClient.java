@@ -5,6 +5,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.springframework.stereotype.Component;
 import uk.co.autotrader.traverson.Traverson;
 import uk.co.autotrader.traverson.TraversonBuilder;
+import uk.co.autotrader.traverson.http.Response;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.Header;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParam;
 
@@ -17,11 +18,6 @@ public class SpotifyClient {
     private final Traverson traverson;
     private final Map<String, String> headers = new HashMap<>();
     private final Map<String, String> queryParams = new HashMap<>();
-
-    private static final String RECENT_STREAMS_URL = "https://api.spotify.com/v1/me/player/recently-played";
-    private static final String TOP_TRACKS_URL = "https://api.spotify.com/v1/me/top/tracks";
-    private static final String USERS_URL = "https://api.spotify.com/v1/users/";
-    private static final String ADD_TRACKS = "https://api.spotify.com/v1/playlists/%s/tracks";
 
     public SpotifyClient(Traverson traverson) {
         this.traverson = traverson;
@@ -47,67 +43,53 @@ public class SpotifyClient {
         return this;
     }
 
-    public RecentStreamingDataRequest getRecentStreamingData() {
-        return new RecentStreamingDataRequest(this);
+    public RecentStreamingDataGetRequest getRecentStreamingData() {
+        return new RecentStreamingDataGetRequest(this);
     }
 
-    public TopTracksRequest getTopTracks() {
-        return new TopTracksRequest(this);
+    public TopTracksGetRequest getTopTracks() {
+        return new TopTracksGetRequest(this);
     }
 
     public CreatePlaylistRequest createPlaylist() {
         return new CreatePlaylistRequest(this);
     }
 
-    <T> SpotifyResponseWrapper<T> fetch(RecentStreamingDataRequest recentStreamingDataRequest, Class<T> type) {
-        queryParams.put("limit", recentStreamingDataRequest.getLimit());
-        queryParams.put("before", recentStreamingDataRequest.getBefore());
+    <T> SpotifyResponseWrapper<T> fetch(AbstractSpotifyGetRequest abstractSpotifyGetRequest, Class<T> clazz){
+        queryParams.putAll(abstractSpotifyGetRequest.getQueryParams());
 
-        TraversonBuilder traversonBuilder = traverson.from(RECENT_STREAMS_URL);
-        addHeaders(traversonBuilder);
-        addQueryParams(traversonBuilder);
+        TraversonBuilder traversonBuilder = fromUrl(abstractSpotifyGetRequest.getUrl());
 
-        return new SpotifyResponseWrapper<>(traversonBuilder.get(type));
+        return wrap(traversonBuilder.get(clazz));
     }
 
-    <T> SpotifyResponseWrapper<T> fetch(TopTracksRequest topTracksRequest, Class<T> type) {
-        queryParams.put("limit", topTracksRequest.getLimit());
-        queryParams.put("time_range", topTracksRequest.getTimeRange());
-
-        TraversonBuilder traversonBuilder = traverson.from(TOP_TRACKS_URL);
-        addHeaders(traversonBuilder);
-        addQueryParams(traversonBuilder);
-
-        return new SpotifyResponseWrapper<>(traversonBuilder.get(type));
+    <T> SpotifyResponseWrapper<T> fetch(AbstractSpotifyPostRequest abstractSpotifyPostRequest, Class<T> clazz) {
+        TraversonBuilder traversonBuilder = fromUrl(abstractSpotifyPostRequest.getUrl());
+        return wrap(traversonBuilder.post(abstractSpotifyPostRequest.getBody(), clazz));
     }
 
-    <T> SpotifyResponseWrapper<T> fetch(CreatePlaylistRequest createPlaylistRequest, Class<T> type) {
-        TraversonBuilder traversonBuilder = traverson.from(USERS_URL + createPlaylistRequest.getUserId() + "/playlists");
-        addHeaders(traversonBuilder);
-        addQueryParams(traversonBuilder);
-
-        return new SpotifyResponseWrapper<>(traversonBuilder.post(createPlaylistRequest.getBody(), type));
-    }
-
-    <T> SpotifyResponseWrapper<T> fetch(AddTracksRequest addTracksRequest, Class<T> type) {
-        TraversonBuilder traversonBuilder = traverson.from(ADD_TRACKS.formatted(addTracksRequest.getPlaylistId()));
-        addHeaders(traversonBuilder);
-        addQueryParams(traversonBuilder);
-
-        return new SpotifyResponseWrapper<>(traversonBuilder.post(addTracksRequest.getBody(), type));
-    }
-
-    <T> SpotifyResponseWrapper<T> fetch(CreatePlaylistRequest createPlaylistRequest, AddTracksRequest addTracksRequest, Class<T> type) {
-        SpotifyResponseWrapper<T> spotifyResponseWrapper = fetch(createPlaylistRequest, type);
+    <T> SpotifyResponseWrapper<T> fetch(CreatePlaylistRequest createPlaylistRequest, AddTracksRequest addTracksRequest, Class<T> clazz) {
+        SpotifyResponseWrapper<T> spotifyResponseWrapper = fetch(createPlaylistRequest, clazz);
 
         if (spotifyResponseWrapper.isFailure()) {
             return spotifyResponseWrapper;
         }
         String playlistId = JSON.parseObject(spotifyResponseWrapper.getResponse().getResource().toString()).getString("id");
         addTracksRequest.withPlaylistId(playlistId);
-        fetch(addTracksRequest.withPlaylistId(playlistId), type);
+        fetch(addTracksRequest.withPlaylistId(playlistId), clazz);
 
         return spotifyResponseWrapper;
+    }
+
+    TraversonBuilder fromUrl(String url){
+        TraversonBuilder traversonBuilder = traverson.from(url);
+        addHeaders(traversonBuilder);
+        addQueryParams(traversonBuilder);
+        return traversonBuilder;
+    }
+
+    <T> SpotifyResponseWrapper<T> wrap(Response<T> response) {
+        return new SpotifyResponseWrapper<>(response);
     }
 
     void addHeaders(TraversonBuilder traversonBuilder) {

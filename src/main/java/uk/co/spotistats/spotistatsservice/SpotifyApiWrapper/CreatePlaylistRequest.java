@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CreatePlaylistRequest {
+public class CreatePlaylistRequest implements AbstractSpotifyPostRequest {
     String name;
     String description;
     String userId;
     private final SpotifyClient spotifyClient;
+
+    private static final String URL = "https://api.spotify.com/v1/users/%s/playlists";
 
     CreatePlaylistRequest(SpotifyClient spotifyClient) {
         this.spotifyClient = spotifyClient;
@@ -49,10 +51,15 @@ public class CreatePlaylistRequest {
         return userId;
     }
 
-    TextBody getBody() {
+    public TextBody getBody() {
         Map<String, String> body = new HashMap<>();
         body.put("name", name);
         body.put("description", description);
         return new TextBody(JSON.toJSONString(body), ContentType.APPLICATION_JSON.getMimeType());
+    }
+
+    @Override
+    public String getUrl() {
+        return URL.formatted(userId);
     }
 }

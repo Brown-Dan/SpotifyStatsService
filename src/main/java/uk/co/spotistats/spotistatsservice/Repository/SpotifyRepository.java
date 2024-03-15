@@ -9,12 +9,12 @@ import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
 import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseJsonToStreamingDataMapper;
-import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParamValue;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.SpotifyClient;
 
 import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
 import static uk.co.spotistats.spotistatsservice.Controller.Model.Errors.fromSpotifyRequestError;
+import static uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParamValue.LONG_TERM;
 import static uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParamValue.NOW;
 
 @Repository
@@ -44,14 +44,14 @@ public class SpotifyRepository {
         if (spotifySearchRequest.createPlaylist()) {
             createPlaylist(CreatePlaylistRequest.fromSpotifySearchRequest(spotifySearchRequest, result.getValue().streamData()));
         }
-        return new Result.Success<>(result.getValue());
+        return success(result.getValue());
     }
 
     public Result<StreamingData, Errors> getTopTracks(SpotifySearchRequest spotifySearchRequest) {
         Result<StreamingData, SpotifyRequestError> result = spotifyClient
                 .withAccessToken(spotifySearchRequest.authData().accessToken())
                 .getTopTracks()
-                .withTimeRange(QueryParamValue.LONG_TERM)
+                .withTimeRange(LONG_TERM)
                 .withLimit(spotifySearchRequest.limit())
                 .fetchInto(JSONObject.class)
                 .map(spotifyResponseMapper::fromTopTracks);
@@ -59,7 +59,7 @@ public class SpotifyRepository {
         if (result.isFailure()) {
             return failure(spotifySearchRequest.userId(), result.getError());
         }
-        return new Result.Success<>(result.getValue());
+        return success(result.getValue());
     }
 
     public Result<Playlist, Errors> createPlaylist(CreatePlaylistRequest createPlaylistRequest) {
@@ -77,10 +77,14 @@ public class SpotifyRepository {
         if (result.isFailure()) {
             return failure(createPlaylistRequest.authData().userId(), result.getError());
         }
-        return new Result.Success<>(result.getValue().cloneBuilder().withTracks(createPlaylistRequest.trackUris()).build());
+        return success(result.getValue().cloneBuilder().withTracks(createPlaylistRequest.trackUris()).build());
     }
 
     private <T> Result<T, Errors> failure(String userId, SpotifyRequestError spotifyRequestError) {
         return new Result.Failure<>(fromSpotifyRequestError(userId, spotifyRequestError));
+    }
+
+    private <T> Result<T, Errors> success(T success) {
+        return new Result.Success<>(success);
     }
 }

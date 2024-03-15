@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AddTracksRequest {
+public class AddTracksRequest implements AbstractSpotifyPostRequest {
     List<String> trackUris;
     String playlistId;
     SpotifyClient spotifyClient;
     CreatePlaylistRequest createPlaylistRequest;
+
+    private static final String URL = "https://api.spotify.com/v1/playlists/%s/tracks";
 
     AddTracksRequest(SpotifyClient spotifyClient) {
         this.spotifyClient = spotifyClient;
@@ -48,5 +50,10 @@ public class AddTracksRequest {
         Map<String, List<String>> body = new HashMap<>();
         body.put("uris", trackUris);
         return new TextBody(JSON.toJSONString(body), ContentType.APPLICATION_JSON.getMimeType());
+    }
+
+    @Override
+    public String getUrl() {
+        return URL.formatted(playlistId);
     }
 }
