@@ -119,7 +119,9 @@ public class SpotifyClient {
         String playlistId = JSON.parseObject(spotifyResponseWrapper.getResponse().getResource().toString()).getString("id");
         addTracksRequest.withPlaylistId(playlistId);
 
-        return fetch(addTracksRequest.withPlaylistId(playlistId), type);
+        fetch(addTracksRequest.withPlaylistId(playlistId), type);
+
+        return spotifyResponseWrapper;
     }
 
     void addHeaders(TraversonBuilder traversonBuilder) {
