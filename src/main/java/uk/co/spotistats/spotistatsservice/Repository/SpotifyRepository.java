@@ -6,7 +6,7 @@ import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.CreatePlaylistRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
-import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseMapper;
@@ -29,21 +29,21 @@ public class SpotifyRepository {
         this.spotifyClient = spotifyClient;
     }
 
-    public Result<StreamingData, Errors> getRecentStreamingData(SpotifySearchRequest spotifySearchRequest) {
+    public Result<StreamingData, Errors> getRecentStreamingData(RecentTracksSearchRequest recentTracksSearchRequest) {
         Result<StreamingData, SpotifyRequestError> result = spotifyClient
-                .withAccessToken(spotifySearchRequest.authData().accessToken())
+                .withAccessToken(recentTracksSearchRequest.authData().accessToken())
                 .withContentType(APPLICATION_JSON)
                 .getRecentStreamingData()
                 .withBefore(NOW)
-                .withLimit(spotifySearchRequest.limit())
+                .withLimit(recentTracksSearchRequest.limit())
                 .fetchInto(JSONObject.class)
                 .map(spotifyResponseMapper::fromRecentStreamingData);
 
         if (result.isFailure()) {
-            return failure(spotifySearchRequest.userId(), result.getError());
+            return failure(recentTracksSearchRequest.userId(), result.getError());
         }
-        if (spotifySearchRequest.createPlaylist()) {
-            createPlaylist(CreatePlaylistRequest.fromSpotifySearchRequest(spotifySearchRequest, result.getValue().streamData()));
+        if (recentTracksSearchRequest.createPlaylist()) {
+            createPlaylist(CreatePlaylistRequest.fromRecentTracksSearchRequest(recentTracksSearchRequest, result.getValue().streamData()));
         }
         return success(result.getValue());
     }
@@ -62,7 +62,7 @@ public class SpotifyRepository {
             return failure(searchRequest.userId(), result.getError());
         }
         if (searchRequest.createPlaylist()) {
-            createPlaylist(CreatePlaylistRequest.fromTopStreamsSearchRequest(searchRequest, result.getValue().streamData()));
+            createPlaylist(CreatePlaylistRequest.fromTopTracksSearchRequest(searchRequest, result.getValue().streamData()));
         }
         return success(result.getValue());
     }

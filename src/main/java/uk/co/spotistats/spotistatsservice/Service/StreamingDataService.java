@@ -18,11 +18,11 @@ import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 import uk.co.spotistats.spotistatsservice.Service.Mapper.StreamingDataToTopTracksMapper;
+import uk.co.spotistats.spotistatsservice.Service.Validator.RecentTracksSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Service.Validator.StreamDataSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Service.Validator.TopTracksSearchRequestValidator;
 
 import java.util.List;
-import java.util.function.Function;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
 
@@ -32,15 +32,16 @@ public class StreamingDataService {
 
     private final SpotifyAuthService spotifyAuthService;
     private final SpotifyRepository spotifyRepository;
-    private final StreamDataSearchRequestValidator streamDataSearchRequestValidator;
     private final StreamingDataRepository streamingDataRepository;
     private final StreamingDataUploadRepository streamingDataUploadRepository;
     private final StreamingDataToTopTracksMapper streamingDataToTopTracksMapper;
+    private final StreamDataSearchRequestValidator streamDataSearchRequestValidator;
     private final TopTracksSearchRequestValidator topTracksSearchRequestValidator;
+    private final RecentTracksSearchRequestValidator recentTracksSearchRequestValidator;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
-    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamDataSearchRequestValidator streamDataSearchRequestValidator, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository, StreamingDataToTopTracksMapper streamingDataToTopTracksMapper, TopTracksSearchRequestValidator topTracksSearchRequestValidator) {
+    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamDataSearchRequestValidator streamDataSearchRequestValidator, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository, StreamingDataToTopTracksMapper streamingDataToTopTracksMapper, TopTracksSearchRequestValidator topTracksSearchRequestValidator, RecentTracksSearchRequestValidator recentTracksSearchRequestValidator) {
         this.spotifyAuthService = spotifyAuthService;
         this.spotifyRepository = spotifyRepository;
         this.streamDataSearchRequestValidator = streamDataSearchRequestValidator;
@@ -48,21 +49,21 @@ public class StreamingDataService {
         this.streamingDataUploadRepository = streamingDataUploadRepository;
         this.streamingDataToTopTracksMapper = streamingDataToTopTracksMapper;
         this.topTracksSearchRequestValidator = topTracksSearchRequestValidator;
+        this.recentTracksSearchRequestValidator = recentTracksSearchRequestValidator;
     }
 
-    public <T> Result<T, Errors> getFromSpotify(RecentTracksSearchRequest recentTracksSearchRequest, Function<RecentTracksSearchRequest, Result<T, Errors>> spotifyRepositoryGetter) {
-        Result<SpotifyAuthData, Errors> result = spotifyAuthService.getSpotifyAuthData(recentTracksSearchRequest.userId());
-
-        if (result.isFailure()) {
-            failure(result.getError());
+    public Result<StreamingData, Errors> getRecentStreams(RecentTracksSearchRequest searchRequest) {
+        Errors validationErrors = recentTracksSearchRequestValidator.validate(searchRequest);
+        if (validationErrors.hasErrors()) {
+            return failure(validationErrors);
         }
-        return spotifyRepositoryGetter.apply(recentTracksSearchRequest.cloneBuilder()
-                .withAuthData(result.getValue())
-                .build());
-    }
 
-    public Result<StreamingData, Errors> getRecentStreams(RecentTracksSearchRequest recentTracksSearchRequest) {
-        return getFromSpotify(recentTracksSearchRequest, spotifyRepository::getRecentStreamingData);
+        Result<SpotifyAuthData, Errors> spotifyAuthDataResult = spotifyAuthService.getSpotifyAuthData(searchRequest.userId());
+        if (spotifyAuthDataResult.isFailure()) {
+            return failure(spotifyAuthDataResult.getError());
+        }
+
+        return spotifyRepository.getRecentStreamingData(searchRequest.cloneBuilder().withAuthData(spotifyAuthDataResult.getValue()).build());
     }
 
     public Result<TopTracksResource, Errors> getTopTracks(TopTracksSearchRequest searchRequest) {
@@ -86,12 +87,12 @@ public class StreamingDataService {
         };
     }
 
-    public Result<StreamingData, Errors> search(StreamingDataSearchRequest streamingDataSearchRequest) {
-        Errors errors = streamDataSearchRequestValidator.validate(streamingDataSearchRequest);
+    public Result<StreamingData, Errors> search(StreamingDataSearchRequest searchRequest) {
+        Errors errors = streamDataSearchRequestValidator.validate(searchRequest);
         if (errors.hasErrors()) {
             failure(errors);
         }
-        return success(streamingDataRepository.search(streamingDataSearchRequest));
+        return success(streamingDataRepository.search(searchRequest));
     }
 
     @Async

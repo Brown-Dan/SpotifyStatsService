@@ -11,7 +11,7 @@ import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.TopTracksResource;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
@@ -36,8 +36,8 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/recent")
-    public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username, SpotifySearchRequest spotifySearchRequest) {
-        return get(streamingDataService::getRecentStreams, spotifySearchRequest.cloneBuilder().withUserId(username).build());
+    public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username, RecentTracksSearchRequest searchRequest) {
+        return get(streamingDataService::getRecentStreams, streamingDataRequestCleaner.clean(searchRequest, username));
     }
 
     @GetMapping(value = "/search")

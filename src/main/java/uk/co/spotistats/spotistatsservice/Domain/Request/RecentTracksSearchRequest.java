@@ -2,20 +2,20 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
-public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, Boolean createPlaylist,
-                                   Integer page) {
+import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
+
+public record RecentTracksSearchRequest(String userId, Integer limit, SpotifyAuthData authData, Boolean createPlaylist) {
 
     public static final class Builder {
         private String userId;
         private Integer limit;
         private SpotifyAuthData authData;
         private Boolean createPlaylist;
-        private Integer page;
 
         private Builder() {
         }
 
-        public static Builder aSpotifySearchRequest() {
+        public static Builder aRecentTracksSearchRequest() {
             return new Builder();
         }
 
@@ -39,22 +39,16 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
             return this;
         }
 
-        public Builder withPage(Integer page) {
-            this.page = page;
-            return this;
-        }
-
-        public SpotifySearchRequest build() {
-            return new SpotifySearchRequest(userId, limit, authData, createPlaylist, page);
+        public RecentTracksSearchRequest build() {
+            return new RecentTracksSearchRequest(userId, limit, authData, createPlaylist);
         }
     }
 
-    public Builder cloneBuilder() {
-        return Builder.aSpotifySearchRequest()
+    public RecentTracksSearchRequest.Builder cloneBuilder(){
+        return aRecentTracksSearchRequest()
+                .withAuthData(authData)
                 .withUserId(userId)
-                .withLimit(limit)
-                .withPage(page)
                 .withCreatePlaylist(createPlaylist)
-                .withAuthData(authData);
+                .withLimit(limit);
     }
 }
