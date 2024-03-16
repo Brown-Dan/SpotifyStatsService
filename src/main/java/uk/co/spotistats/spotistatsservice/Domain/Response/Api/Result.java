@@ -1,4 +1,4 @@
-package uk.co.spotistats.spotistatsservice.Domain.Response;
+package uk.co.spotistats.spotistatsservice.Domain.Response.Api;
 
 import java.util.NoSuchElementException;
 

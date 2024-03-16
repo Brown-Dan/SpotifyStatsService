@@ -2,8 +2,8 @@ package uk.co.spotistats.spotistatsservice.Controller.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.http.HttpStatus;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Response.ErrorKey;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
 
 import java.util.List;

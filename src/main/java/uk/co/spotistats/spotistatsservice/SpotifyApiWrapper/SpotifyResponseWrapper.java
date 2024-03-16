@@ -1,7 +1,7 @@
 package uk.co.spotistats.spotistatsservice.SpotifyApiWrapper;
 
 import uk.co.autotrader.traverson.http.Response;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
 
 import java.util.Arrays;

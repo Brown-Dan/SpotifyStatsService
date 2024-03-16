@@ -8,8 +8,8 @@ import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.ConditionBuilder;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamDataSearchRequestOrderBy;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import java.util.List;
 import static uk.co.spotistats.generated.tables.StreamData.STREAM_DATA;
 import static uk.co.spotistats.generated.tables.StreamingData.STREAMING_DATA;
 import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder.aStreamData;
-import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.someStreamingData;
 
 @Repository
 public class StreamingDataRepository {
@@ -63,12 +63,12 @@ public class StreamingDataRepository {
 
     private StreamingData buildStreamingData(List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData) {
         if (streamData.isEmpty()) {
-            return aStreamingData()
+            return someStreamingData()
                     .withSize(0)
                     .withStreamData(new ArrayList<>())
                     .build();
         }
-        return aStreamingData()
+        return someStreamingData()
                 .withFirstStreamDateTime(streamData.getFirst().getDateTime())
                 .withStreamData(streamData.stream().map(this::mapStreamDataEntityToStreamData).toList())
                 .withLastStreamDateTime(streamData.getLast().getDateTime())

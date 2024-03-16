@@ -1,8 +1,11 @@
 package uk.co.spotistats.spotistatsservice.Domain.Model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTrack;
 
 import java.time.LocalDateTime;
+
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder.aStreamData;
 
 public record StreamData(
         @JsonProperty("ts") LocalDateTime streamDateTime,
@@ -13,6 +16,17 @@ public record StreamData(
         @JsonProperty("master_metadata_album_artist_name") String artist,
         @JsonProperty("master_metadata_album_album_name") String album,
         @JsonProperty("platform") String platform) {
+
+    public static StreamData fromRecentTrack(RecentTrack recentTrack){
+        return aStreamData()
+                .withName(recentTrack.name())
+                .withTimeStreamed(recentTrack.lengthMs())
+                .withAlbum(recentTrack.album())
+                .withArtist(recentTrack.artist())
+                .withTrackUri(recentTrack.trackUri())
+                .withStreamDateTime(recentTrack.streamDateTime())
+                .build();
+    }
 
     public static final class Builder {
         private LocalDateTime streamDateTime;

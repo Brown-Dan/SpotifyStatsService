@@ -8,7 +8,8 @@ import uk.co.spotistats.spotistatsservice.Domain.Request.CreatePlaylistRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
 import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseMapper;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.SpotifyClient;
@@ -29,8 +30,8 @@ public class SpotifyRepository {
         this.spotifyClient = spotifyClient;
     }
 
-    public Result<StreamingData, Errors> getRecentStreamingData(RecentTracksSearchRequest recentTracksSearchRequest) {
-        Result<StreamingData, SpotifyRequestError> result = spotifyClient
+    public Result<RecentTracks, Errors> getRecentStreamingData(RecentTracksSearchRequest recentTracksSearchRequest) {
+        Result<RecentTracks, SpotifyRequestError> result = spotifyClient
                 .withAccessToken(recentTracksSearchRequest.authData().accessToken())
                 .withContentType(APPLICATION_JSON)
                 .getRecentStreamingData()
@@ -43,7 +44,12 @@ public class SpotifyRepository {
             return failure(recentTracksSearchRequest.userId(), result.getError());
         }
         if (recentTracksSearchRequest.createPlaylist()) {
-            createPlaylist(CreatePlaylistRequest.fromRecentTracksSearchRequest(recentTracksSearchRequest, result.getValue().streamData()));
+            Result<Playlist, Errors> createPlaylistResult =
+                    createPlaylist(CreatePlaylistRequest.fromRecentTracksSearchRequest(recentTracksSearchRequest, result.getValue().tracks()));
+            if (createPlaylistResult.isFailure()){
+                return failure(createPlaylistResult.getError());
+            }
+            return success(result.getValue().addPlaylist(createPlaylistResult.getValue().id()));
         }
         return success(result.getValue());
     }
@@ -87,6 +93,10 @@ public class SpotifyRepository {
 
     private <T> Result<T, Errors> failure(String userId, SpotifyRequestError spotifyRequestError) {
         return new Result.Failure<>(fromSpotifyRequestError(userId, spotifyRequestError));
+    }
+
+    private <T> Result<T, Errors> failure(Errors errors) {
+        return new Result.Failure<>(errors);
     }
 
     private <T> Result<T, Errors> success(T success) {

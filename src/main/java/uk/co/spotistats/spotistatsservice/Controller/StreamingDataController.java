@@ -9,11 +9,12 @@ import uk.co.spotistats.spotistatsservice.Controller.Cleaner.StreamingDataReques
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.TopTracksResource;
-import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.util.function.Function;
@@ -36,7 +37,7 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/recent")
-    public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username, RecentTracksSearchRequest searchRequest) {
+    public ResponseEntity<ApiResult<RecentTracks, Errors>> getRecentStreams(@PathVariable String username, RecentTracksSearchRequest searchRequest) {
         return get(streamingDataService::getRecentStreams, streamingDataRequestCleaner.clean(searchRequest, username));
     }
 

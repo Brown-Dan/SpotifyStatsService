@@ -5,17 +5,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Upload.StreamingDataUpsertResult;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static uk.co.spotistats.generated.Tables.STREAM_DATA;
 import static uk.co.spotistats.generated.tables.StreamingData.STREAMING_DATA;
-import static uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult.Builder.aStreamingDataInsertResult;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.Upload.StreamingDataUpsertResult.Builder.aStreamingDataInsertResult;
 
 @Component
 public class StreamingDataUploadRepository {

@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.someStreamingData;
 
 @Component
 public class MultipartFileToStreamingDataMapper {
@@ -32,7 +32,7 @@ public class MultipartFileToStreamingDataMapper {
         try {
             JsonNode streamingDataJson = objectMapper.readTree(new String(file.getBytes()));
             List<StreamData> streamData = StreamSupport.stream(streamingDataJson.spliterator(), false).map(this::mapStreamData).toList();
-            return new Result.Success<>(aStreamingData()
+            return new Result.Success<>(someStreamingData()
                     .withStreamData(streamData)
                     .withFirstStreamDateTime(streamData.getFirst().streamDateTime())
                     .withLastStreamDateTime(streamData.getLast().streamDateTime())

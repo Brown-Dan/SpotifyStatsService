@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
+import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTrack;
+import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
@@ -19,8 +21,10 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder.aStreamData;
-import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.someStreamingData;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Playlist.Builder.aPlaylist;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTrack.Builder.aRecentTrack;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks.Builder.someRecentTracks;
 
 @Component
 public class SpotifyResponseMapper {
@@ -33,13 +37,14 @@ public class SpotifyResponseMapper {
         this.objectMapper = objectMapper;
     }
 
-    public StreamingData fromRecentStreamingData(JSONObject json) {
+    public RecentTracks fromRecentStreamingData(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
-            List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toStreamData(item.get("track"))
+            List<RecentTrack> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toRecentTrack(item.get("track"))
                     .withStreamDateTime(Optional.ofNullable(item.get("played_at")).map(JsonNode::asText).map(ZonedDateTime::parse).map(ZonedDateTime::toLocalDateTime).orElse(null)).build()).toList();
-            return aStreamingData()
-                    .withStreamData(streamData)
+            return someRecentTracks()
+                    .withTotalStreamTimeMinutes(((int) streamData.stream().mapToLong(RecentTrack::lengthMs).sum() / 1000) / 60)
+                    .withTracks(streamData)
                     .withSize(streamData.size())
                     .withFirstStreamDateTime(streamData.getLast().streamDateTime())
                     .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build();
@@ -49,12 +54,21 @@ public class SpotifyResponseMapper {
         }
     }
 
+    private RecentTrack.Builder toRecentTrack(JsonNode track) {
+        return aRecentTrack()
+                .withAlbum(track.get("album").get("name").asText())
+                .withArtist(track.get("artists").get(0).get("name").asText())
+                .withName(track.get("name").asText())
+                .withTrackUri(track.get("uri").asText())
+                .withLengthMs(track.get("duration_ms").asLong());
+    }
+
     public StreamingData fromTopTracks(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toStreamData(item)
                     .withStreamDateTime(Optional.ofNullable(item.get("played_at")).map(JsonNode::asText).map(ZonedDateTime::parse).map(ZonedDateTime::toLocalDateTime).orElse(null)).build()).toList();
-            return aStreamingData()
+            return someStreamingData()
                     .withStreamData(streamData)
                     .withSize(streamData.size())
                     .withFirstStreamDateTime(streamData.isEmpty() ? null : streamData.getLast().streamDateTime())

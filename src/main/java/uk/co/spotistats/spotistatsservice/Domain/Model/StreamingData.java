@@ -1,11 +1,12 @@
 package uk.co.spotistats.spotistatsservice.Domain.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.someStreamingData;
 
 public record StreamingData(List<StreamData> streamData,
                             Integer size,
@@ -13,7 +14,7 @@ public record StreamingData(List<StreamData> streamData,
                             LocalDateTime lastStreamDateTime, LocalDateTime lastUpdated, @JsonIgnore String username) {
 
     public static StreamingData fromStreamingDataEntity(uk.co.spotistats.generated.tables.pojos.StreamingData streamingDataEntity) {
-        return aStreamingData()
+        return someStreamingData()
                 .withUsername(streamingDataEntity.getUsername())
                 .withFirstStreamDateTime(streamingDataEntity.getFirstStreamDate())
                 .withLastStreamDateTime(streamingDataEntity.getLastStreamData())
@@ -26,17 +27,17 @@ public record StreamingData(List<StreamData> streamData,
         return lastUpdated.isBefore(LocalDateTime.now().minusMinutes(25));
     }
 
-    public StreamingData updateStreamingDataFromSync(StreamingData newData) {
-        LocalDateTime firstStreamDateTime = firstStreamDateTime().isBefore(newData.firstStreamDateTime())
-                ? firstStreamDateTime() : newData.firstStreamDateTime();
-        LocalDateTime lastStreamDateTime = lastStreamDateTime().isAfter(newData.lastStreamDateTime())
-                ? lastStreamDateTime() : newData.lastStreamDateTime();
+    public StreamingData updateStreamingDataFromSync(RecentTracks recentTracks) {
+        LocalDateTime firstStreamDateTime = firstStreamDateTime().isBefore(recentTracks.firstStreamDateTime())
+                ? firstStreamDateTime() : recentTracks.firstStreamDateTime();
+        LocalDateTime lastStreamDateTime = lastStreamDateTime().isAfter(recentTracks.lastStreamDateTime())
+                ? lastStreamDateTime() : recentTracks.lastStreamDateTime();
 
-        return aStreamingData()
-                .withSize(size() + newData.size())
+        return someStreamingData()
+                .withSize(size() + recentTracks.size())
                 .withFirstStreamDateTime(firstStreamDateTime)
                 .withLastStreamDateTime(lastStreamDateTime)
-                .withUsername(newData.username())
+                .withUsername(username)
                 .build();
     }
 
@@ -51,7 +52,7 @@ public record StreamingData(List<StreamData> streamData,
         private Builder() {
         }
 
-        public static Builder aStreamingData() {
+        public static Builder someStreamingData() {
             return new Builder();
         }
 
@@ -91,7 +92,7 @@ public record StreamingData(List<StreamData> streamData,
     }
 
     public StreamingData.Builder cloneBuilder() {
-        return aStreamingData()
+        return someStreamingData()
                 .withUsername(username)
                 .withLastUpdated(lastUpdated)
                 .withStreamData(streamData)

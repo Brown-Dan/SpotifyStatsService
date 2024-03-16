@@ -3,8 +3,8 @@ package uk.co.spotistats.spotistatsservice.Service.Validator;
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Response.ErrorKey;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataUploadService;
 
 import java.util.ArrayList;

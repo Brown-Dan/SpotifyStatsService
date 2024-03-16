@@ -8,9 +8,9 @@ import uk.co.spotistats.spotistatsservice.Controller.Mapper.MultipartFileToStrea
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Upload.StreamingDataUpsertResult;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataUploadService;
 
 @RestController

@@ -4,15 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
-import uk.co.spotistats.spotistatsservice.Domain.Response.StreamingDataUpsertResult;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Upload.StreamingDataUpsertResult;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.aStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.someStreamingData;
 
 @Service
 public class StreamingDataUploadService {
@@ -61,7 +61,7 @@ public class StreamingDataUploadService {
         LocalDateTime lastStreamDateTime = originalData.lastStreamDateTime().isAfter(newData.lastStreamDateTime())
                 ? originalData.lastStreamDateTime() : newData.lastStreamDateTime();
 
-        return aStreamingData()
+        return someStreamingData()
                 .withSize(originalData.size() + newData.size())
                 .withFirstStreamDateTime(firstStreamDateTime)
                 .withLastStreamDateTime(lastStreamDateTime)

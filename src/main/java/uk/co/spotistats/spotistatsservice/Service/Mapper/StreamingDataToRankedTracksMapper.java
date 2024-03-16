@@ -2,33 +2,33 @@ package uk.co.spotistats.spotistatsservice.Service.Mapper;
 
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
-import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Advanced.AdvancedTrackDataResource;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Advanced.AdvancedRankedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.TopTracksResource;
-import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Simple.SimpleTrackDataResource;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Simple.SimpleRankedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamDataSearchRequestOrderBy;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Error;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-import static uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Advanced.AdvancedTrackDataResource.Builder.anAdvancedTrackDataResource;
-import static uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Advanced.AdvancedTopTracksResource.Builder.anAdvancedTopTracksResource;
-import static uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Simple.SimpleTopTracksResource.Builder.aSimpleTopTracksResponse;
-import static uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Simple.SimpleTrackDataResource.Builder.aSimpleTrackDataResource;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Advanced.AdvancedRankedTrack.Builder.anAdvancedRankedTrack;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Advanced.AdvancedRankedTracks.Builder.someAdvancedRankedTracks;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Simple.SimpleRankedTracks.Builder.someSimpleRankedTracks;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Simple.SimpleRankedTrack.Builder.aSimpleRankedTrack;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
 @Component
-public class StreamingDataToTopTracksMapper {
+public class StreamingDataToRankedTracksMapper {
 
     private final StreamingDataRepository streamingDataRepository;
 
-    public StreamingDataToTopTracksMapper(StreamingDataRepository streamingDataRepository) {
+    public StreamingDataToRankedTracksMapper(StreamingDataRepository streamingDataRepository) {
         this.streamingDataRepository = streamingDataRepository;
     }
 
@@ -43,12 +43,12 @@ public class StreamingDataToTopTracksMapper {
                 .withStartDate(getStreamingDataResult.getValue().firstStreamDateTime().toLocalDate())
                 .withEndDate(getStreamingDataResult.getValue().lastStreamDateTime().toLocalDate());
 
-        List<AdvancedTrackDataResource> advancedTrackDataResources = streamingData.streamData().stream().map(streamData ->
+        List<AdvancedRankedTrack> advancedRankedTracks = streamingData.streamData().stream().map(streamData ->
                 mapAdvancedTrackData(streamData, streamingDataSearchRequestBuilder,
                         calculateRank(streamingData.streamData().indexOf(streamData), searchRequest.page(), searchRequest.limit()))).toList();
 
-        return new Result.Success<>(anAdvancedTopTracksResource()
-                .withTracks(advancedTrackDataResources)
+        return new Result.Success<>(someAdvancedRankedTracks()
+                .withTracks(advancedRankedTracks)
                 .withTotalResults(100)
                 .withPage(searchRequest.page())
                 .build());
@@ -59,7 +59,7 @@ public class StreamingDataToTopTracksMapper {
     }
 
     public Result<TopTracksResource, Errors> mapToSimple(StreamingData streamingData, TopTracksSearchRequest searchRequest) {
-        return new Result.Success<>(aSimpleTopTracksResponse()
+        return new Result.Success<>(someSimpleRankedTracks()
                 .withStreamData(streamingData.streamData().stream().map(streamData -> mapSimpleTrackData(streamData,
                         calculateRank(streamingData.streamData().indexOf(streamData), searchRequest.page(), searchRequest.limit()))).toList())
                 .withTotalResults(100)
@@ -67,8 +67,8 @@ public class StreamingDataToTopTracksMapper {
                 .build());
     }
 
-    private SimpleTrackDataResource mapSimpleTrackData(StreamData streamData, Integer rank) {
-        return aSimpleTrackDataResource()
+    private SimpleRankedTrack mapSimpleTrackData(StreamData streamData, Integer rank) {
+        return aSimpleRankedTrack()
                 .withAlbum(streamData.album())
                 .withArtist(streamData.artist())
                 .withLengthMs(streamData.timeStreamed())
@@ -78,12 +78,12 @@ public class StreamingDataToTopTracksMapper {
                 .build();
     }
 
-    private AdvancedTrackDataResource mapAdvancedTrackData(StreamData streamData, StreamingDataSearchRequest.Builder searchRequestBuilder, Integer rank) {
+    private AdvancedRankedTrack mapAdvancedTrackData(StreamData streamData, StreamingDataSearchRequest.Builder searchRequestBuilder, Integer rank) {
         StreamingDataSearchRequest streamingDataSearchRequest = searchRequestBuilder.withUri(streamData.trackUri()).build();
         StreamingData streamingData = streamingDataRepository.search(streamingDataSearchRequest);
 
         long totalTimeStreamed = streamingData.streamData().stream().mapToLong(StreamData::timeStreamed).sum();
-        AdvancedTrackDataResource.Builder advancedTrackData = anAdvancedTrackDataResource()
+        AdvancedRankedTrack.Builder advancedTrackData = anAdvancedRankedTrack()
                 .withTotalMsPlayed((int) totalTimeStreamed)
                 .withTrackName(streamData.name())
                 .withRanking(rank)

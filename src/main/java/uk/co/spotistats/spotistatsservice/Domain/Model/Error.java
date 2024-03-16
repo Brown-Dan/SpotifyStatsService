@@ -1,4 +1,6 @@
-package uk.co.spotistats.spotistatsservice.Domain.Response;
+package uk.co.spotistats.spotistatsservice.Domain.Model;
+
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 
 public record Error(String field, String message, ErrorKey key) {
 
