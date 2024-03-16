@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
@@ -13,6 +14,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSea
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TrackUriSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.AdvancedTrack;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
@@ -43,18 +45,20 @@ public class StreamingDataService {
     private final StreamDataSearchRequestValidator streamDataSearchRequestValidator;
     private final TopTracksSearchRequestValidator topTracksSearchRequestValidator;
     private final RecentTracksSearchRequestValidator recentTracksSearchRequestValidator;
+    private final StreamingDataUploadService streamingDataUploadService;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
-    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamDataSearchRequestValidator streamDataSearchRequestValidator, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository, StreamingDataToRankedTracksMapper streamingDataToRankedTracksMapper, TopTracksSearchRequestValidator topTracksSearchRequestValidator, RecentTracksSearchRequestValidator recentTracksSearchRequestValidator) {
+    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository, StreamingDataToRankedTracksMapper streamingDataToRankedTracksMapper, StreamDataSearchRequestValidator streamDataSearchRequestValidator, TopTracksSearchRequestValidator topTracksSearchRequestValidator, RecentTracksSearchRequestValidator recentTracksSearchRequestValidator, StreamingDataUploadService streamingDataUploadService) {
         this.spotifyAuthService = spotifyAuthService;
         this.spotifyRepository = spotifyRepository;
-        this.streamDataSearchRequestValidator = streamDataSearchRequestValidator;
         this.streamingDataRepository = streamingDataRepository;
         this.streamingDataUploadRepository = streamingDataUploadRepository;
         this.streamingDataToRankedTracksMapper = streamingDataToRankedTracksMapper;
+        this.streamDataSearchRequestValidator = streamDataSearchRequestValidator;
         this.topTracksSearchRequestValidator = topTracksSearchRequestValidator;
         this.recentTracksSearchRequestValidator = recentTracksSearchRequestValidator;
+        this.streamingDataUploadService = streamingDataUploadService;
     }
 
     public Result<RecentTracks, Errors> getRecentStreams(RecentTracksSearchRequest searchRequest) {
@@ -93,6 +97,10 @@ public class StreamingDataService {
     }
 
     public Result<AdvancedTrack, Errors> getByTrackUri(TrackUriSearchRequest trackUriSearchRequest) {
+        if (!streamingDataUploadService.hasStreamingData(trackUriSearchRequest.username())){
+            return failure(Errors.fromError(new Error(null, "uploaded streaming data is required to use search insights", ErrorKey.STREAMING_DATA_NOT_UPLOADED)));
+        }
+
         StreamingDataSearchRequest streamingDataSearchRequest = aStreamingDataSearchRequest()
                 .withUri(trackUriSearchRequest.trackUri())
                 .withOrderBy(DATE.toString())
