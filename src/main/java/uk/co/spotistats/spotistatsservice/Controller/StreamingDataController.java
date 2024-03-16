@@ -38,7 +38,7 @@ public class StreamingDataController {
         return get(streamingDataService::getTopTracks, streamingDataRequestCleaner.clean(searchRequest, username));
     }
 
-    @GetMapping(value = "/top/{uri}")
+    @GetMapping(value = "/get/{uri}")
     public ResponseEntity<ApiResult<AdvancedTrack, Errors>> getTrackByUri(@PathVariable String username, @PathVariable String uri) {
         return get(streamingDataService::getByTrackUri, new TrackUriSearchRequest(username, uri));
     }
