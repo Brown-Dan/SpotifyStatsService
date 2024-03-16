@@ -31,7 +31,7 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<TopTracksResource, Errors>> top(@PathVariable String username, TopTracksSearchRequest searchRequest) {
+    public ResponseEntity<ApiResult<TopTracksResource, Errors>> getTopTracks(@PathVariable String username, TopTracksSearchRequest searchRequest) {
         return get(streamingDataService::getTopTracks, streamingDataRequestCleaner.clean(searchRequest, username));
     }
 
