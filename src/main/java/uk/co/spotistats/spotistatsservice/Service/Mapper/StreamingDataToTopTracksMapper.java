@@ -48,7 +48,7 @@ public class StreamingDataToTopTracksMapper {
                         calculateRank(streamingData.streamData().indexOf(streamData), searchRequest.page(), searchRequest.limit()))).toList();
 
         return new Result.Success<>(aRankedTopTracksResponse()
-                .withRankedStreamData(rankedTrackDataResources)
+                .withTracks(rankedTrackDataResources)
                 .withTotalResults(100)
                 .withPage(searchRequest.page())
                 .build());
