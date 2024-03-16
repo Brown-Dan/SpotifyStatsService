@@ -9,8 +9,8 @@ import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.TopTracksResource;
+import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
@@ -24,7 +24,7 @@ import uk.co.spotistats.spotistatsservice.Service.Validator.TopTracksSearchReque
 import java.util.List;
 import java.util.function.Function;
 
-import static uk.co.spotistats.spotistatsservice.Domain.Request.SpotifySearchRequest.Builder.aSpotifySearchRequest;
+import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
 
 @Service
 @EnableAsync
@@ -50,19 +50,19 @@ public class StreamingDataService {
         this.topTracksSearchRequestValidator = topTracksSearchRequestValidator;
     }
 
-    public <T> Result<T, Errors> getFromSpotify(SpotifySearchRequest spotifySearchRequest, Function<SpotifySearchRequest, Result<T, Errors>> spotifyRepositoryGetter) {
-        Result<SpotifyAuthData, Errors> result = spotifyAuthService.getSpotifyAuthData(spotifySearchRequest.userId());
+    public <T> Result<T, Errors> getFromSpotify(RecentTracksSearchRequest recentTracksSearchRequest, Function<RecentTracksSearchRequest, Result<T, Errors>> spotifyRepositoryGetter) {
+        Result<SpotifyAuthData, Errors> result = spotifyAuthService.getSpotifyAuthData(recentTracksSearchRequest.userId());
 
         if (result.isFailure()) {
             failure(result.getError());
         }
-        return spotifyRepositoryGetter.apply(spotifySearchRequest.cloneBuilder()
+        return spotifyRepositoryGetter.apply(recentTracksSearchRequest.cloneBuilder()
                 .withAuthData(result.getValue())
                 .build());
     }
 
-    public Result<StreamingData, Errors> getRecentStreams(SpotifySearchRequest spotifySearchRequest) {
-        return getFromSpotify(spotifySearchRequest, spotifyRepository::getRecentStreamingData);
+    public Result<StreamingData, Errors> getRecentStreams(RecentTracksSearchRequest recentTracksSearchRequest) {
+        return getFromSpotify(recentTracksSearchRequest, spotifyRepository::getRecentStreamingData);
     }
 
     public Result<TopTracksResource, Errors> getTopTracks(TopTracksSearchRequest searchRequest) {
@@ -97,8 +97,8 @@ public class StreamingDataService {
     @Async
     public void syncRecentStreamData(StreamingData streamingData) {
         LOG.info("Syncing streaming data for user - {}", streamingData.username());
-        SpotifySearchRequest spotifySearchRequest = aSpotifySearchRequest().withUserId(streamingData.username()).withLimit(50).build();
-        Result<StreamingData, Errors> streamingDataResult = getRecentStreams(spotifySearchRequest);
+        RecentTracksSearchRequest recentTracksSearchRequest = aRecentTracksSearchRequest().withCreatePlaylist(false).withUserId(streamingData.username()).withLimit(50).build();
+        Result<StreamingData, Errors> streamingDataResult = getRecentStreams(recentTracksSearchRequest);
         if (streamingDataResult.isFailure()) {
             LOG.error("Failure syncing streaming data for user - {}", streamingData.username());
             return;
