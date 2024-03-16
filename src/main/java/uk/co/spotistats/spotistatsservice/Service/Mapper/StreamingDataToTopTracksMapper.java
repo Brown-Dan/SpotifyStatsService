@@ -55,7 +55,7 @@ public class StreamingDataToTopTracksMapper {
     }
 
     private Integer calculateRank(Integer index, Integer page, Integer limit){
-        return (index + 1) + (page * limit);
+        return (index + 1) + ((page - 1) * limit);
     }
 
     public Result<TopTracksResource, Errors> mapToUnranked(StreamingData streamingData, TopTracksSearchRequest searchRequest) {
