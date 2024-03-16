@@ -37,12 +37,13 @@ public class SpotifyResponseMapper {
         this.objectMapper = objectMapper;
     }
 
-    public RecentTracks fromRecentStreamingData(JSONObject json) {
+    public RecentTracks toRecentTracks(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<RecentTrack> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toRecentTrack(item.get("track"))
                     .withStreamDateTime(Optional.ofNullable(item.get("played_at")).map(JsonNode::asText).map(ZonedDateTime::parse).map(ZonedDateTime::toLocalDateTime).orElse(null)).build()).toList();
             return someRecentTracks()
+                    .withCreatedPlaylist(false)
                     .withTotalStreamTimeMinutes(((int) streamData.stream().mapToLong(RecentTrack::lengthMs).sum() / 1000) / 60)
                     .withTracks(streamData)
                     .withSize(streamData.size())

@@ -38,7 +38,7 @@ public class SpotifyRepository {
                 .withBefore(NOW)
                 .withLimit(recentTracksSearchRequest.limit())
                 .fetchInto(JSONObject.class)
-                .map(spotifyResponseMapper::fromRecentStreamingData);
+                .map(spotifyResponseMapper::toRecentTracks);
 
         if (result.isFailure()) {
             return failure(recentTracksSearchRequest.userId(), result.getError());
