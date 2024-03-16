@@ -1,6 +1,6 @@
 package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Simple;
 
-public record SimpleTrackDataResource(String trackUri, String name, String artist, String album, long lengthMs, Integer rank) {
+public record SimpleTrackDataResource(Integer rank, String trackUri, String name, String artist, String album, long lengthMs) {
 
     public static final class Builder {
         private String trackUri;
@@ -48,7 +48,7 @@ public record SimpleTrackDataResource(String trackUri, String name, String artis
         }
 
         public SimpleTrackDataResource build() {
-            return new SimpleTrackDataResource(trackUri, name, artist, album, lengthMs, rank);
+            return new SimpleTrackDataResource(rank, trackUri, name, artist, album, lengthMs);
         }
     }
 }
