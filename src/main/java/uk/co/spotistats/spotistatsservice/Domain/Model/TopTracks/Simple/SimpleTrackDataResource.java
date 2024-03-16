@@ -1,6 +1,6 @@
-package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks;
+package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Simple;
 
-public record UnrankedTrackDataResource(String trackUri, String name, String artist, String album, long lengthMs, Integer rank) {
+public record SimpleTrackDataResource(String trackUri, String name, String artist, String album, long lengthMs, Integer rank) {
 
     public static final class Builder {
         private String trackUri;
@@ -13,7 +13,7 @@ public record UnrankedTrackDataResource(String trackUri, String name, String art
         private Builder() {
         }
 
-        public static Builder anUnrankedTrackDataResource() {
+        public static Builder aSimpleTrackDataResource() {
             return new Builder();
         }
 
@@ -47,8 +47,8 @@ public record UnrankedTrackDataResource(String trackUri, String name, String art
             return this;
         }
 
-        public UnrankedTrackDataResource build() {
-            return new UnrankedTrackDataResource(trackUri, name, artist, album, lengthMs, rank);
+        public SimpleTrackDataResource build() {
+            return new SimpleTrackDataResource(trackUri, name, artist, album, lengthMs, rank);
         }
     }
 }

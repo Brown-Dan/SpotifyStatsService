@@ -81,8 +81,8 @@ public class StreamingDataService {
         return switch (result) {
             case Result.Failure(Errors errors) -> failure(errors);
             case Result.Success(StreamingData streamingData) ->
-                    searchRequest.ranked() ? streamingDataToTopTracksMapper.mapToRanked(streamingData, searchRequest) :
-                            streamingDataToTopTracksMapper.mapToUnranked(streamingData, searchRequest);
+                    searchRequest.advanced() ? streamingDataToTopTracksMapper.mapToAdvanced(streamingData, searchRequest) :
+                            streamingDataToTopTracksMapper.mapToSimple(streamingData, searchRequest);
         };
     }
 

@@ -37,7 +37,7 @@ public class SpotifyRepository {
                 .withBefore(NOW)
                 .withLimit(spotifySearchRequest.limit())
                 .fetchInto(JSONObject.class)
-                .map(spotifyResponseMapper::toStreamingData);
+                .map(spotifyResponseMapper::fromRecentStreamingData);
 
         if (result.isFailure()) {
             return failure(spotifySearchRequest.userId(), result.getError());
@@ -56,7 +56,7 @@ public class SpotifyRepository {
                 .withLimit(searchRequest.limit())
                 .withOffset((searchRequest.page() - 1) * searchRequest.limit())
                 .fetchInto(JSONObject.class)
-                .map(spotifyResponseMapper::toRankedStreamingData);
+                .map(spotifyResponseMapper::fromTopTracks);
 
         if (result.isFailure()) {
             return failure(searchRequest.userId(), result.getError());

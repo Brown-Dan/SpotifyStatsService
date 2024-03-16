@@ -24,7 +24,7 @@ public class TopTracksSearchRequestValidator {
         List<Error> errors = new ArrayList<>();
 
         validateLimit(topTracksSearchRequest).ifPresent(errors::add);
-        validateRanked(topTracksSearchRequest).ifPresent(errors::add);
+        validateAdvanced(topTracksSearchRequest).ifPresent(errors::add);
         validatePage(topTracksSearchRequest).ifPresent(errors::add);
 
         return Errors.fromErrors(errors);
@@ -48,9 +48,9 @@ public class TopTracksSearchRequestValidator {
         return Optional.empty();
     }
 
-    private Optional<Error> validateRanked(TopTracksSearchRequest topTracksSearchRequest) {
-        if (!streamingDataUploadService.hasStreamingData(topTracksSearchRequest.userId()) && topTracksSearchRequest.ranked()) {
-            return Optional.of(new Error("ranked", "uploaded streaming data is required when 'ranked' is 'true'", ErrorKey.STREAMING_DATA_NOT_UPLOADED));
+    private Optional<Error> validateAdvanced(TopTracksSearchRequest topTracksSearchRequest) {
+        if (!streamingDataUploadService.hasStreamingData(topTracksSearchRequest.userId()) && topTracksSearchRequest.advanced()) {
+            return Optional.of(new Error("advanced", "uploaded streaming data is required when for 'advanced' insights", ErrorKey.STREAMING_DATA_NOT_UPLOADED));
         }
         return Optional.empty();
     }

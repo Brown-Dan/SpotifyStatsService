@@ -5,7 +5,7 @@ import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest.Builder.aTopTracksSearchRequest;
 
 public record TopTracksSearchRequest(String userId, Integer limit, SpotifyAuthData authData, Boolean createPlaylist,
-                                     Integer page, Boolean ranked) {
+                                     Integer page, Boolean advanced) {
 
 
     public static final class Builder {
@@ -14,7 +14,7 @@ public record TopTracksSearchRequest(String userId, Integer limit, SpotifyAuthDa
         private SpotifyAuthData authData;
         private Boolean createPlaylist;
         private Integer page;
-        private Boolean ranked;
+        private Boolean advanced;
 
         private Builder() {
         }
@@ -48,13 +48,13 @@ public record TopTracksSearchRequest(String userId, Integer limit, SpotifyAuthDa
             return this;
         }
 
-        public Builder withRanked(Boolean ranked) {
-            this.ranked = ranked;
+        public Builder withAdvanced(Boolean advanced) {
+            this.advanced = advanced;
             return this;
         }
 
         public TopTracksSearchRequest build() {
-            return new TopTracksSearchRequest(userId, limit, authData, createPlaylist, page, ranked);
+            return new TopTracksSearchRequest(userId, limit, authData, createPlaylist, page, advanced);
         }
     }
 
@@ -65,6 +65,6 @@ public record TopTracksSearchRequest(String userId, Integer limit, SpotifyAuthDa
                 .withAuthData(authData)
                 .withCreatePlaylist(createPlaylist)
                 .withPage(page)
-                .withRanked(ranked);
+                .withAdvanced(advanced);
     }
 }

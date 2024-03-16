@@ -33,7 +33,7 @@ public class SpotifyResponseMapper {
         this.objectMapper = objectMapper;
     }
 
-    public StreamingData toStreamingData(JSONObject json) {
+    public StreamingData fromRecentStreamingData(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toStreamData(item.get("track"))
@@ -49,7 +49,7 @@ public class SpotifyResponseMapper {
         }
     }
 
-    public StreamingData toRankedStreamingData(JSONObject json) {
+    public StreamingData fromTopTracks(JSONObject json) {
         try {
             JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<StreamData> streamData = StreamSupport.stream(responseAsJsonNode.spliterator(), false).map(item -> toStreamData(item)

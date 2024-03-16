@@ -1,16 +1,16 @@
-package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks;
+package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Advanced;
 
 import java.time.LocalDateTime;
 
-public record RankedTrackDataResource(int ranking,
-                                      String trackName,
-                                      String artistName,
-                                      String albumName,
-                                      String trackUri,
-                                      LocalDateTime lastStreamedDate,
-                                      int totalMinutesPlayed,
-                                      int totalMsPlayed,
-                                      int totalStreams) {
+public record AdvancedTrackDataResource(int ranking,
+                                        String trackName,
+                                        String artistName,
+                                        String albumName,
+                                        String trackUri,
+                                        LocalDateTime lastStreamedDate,
+                                        int totalMinutesPlayed,
+                                        int totalMsPlayed,
+                                        int totalStreams) {
 
 
     public static final class Builder {
@@ -27,7 +27,7 @@ public record RankedTrackDataResource(int ranking,
         private Builder() {
         }
 
-        public static Builder aRankedStreamData() {
+        public static Builder anAdvancedTrackDataResource() {
             return new Builder();
         }
 
@@ -76,8 +76,8 @@ public record RankedTrackDataResource(int ranking,
             return this;
         }
 
-        public RankedTrackDataResource build() {
-            return new RankedTrackDataResource(ranking, trackName, artistName, albumName, trackUri, lastStreamedDate, totalMinutesPlayed, totalMsPlayed, totalStreams);
+        public AdvancedTrackDataResource build() {
+            return new AdvancedTrackDataResource(ranking, trackName, artistName, albumName, trackUri, lastStreamedDate, totalMinutesPlayed, totalMsPlayed, totalStreams);
         }
     }
 }

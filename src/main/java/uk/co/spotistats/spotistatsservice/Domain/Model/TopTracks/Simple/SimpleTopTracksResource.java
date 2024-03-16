@@ -1,23 +1,25 @@
-package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks;
+package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.Simple;
+
+import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.TopTracksResource;
 
 import java.util.List;
 
-public record RankedTopTracksResource(List<RankedTrackDataResource> tracks, int totalResults,
+public record SimpleTopTracksResource(List<SimpleTrackDataResource> tracks, int totalResults,
                                       int page) implements TopTracksResource {
 
     public static final class Builder {
-        private List<RankedTrackDataResource> tracks;
+        private List<SimpleTrackDataResource> tracks;
         private int totalResults;
         private int page;
 
         private Builder() {
         }
 
-        public static Builder aRankedTopTracksResponse() {
+        public static Builder aSimpleTopTracksResponse() {
             return new Builder();
         }
 
-        public Builder withTracks(List<RankedTrackDataResource> tracks) {
+        public Builder withStreamData(List<SimpleTrackDataResource> tracks) {
             this.tracks = tracks;
             return this;
         }
@@ -32,8 +34,8 @@ public record RankedTopTracksResource(List<RankedTrackDataResource> tracks, int 
             return this;
         }
 
-        public RankedTopTracksResource build() {
-            return new RankedTopTracksResource(tracks, totalResults, page);
+        public SimpleTopTracksResource build() {
+            return new SimpleTopTracksResource(tracks, totalResults, page);
         }
     }
 }

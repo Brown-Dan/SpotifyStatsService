@@ -13,7 +13,7 @@ public class StreamingDataRequestCleaner {
                 .withLimit(topTracksSearchRequest.limit() == null ? 10 : topTracksSearchRequest.limit())
                 .withPage(topTracksSearchRequest.page() == null ? 1 : topTracksSearchRequest.page())
                 .withCreatePlaylist(topTracksSearchRequest.createPlaylist() != null && topTracksSearchRequest.createPlaylist())
-                .withRanked(topTracksSearchRequest.ranked() != null && topTracksSearchRequest.ranked())
+                .withAdvanced(topTracksSearchRequest.advanced() != null && topTracksSearchRequest.advanced())
                 .withUserId(userId)
                 .build();
     }
