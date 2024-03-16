@@ -28,6 +28,7 @@ import uk.co.spotistats.spotistatsservice.Service.Validator.TopTracksSearchReque
 import java.util.List;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
+import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamDataSearchRequestOrderBy.DATE;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
 @Service
@@ -94,6 +95,7 @@ public class StreamingDataService {
     public Result<AdvancedTrack, Errors> getByTrackUri(TrackUriSearchRequest trackUriSearchRequest) {
         StreamingDataSearchRequest streamingDataSearchRequest = aStreamingDataSearchRequest()
                 .withUri(trackUriSearchRequest.trackUri())
+                .withOrderBy(DATE.toString())
                 .withUsername(trackUriSearchRequest.username()).build();
 
         StreamingData streamingData = streamingDataRepository.search(streamingDataSearchRequest);
