@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import uk.co.spotistats.spotistatsservice.Controller.Cleaner.StreamingDataRequestCleaner;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
@@ -22,19 +23,21 @@ import java.util.function.Function;
 public class StreamingDataController {
 
     private final StreamingDataService streamingDataService;
+    private final StreamingDataRequestCleaner streamingDataRequestCleaner;
 
-    public StreamingDataController(StreamingDataService streamingDataService) {
+    public StreamingDataController(StreamingDataService streamingDataService, StreamingDataRequestCleaner streamingDataRequestCleaner) {
         this.streamingDataService = streamingDataService;
+        this.streamingDataRequestCleaner = streamingDataRequestCleaner;
+    }
+
+    @GetMapping(value = "/top")
+    public ResponseEntity<ApiResult<TopTracksResource, Errors>> top(@PathVariable String username, TopTracksSearchRequest searchRequest) {
+        return get(streamingDataService::getTopTracks, streamingDataRequestCleaner.clean(searchRequest, username));
     }
 
     @GetMapping(value = "/recent")
     public ResponseEntity<ApiResult<StreamingData, Errors>> getRecentStreams(@PathVariable String username, SpotifySearchRequest spotifySearchRequest) {
         return get(streamingDataService::getRecentStreams, spotifySearchRequest.cloneBuilder().withUserId(username).build());
-    }
-
-    @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<TopTracksResource, Errors>> top(@PathVariable String username, TopTracksSearchRequest searchRequest) {
-        return get(streamingDataService::getTopTracks, searchRequest.cloneBuilder().withUserId(username).build());
     }
 
     @GetMapping(value = "/search")

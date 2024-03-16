@@ -71,13 +71,13 @@ public class StreamingDataService {
             return failure(validationErrors);
         }
 
-        Result<SpotifyAuthData, Errors> getSpotifyAuthDataResult = spotifyAuthService.getSpotifyAuthData(searchRequest.userId());
-        if (getSpotifyAuthDataResult.isFailure()) {
-            return failure(getSpotifyAuthDataResult.getError());
+        Result<SpotifyAuthData, Errors> spotifyAuthDataResult = spotifyAuthService.getSpotifyAuthData(searchRequest.userId());
+        if (spotifyAuthDataResult.isFailure()) {
+            return failure(spotifyAuthDataResult.getError());
         }
 
         Result<StreamingData, Errors> result = spotifyRepository
-                .getTopTracks(searchRequest.cloneBuilder().withAuthData(getSpotifyAuthDataResult.getValue()).build());
+                .getTopTracks(searchRequest.cloneBuilder().withAuthData(spotifyAuthDataResult.getValue()).build());
         return switch (result) {
             case Result.Failure(Errors errors) -> failure(errors);
             case Result.Success(StreamingData streamingData) ->

@@ -2,14 +2,14 @@ package uk.co.spotistats.spotistatsservice.Domain.Request;
 
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 
-public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, boolean createPlaylist,
+public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData authData, Boolean createPlaylist,
                                    Integer page) {
 
     public static final class Builder {
         private String userId;
         private Integer limit;
         private SpotifyAuthData authData;
-        private boolean createPlaylist;
+        private Boolean createPlaylist;
         private Integer page;
 
         private Builder() {
@@ -34,7 +34,7 @@ public record SpotifySearchRequest(String userId, Integer limit, SpotifyAuthData
             return this;
         }
 
-        public Builder withCreatePlaylist(boolean createPlaylist) {
+        public Builder withCreatePlaylist(Boolean createPlaylist) {
             this.createPlaylist = createPlaylist;
             return this;
         }
