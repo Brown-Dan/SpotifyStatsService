@@ -1,16 +1,16 @@
-package uk.co.spotistats.spotistatsservice.Domain.Model;
+package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks;
 
 import java.time.LocalDateTime;
 
-public record RankedTrackData(int ranking,
-                              String trackName,
-                              String artistName,
-                              String albumName,
-                              String trackUri,
-                              LocalDateTime lastStreamedDate,
-                              int minutesPlayed,
-                              int totalMsPlayed,
-                              int totalStreams) {
+public record RankedTrackDataResource(int ranking,
+                                      String trackName,
+                                      String artistName,
+                                      String albumName,
+                                      String trackUri,
+                                      LocalDateTime lastStreamedDate,
+                                      int totalMinutesPlayed,
+                                      int totalMsPlayed,
+                                      int totalStreams) {
 
 
     public static final class Builder {
@@ -20,7 +20,7 @@ public record RankedTrackData(int ranking,
         private String albumName;
         private String trackUri;
         private LocalDateTime lastStreamedDate;
-        private int minutesPlayed;
+        private int totalMinutesPlayed;
         private int totalMsPlayed;
         private int totalStreams;
 
@@ -61,8 +61,8 @@ public record RankedTrackData(int ranking,
             return this;
         }
 
-        public Builder withMinutesPlayed(int minutesPlayed) {
-            this.minutesPlayed = minutesPlayed;
+        public Builder withTotalMinutesPlayed(int totalMinutesPlayed) {
+            this.totalMinutesPlayed = totalMinutesPlayed;
             return this;
         }
 
@@ -76,8 +76,8 @@ public record RankedTrackData(int ranking,
             return this;
         }
 
-        public RankedTrackData build() {
-            return new RankedTrackData(ranking, trackName, artistName, albumName, trackUri, lastStreamedDate, minutesPlayed, totalMsPlayed, totalStreams);
+        public RankedTrackDataResource build() {
+            return new RankedTrackDataResource(ranking, trackName, artistName, albumName, trackUri, lastStreamedDate, totalMinutesPlayed, totalMsPlayed, totalStreams);
         }
     }
 }

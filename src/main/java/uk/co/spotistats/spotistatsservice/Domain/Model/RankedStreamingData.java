@@ -1,11 +1,13 @@
 package uk.co.spotistats.spotistatsservice.Domain.Model;
 
+import uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks.RankedTrackDataResource;
+
 import java.util.List;
 
-public record RankedStreamingData(List<RankedTrackData> rankedTrackData, Integer size) {
+public record RankedStreamingData(List<RankedTrackDataResource> rankedTracks, Integer size) {
 
     public static final class Builder {
-        private List<RankedTrackData> rankedTrackData;
+        private List<RankedTrackDataResource> rankedTrackDatumResources;
         private Integer size;
 
         private Builder() {
@@ -15,8 +17,8 @@ public record RankedStreamingData(List<RankedTrackData> rankedTrackData, Integer
             return new Builder();
         }
 
-        public Builder withRankedStreamData(List<RankedTrackData> rankedTrackData) {
-            this.rankedTrackData = rankedTrackData;
+        public Builder withRankedStreamData(List<RankedTrackDataResource> rankedTrackDatumResources) {
+            this.rankedTrackDatumResources = rankedTrackDatumResources;
             return this;
         }
 
@@ -26,7 +28,7 @@ public record RankedStreamingData(List<RankedTrackData> rankedTrackData, Integer
         }
 
         public RankedStreamingData build() {
-            return new RankedStreamingData(rankedTrackData, size);
+            return new RankedStreamingData(rankedTrackDatumResources, size);
         }
     }
 }

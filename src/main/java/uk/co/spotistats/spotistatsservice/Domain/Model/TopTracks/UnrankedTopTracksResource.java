@@ -1,14 +1,12 @@
 package uk.co.spotistats.spotistatsservice.Domain.Model.TopTracks;
 
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
-
 import java.util.List;
 
-public record UnrankedTopTracksResource(List<StreamData> streamData, int totalResults,
+public record UnrankedTopTracksResource(List<UnrankedTrackDataResource> streamData, int totalResults,
                                         int page) implements TopTracksResource {
 
     public static final class Builder {
-        private List<StreamData> streamData;
+        private List<UnrankedTrackDataResource> streamData;
         private int totalResults;
         private int page;
 
@@ -19,7 +17,7 @@ public record UnrankedTopTracksResource(List<StreamData> streamData, int totalRe
             return new Builder();
         }
 
-        public Builder withStreamData(List<StreamData> streamData) {
+        public Builder withStreamData(List<UnrankedTrackDataResource> streamData) {
             this.streamData = streamData;
             return this;
         }
