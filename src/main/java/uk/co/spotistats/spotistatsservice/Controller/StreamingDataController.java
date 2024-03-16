@@ -9,9 +9,11 @@ import uk.co.spotistats.spotistatsservice.Controller.Cleaner.StreamingDataReques
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Request.TrackUriSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Response.AdvancedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
@@ -34,6 +36,11 @@ public class StreamingDataController {
     @GetMapping(value = "/top")
     public ResponseEntity<ApiResult<TopTracksResource, Errors>> getTopTracks(@PathVariable String username, TopTracksSearchRequest searchRequest) {
         return get(streamingDataService::getTopTracks, streamingDataRequestCleaner.clean(searchRequest, username));
+    }
+
+    @GetMapping(value = "/top/{uri}")
+    public ResponseEntity<ApiResult<AdvancedTrack, Errors>> getTrackByUri(@PathVariable String username, @PathVariable String uri) {
+        return get(streamingDataService::getByTrackUri, new TrackUriSearchRequest(username, uri));
     }
 
     @GetMapping(value = "/recent")

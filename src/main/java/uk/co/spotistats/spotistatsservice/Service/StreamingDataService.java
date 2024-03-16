@@ -11,6 +11,8 @@ import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.TrackUriSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Response.AdvancedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
@@ -26,6 +28,7 @@ import uk.co.spotistats.spotistatsservice.Service.Validator.TopTracksSearchReque
 import java.util.List;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
+import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
 @Service
 @EnableAsync
@@ -87,6 +90,17 @@ public class StreamingDataService {
                             streamingDataToRankedTracksMapper.mapToSimple(streamingData, searchRequest);
         };
     }
+
+    public Result<AdvancedTrack, Errors> getByTrackUri(TrackUriSearchRequest trackUriSearchRequest) {
+        StreamingDataSearchRequest streamingDataSearchRequest = aStreamingDataSearchRequest()
+                .withUri(trackUriSearchRequest.trackUri())
+                .withUsername(trackUriSearchRequest.username()).build();
+
+        StreamingData streamingData = streamingDataRepository.search(streamingDataSearchRequest);
+
+        return success(AdvancedTrack.fromStreamingData(streamingData));
+    }
+
 
     public Result<StreamingData, Errors> search(StreamingDataSearchRequest searchRequest) {
         Errors errors = streamDataSearchRequestValidator.validate(searchRequest);
