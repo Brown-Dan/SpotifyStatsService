@@ -152,7 +152,6 @@ public class SpotifyAuthService {
                 .withSubject(username)
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plusSeconds(7200))
-                .withNotBefore(Instant.now().plusSeconds(3600))
                 .withJWTId(UUID.randomUUID().toString())
                 .sign(algorithm);
     }
