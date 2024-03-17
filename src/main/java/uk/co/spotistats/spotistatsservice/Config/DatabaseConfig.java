@@ -22,7 +22,7 @@ public class DatabaseConfig {
     public DSLContext dslContext() throws SQLException {
 
         Connection connection = DriverManager.getConnection(
-                System.getenv("JDBC_DATABASE_URL"));
+                "jdbc:postgresql://ec2-34-250-119-127.eu-west-1.compute.amazonaws.com:5432/db1u7m6u2v1m60?password=pdf4b7fc466948969fd029adb11a0cb3002d1a9e6a07d529e2503760f2a2da642&amp;sslmode=require&amp;user=ub3kreaapns63l", "ub3kreaapns63l", "pdf4b7fc466948969fd029adb11a0cb3002d1a9e6a07d529e2503760f2a2da642");
         return DSL.using(connection, SQLDialect.POSTGRES);
     }
 
@@ -49,7 +49,7 @@ public class DatabaseConfig {
     @PostConstruct
     public void migrate() {
         Flyway.configure()
-                .dataSource(System.getenv("JDBC_DATABASE_URL"), System.getenv("JDBC_DATABASE_USERNAME"), System.getenv("JDBC_DATABASE_PASSWORD"))
+                .dataSource("jdbc:postgresql://ec2-34-250-119-127.eu-west-1.compute.amazonaws.com:5432/db1u7m6u2v1m60?password=pdf4b7fc466948969fd029adb11a0cb3002d1a9e6a07d529e2503760f2a2da642&amp;sslmode=require&amp;user=ub3kreaapns63l", "ub3kreaapns63l", "pdf4b7fc466948969fd029adb11a0cb3002d1a9e6a07d529e2503760f2a2da642")
                 .schemas("StreamingData")
                 .baselineOnMigrate(true)
                 .locations("classpath:db/migration")

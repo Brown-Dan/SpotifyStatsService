@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.co.spotistats.spotistatsservice.Controller.Cleaner.StreamingDataRequestCleaner;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
@@ -21,7 +22,7 @@ import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 import java.util.function.Function;
 
 @Controller
-@RequestMapping("{userId}")
+@RequestMapping("tracks")
 public class StreamingDataController {
 
     private final StreamingDataService streamingDataService;
@@ -33,22 +34,22 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<TopTracksResource, Errors>> getTopTracks(@PathVariable String userId, TopTracksSearchRequest searchRequest) {
+    public ResponseEntity<ApiResult<TopTracksResource, Errors>> getTopTracks(@RequestAttribute String userId, TopTracksSearchRequest searchRequest) {
         return get(streamingDataService::getTopTracks, streamingDataRequestCleaner.clean(searchRequest, userId));
     }
 
     @GetMapping(value = "/get/{uri}")
-    public ResponseEntity<ApiResult<AdvancedTrack, Errors>> getTrackByUri(@PathVariable String userId, @PathVariable String uri) {
+    public ResponseEntity<ApiResult<AdvancedTrack, Errors>> getTrackByUri(@RequestAttribute String userId, @PathVariable String uri) {
         return get(streamingDataService::getByTrackUri, streamingDataRequestCleaner.clean(userId, uri));
     }
 
     @GetMapping(value = "/recent")
-    public ResponseEntity<ApiResult<RecentTracks, Errors>> getRecentStreams(@PathVariable String userId, RecentTracksSearchRequest searchRequest) {
+    public ResponseEntity<ApiResult<RecentTracks, Errors>> getRecentStreams(@RequestAttribute String userId, RecentTracksSearchRequest searchRequest) {
         return get(streamingDataService::getRecentStreams, streamingDataRequestCleaner.clean(searchRequest, userId));
     }
 
     @GetMapping(value = "/search")
-    public ResponseEntity<ApiResult<SearchResponse, Errors>> search(@PathVariable String userId, StreamingDataSearchRequest searchRequest) {
+    public ResponseEntity<ApiResult<SearchResponse, Errors>> search(@RequestAttribute String userId, StreamingDataSearchRequest searchRequest) {
         return get(streamingDataService::search, streamingDataRequestCleaner.clean(searchRequest, userId));
     }
 

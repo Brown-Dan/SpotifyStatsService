@@ -36,7 +36,7 @@ public class AuthFilter extends OncePerRequestFilter {
         } else {
             try {
                 DecodedJWT decodedJWT = jwtVerifier.verify(wrappedRequest.getHeader("Authorization"));
-                wrappedRequest.setAttribute("username", decodedJWT.getSubject());
+                wrappedRequest.setAttribute("userId", decodedJWT.getSubject());
                 filterChain.doFilter(wrappedRequest, response);
             } catch (JWTVerificationException jwtVerificationException){
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);

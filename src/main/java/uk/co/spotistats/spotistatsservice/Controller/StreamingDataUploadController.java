@@ -14,7 +14,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Upload.StreamingDataUp
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataUploadService;
 
 @RestController
-@RequestMapping("{username}")
+@RequestMapping("data")
 public class StreamingDataUploadController {
 
     private final StreamingDataUploadService streamingDataUploadService;
@@ -27,7 +27,7 @@ public class StreamingDataUploadController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResult<StreamingDataUpsertResult, Errors>> upload(@RequestPart MultipartFile streamingDataFile,
-                                                                               @PathVariable String username) {
+                                                                               @RequestAttribute String username) {
         Result<StreamingData, Error> streamingDataMapResult = multipartFileToStreamingDataMapper.map(streamingDataFile);
 
         if (streamingDataMapResult.isFailure()) {
