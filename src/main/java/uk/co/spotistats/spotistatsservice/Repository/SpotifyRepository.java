@@ -50,10 +50,9 @@ public class SpotifyRepository {
         if (recentTracksSearchRequest.createPlaylist()) {
             Result<Playlist, Errors> createPlaylistResult =
                     createPlaylist(CreatePlaylistRequest.fromRecentTracksSearchRequest(recentTracksSearchRequest, result.getValue().tracks()));
-            if (createPlaylistResult.isFailure()){
-                return failure(createPlaylistResult.getError());
+            if (!createPlaylistResult.isFailure()){
+                return success(result.getValue().addPlaylist(createPlaylistResult.getValue().id()));
             }
-            return success(result.getValue().addPlaylist(createPlaylistResult.getValue().id()));
         }
         return success(result.getValue());
     }
