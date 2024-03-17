@@ -87,7 +87,7 @@ public class SpotifyResponseMapper {
 
     public SimpleTopArtists fromTopArtists(JSONObject json, int page) {
         try {
-            JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("artists");
+            JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("items");
             List<SimpleTopArtist> artists = StreamSupport.stream(responseAsJsonNode.spliterator(), false)
                     .map(this::mapToArtist).toList();
             return aSimpleTopArtists()
@@ -113,8 +113,7 @@ public class SpotifyResponseMapper {
                 .withName(artist.get("name").asText())
                 .withGenres(genres)
                 .withPopularity(artist.get("popularity").asInt())
-                .withSpotifyUri(artist.get("uri").toString())
-                .withSpotifyProfileLink(artist.get("href").toString())
+                .withSpotifyUri(artist.get("uri").asText())
                 .build();
     }
 

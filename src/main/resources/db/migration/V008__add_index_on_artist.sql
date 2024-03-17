@@ -1,0 +1,1 @@
+CREATE INDEX if not exists idx_artist ON stream_data (artist_name);

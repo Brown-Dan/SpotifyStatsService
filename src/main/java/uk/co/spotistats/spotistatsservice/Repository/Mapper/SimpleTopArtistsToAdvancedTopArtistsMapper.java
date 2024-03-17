@@ -56,7 +56,6 @@ public class SimpleTopArtistsToAdvancedTopArtistsMapper {
                 .withGenres(simpleTopArtist.genres())
                 .withPopularity(simpleTopArtist.popularity())
                 .withSpotifyUri(simpleTopArtist.spotifyUri())
-                .withSpotifyProfileLink(simpleTopArtist.spotifyProfileLink())
                 .withFirstStreamedDate(searchResponse.tracks().isEmpty() ? null : searchResponse.tracks().getFirst().streamDateTime())
                 .withLastStreamedDate(searchResponse.tracks().isEmpty() ? null : searchResponse.tracks().getLast().streamDateTime())
                 .withTotalMsStreamed(totalMsStreamed)
