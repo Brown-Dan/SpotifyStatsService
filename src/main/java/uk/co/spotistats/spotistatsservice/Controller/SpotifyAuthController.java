@@ -3,7 +3,7 @@ package uk.co.spotistats.spotistatsservice.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
@@ -31,7 +31,7 @@ public class SpotifyAuthController {
     }
 
     @GetMapping(value = "/token/refresh")
-    public ResponseEntity<ApiResult<String, Errors>> refreshJwtToken(@RequestAttribute String jwt){
+    public ResponseEntity<ApiResult<String, Errors>> refreshJwtToken(@RequestHeader String jwt){
         Result<String, Errors> result = spotifyAuthService.refreshJwt(jwt);
         return switch (result){
             case Result.Success (String refreshedJwt) -> ok(refreshedJwt);
