@@ -1,5 +1,6 @@
 package uk.co.spotistats.spotistatsservice.Domain.Model;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 
 public record Error(String field, String message, ErrorKey key) {
@@ -7,6 +8,10 @@ public record Error(String field, String message, ErrorKey key) {
     public static Error forbiddenToUpdate(String field, String username) {
         return new Error(field, "Forbidden to update '%s' for user - %s"
                 .formatted(field, username), ErrorKey.FORBIDDEN_TO_UPDATE);
+    }
+
+    public static Error jwtVerificationException(JWTVerificationException jwtVerificationException) {
+        return new Error("Request.Headers.Authorization", "Error validating Jwt token - %s".formatted(jwtVerificationException.getMessage()), ErrorKey.JWT_VERIFICATION_EXCEPTION);
     }
 
     public static Error notFound(String field, String username) {
