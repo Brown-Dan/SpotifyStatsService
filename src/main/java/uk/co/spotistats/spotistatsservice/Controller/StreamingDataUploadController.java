@@ -27,14 +27,14 @@ public class StreamingDataUploadController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResult<StreamingDataUpsertResult, Errors>> upload(@RequestPart MultipartFile streamingDataFile,
-                                                                               @RequestAttribute String username) {
+                                                                               @RequestAttribute String userId) {
         Result<StreamingData, Error> streamingDataMapResult = multipartFileToStreamingDataMapper.map(streamingDataFile);
 
         if (streamingDataMapResult.isFailure()) {
             return badRequest(Errors.fromError(streamingDataMapResult.getError()));
         }
         Result<StreamingDataUpsertResult, Error> upsertResult =
-                streamingDataUploadService.upsert(streamingDataMapResult.getValue(), username);
+                streamingDataUploadService.upsert(streamingDataMapResult.getValue(), userId);
 
         return switch (upsertResult) {
             case Result.Success(StreamingDataUpsertResult streamingDataUpsertResult) -> ok(streamingDataUpsertResult);
