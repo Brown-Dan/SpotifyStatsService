@@ -33,12 +33,12 @@ public class StreamingDataController {
         this.streamingDataRequestCleaner = streamingDataRequestCleaner;
     }
 
-    @GetMapping(value = "tracks//top")
+    @GetMapping(value = "tracks/top")
     public ResponseEntity<ApiResult<TopTracks, Errors>> getTopTracks(@RequestAttribute String userId, TopTracksSearchRequest searchRequest) {
         return get(streamingDataService::getTopTracks, streamingDataRequestCleaner.clean(searchRequest, userId));
     }
 
-    @GetMapping(value = "tracks//get/{uri}")
+    @GetMapping(value = "tracks/get/{uri}")
     public ResponseEntity<ApiResult<AdvancedTrack, Errors>> getTrackByUri(@RequestAttribute String userId, @PathVariable String uri) {
         return get(streamingDataService::getByTrackUri, streamingDataRequestCleaner.clean(userId, uri));
     }
