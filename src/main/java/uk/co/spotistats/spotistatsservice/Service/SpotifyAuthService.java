@@ -1,6 +1,8 @@
 package uk.co.spotistats.spotistatsservice.Service;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.net.URIBuilder;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,9 @@ import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.SpotifyClient;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 import static uk.co.spotistats.spotistatsservice.Controller.Model.Errors.fromSpotifyRequestError;
 
@@ -27,13 +31,15 @@ public class SpotifyAuthService {
     private final SpotifyResponseMapper spotifyResponseMapper;
     private final SpotifyAuthRepository spotifyAuthRepository;
     private final SpotifyClient spotifyClient;
+    private final Algorithm algorithm;
 
     private static final String REDIRECT_URL = "https://spotifystats.co.uk/spotify/authenticate/callback";
 
-    public SpotifyAuthService(SpotifyResponseMapper spotifyResponseMapper, SpotifyAuthRepository spotifyAuthRepository, SpotifyClient spotifyClient) {
+    public SpotifyAuthService(SpotifyResponseMapper spotifyResponseMapper, SpotifyAuthRepository spotifyAuthRepository, SpotifyClient spotifyClient, Algorithm algorithm) {
         this.spotifyResponseMapper = spotifyResponseMapper;
         this.spotifyAuthRepository = spotifyAuthRepository;
         this.spotifyClient = spotifyClient;
+        this.algorithm = algorithm;
     }
 
     public Result<SpotifyAuthData, Errors> insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
@@ -78,7 +84,7 @@ public class SpotifyAuthService {
         }
     }
 
-    public Result<SpotifyAuthData, Errors> exchangeAccessToken(String accessToken) {
+    public Result<String, Errors> exchangeAccessToken(String accessToken) {
         Result<SpotifyAuthData, SpotifyRequestError> exchangeAccessTokenResult = spotifyClient.withAuthorization(System.getenv("SPOTIFY_BASE_64_AUTH"))
                 .withContentType(ContentType.APPLICATION_FORM_URLENCODED)
                 .exchangeAccessToken()
@@ -90,13 +96,17 @@ public class SpotifyAuthService {
         if (exchangeAccessTokenResult.isFailure()) {
             return failure(Errors.fromSpotifyRequestError(exchangeAccessTokenResult.getError()));
         }
+        Result<String, Errors> getUserIdResult = getUserId(exchangeAccessTokenResult.getValue());
 
-        return switch (getUserId(exchangeAccessTokenResult.getValue())) {
-            case Result.Failure(Errors errors) -> failure(errors);
-            case Result.Success(String userId) ->
-                    insertSpotifyAuthData(exchangeAccessTokenResult.getValue().cloneBuilder()
-                            .withUserId(userId).build());
-        };
+        if(getUserIdResult.isFailure()){
+            return failure(getUserIdResult.getError());
+        }
+        Result<SpotifyAuthData, Errors> insertAuthDataResult = insertSpotifyAuthData(exchangeAccessTokenResult.getValue().cloneBuilder().withUserId(getUserIdResult.getValue()).build());
+
+        if (insertAuthDataResult.isFailure()){
+            return failure(insertAuthDataResult.getError());
+        }
+        return success(getJwtToken(insertAuthDataResult.getValue().userId()));
     }
 
     private Result<String, Errors> getUserId(SpotifyAuthData spotifyAuthData) {
@@ -128,6 +138,17 @@ public class SpotifyAuthService {
                     success(spotifyAuthRepository.updateUserAuthData(spotifyAuthData.updateFromRefreshResponse(success)));
         };
     }
+
+    private String getJwtToken(String username){
+        return JWT.create()
+                .withIssuer("spotiStatsService")
+                .withSubject(username)
+                .withIssuedAt(Instant.now())
+                .withExpiresAt(Instant.now().plusSeconds(3600))
+                .withJWTId(UUID.randomUUID().toString())
+                .sign(algorithm);
+    }
+
 
     private <T> Result<T, Errors> failure(SpotifyRequestError spotifyRequestError) {
         return new Result.Failure<>(fromSpotifyRequestError(spotifyRequestError));

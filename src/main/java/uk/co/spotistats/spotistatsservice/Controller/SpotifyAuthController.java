@@ -9,7 +9,6 @@ import org.springframework.web.servlet.view.RedirectView;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
-import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
 
 @Controller
@@ -23,8 +22,8 @@ public class SpotifyAuthController {
     }
 
     @GetMapping(value = "/authenticate/callback")
-    public ResponseEntity<ApiResult<SpotifyAuthData, Errors>> authenticationCallback(@RequestParam String code) {
-        Result<SpotifyAuthData, Errors> result = spotifyAuthService.exchangeAccessToken(code);
+    public ResponseEntity<ApiResult<String, Errors>> authenticationCallback(@RequestParam String code) {
+        Result<String, Errors> result = spotifyAuthService.exchangeAccessToken(code);
 
         if (result.isFailure()) {
             return badRequest(result.getError());
@@ -32,7 +31,7 @@ public class SpotifyAuthController {
         return ok(result.getValue());
     }
 
-    @GetMapping(value = "/authorize")
+    @GetMapping(value = "/login")
     public RedirectView authorizationRedirect() {
         return spotifyAuthService.redirect();
     }
