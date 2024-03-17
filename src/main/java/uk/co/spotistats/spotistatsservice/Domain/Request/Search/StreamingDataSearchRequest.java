@@ -19,11 +19,11 @@ public record StreamingDataSearchRequest(
         String orderBy,
         Integer limit,
         LocalTime startTime,
-        LocalTime endTime
+        LocalTime endTime,
+        Boolean createPlaylist
 ) {
 
     public static final class Builder {
-
         private String username;
         private LocalDate startDate;
         private LocalDate endDate;
@@ -38,6 +38,7 @@ public record StreamingDataSearchRequest(
         private Integer limit;
         private LocalTime startTime;
         private LocalTime endTime;
+        private Boolean createPlaylist;
 
         private Builder() {
         }
@@ -116,8 +117,13 @@ public record StreamingDataSearchRequest(
             return this;
         }
 
+        public Builder withCreatePlaylist(Boolean createPlaylist) {
+            this.createPlaylist = createPlaylist;
+            return this;
+        }
+
         public StreamingDataSearchRequest build() {
-            return new StreamingDataSearchRequest(username, startDate, endDate, onDate, country, uri, trackName, artist, album, platform, orderBy, limit, startTime, endTime);
+            return new StreamingDataSearchRequest(username, startDate, endDate, onDate, country, uri, trackName, artist, album, platform, orderBy, limit, startTime, endTime, createPlaylist);
         }
     }
 
@@ -136,6 +142,7 @@ public record StreamingDataSearchRequest(
                 .withAlbum(album)
                 .withPlatform(platform)
                 .withOrderBy(orderBy)
+                .withCreatePlaylist(createPlaylist)
                 .withLimit(limit);
     }
 }

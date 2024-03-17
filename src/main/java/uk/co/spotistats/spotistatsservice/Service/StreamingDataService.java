@@ -115,7 +115,7 @@ public class StreamingDataService {
     public Result<StreamingData, Errors> search(StreamingDataSearchRequest searchRequest) {
         Errors errors = streamDataSearchRequestValidator.validate(searchRequest);
         if (errors.hasErrors()) {
-            failure(errors);
+           return failure(errors);
         }
         return success(streamingDataRepository.search(searchRequest));
     }
