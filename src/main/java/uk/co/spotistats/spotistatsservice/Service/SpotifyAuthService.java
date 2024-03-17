@@ -42,13 +42,9 @@ public class SpotifyAuthService {
         this.algorithm = algorithm;
     }
 
-    public Result<SpotifyAuthData, Errors> insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
-        Optional<SpotifyAuthData> existingAuthData = spotifyAuthRepository.getAuthorizationDetailsByUsername(spotifyAuthData.userId());
-
-        if (existingAuthData.isPresent()) {
-            return new Result.Failure<>(Errors.fromError(Error.forbiddenToUpdate("authData", spotifyAuthData.userId())));
-        }
-        return new Result.Success<>(spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData));
+    public SpotifyAuthData insertSpotifyAuthData(SpotifyAuthData spotifyAuthData) {
+        return spotifyAuthRepository.getAuthorizationDetailsByUsername(spotifyAuthData.userId()).orElseGet(() ->
+                spotifyAuthRepository.insertSpotifyAuthData(spotifyAuthData));
     }
 
     public Result<SpotifyAuthData, Errors> getSpotifyAuthData(String userId) {
@@ -101,12 +97,9 @@ public class SpotifyAuthService {
         if(getUserIdResult.isFailure()){
             return failure(getUserIdResult.getError());
         }
-        Result<SpotifyAuthData, Errors> insertAuthDataResult = insertSpotifyAuthData(exchangeAccessTokenResult.getValue().cloneBuilder().withUserId(getUserIdResult.getValue()).build());
+        SpotifyAuthData insertedSpotifyAuthData = insertSpotifyAuthData(exchangeAccessTokenResult.getValue().cloneBuilder().withUserId(getUserIdResult.getValue()).build());
 
-        if (insertAuthDataResult.isFailure()){
-            return failure(insertAuthDataResult.getError());
-        }
-        return success(getJwtToken(insertAuthDataResult.getValue().userId()));
+        return success(getJwtToken(insertedSpotifyAuthData.userId()));
     }
 
     private Result<String, Errors> getUserId(SpotifyAuthData spotifyAuthData) {
@@ -144,7 +137,7 @@ public class SpotifyAuthService {
                 .withIssuer("spotiStatsService")
                 .withSubject(username)
                 .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plusSeconds(3600))
+                .withExpiresAt(Instant.now().plusSeconds(7200))
                 .withJWTId(UUID.randomUUID().toString())
                 .sign(algorithm);
     }
