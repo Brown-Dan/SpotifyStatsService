@@ -2,7 +2,10 @@ package uk.co.spotistats.spotistatsservice.Service;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.net.URIBuilder;
 import org.springframework.stereotype.Service;
@@ -31,14 +34,16 @@ public class SpotifyAuthService {
     private final SpotifyResponseMapper spotifyResponseMapper;
     private final SpotifyAuthRepository spotifyAuthRepository;
     private final SpotifyClient spotifyClient;
+    private final JWTVerifier jwtVerifier;
     private final Algorithm algorithm;
 
-    private static final String REDIRECT_URL = "https://spotifystats.co.uk/spotify/authenticate/callback";
+    private static final String REDIRECT_URL = "https://spotifystats.co.uk/authenticate/callback";
 
-    public SpotifyAuthService(SpotifyResponseMapper spotifyResponseMapper, SpotifyAuthRepository spotifyAuthRepository, SpotifyClient spotifyClient, Algorithm algorithm) {
+    public SpotifyAuthService(SpotifyResponseMapper spotifyResponseMapper, SpotifyAuthRepository spotifyAuthRepository, SpotifyClient spotifyClient, JWTVerifier jwtVerifier, Algorithm algorithm) {
         this.spotifyResponseMapper = spotifyResponseMapper;
         this.spotifyAuthRepository = spotifyAuthRepository;
         this.spotifyClient = spotifyClient;
+        this.jwtVerifier = jwtVerifier;
         this.algorithm = algorithm;
     }
 
@@ -72,7 +77,7 @@ public class SpotifyAuthService {
                     .setPath("/authorize")
                     .setParameter("client_id", System.getenv("SPOTIFY_CLIENT_ID"))
                     .setParameter("response_type", "code")
-                    .setParameter("redirect_uri", "https://spotifystats.co.uk/spotify/authenticate/callback")
+                    .setParameter("redirect_uri", REDIRECT_URL)
                     .setParameter("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read user-read-private user-read-email playlist-modify-public playlist-modify-private")
                     .build().toURL().toString());
         } catch (URISyntaxException | MalformedURLException ignored) {
@@ -94,7 +99,7 @@ public class SpotifyAuthService {
         }
         Result<String, Errors> getUserIdResult = getUserId(exchangeAccessTokenResult.getValue());
 
-        if(getUserIdResult.isFailure()){
+        if (getUserIdResult.isFailure()) {
             return failure(getUserIdResult.getError());
         }
         SpotifyAuthData insertedSpotifyAuthData = insertSpotifyAuthData(exchangeAccessTokenResult.getValue().cloneBuilder().withUserId(getUserIdResult.getValue()).build());
@@ -132,17 +137,25 @@ public class SpotifyAuthService {
         };
     }
 
-    private String getJwtToken(String username){
+    public Result<String, Errors> refreshJwt(String jwt) {
+        try {
+            DecodedJWT decodedJWT = jwtVerifier.verify(jwt);
+            return success(getJwtToken(decodedJWT.getSubject()));
+        } catch (JWTVerificationException jwtVerificationException){
+            return failure(Errors.fromError(Error.jwtVerificationException(jwtVerificationException)));
+        }
+    }
+
+    private String getJwtToken(String username) {
         return JWT.create()
                 .withIssuer("SpotiStatsService")
                 .withSubject(username)
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plusSeconds(7200))
-                .withNotBefore(Instant.now().plusSeconds(1))
+                .withNotBefore(Instant.now().plusSeconds(3600))
                 .withJWTId(UUID.randomUUID().toString())
                 .sign(algorithm);
     }
-
 
     private <T> Result<T, Errors> failure(SpotifyRequestError spotifyRequestError) {
         return new Result.Failure<>(fromSpotifyRequestError(spotifyRequestError));

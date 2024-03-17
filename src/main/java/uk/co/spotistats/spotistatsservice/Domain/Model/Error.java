@@ -14,6 +14,10 @@ public record Error(String field, String message, ErrorKey key) {
         return new Error("Request.Headers.Authorization", "Error validating Jwt token - %s".formatted(jwtVerificationException.getMessage()), ErrorKey.JWT_VERIFICATION_EXCEPTION);
     }
 
+    public static Error jwtRefreshRequired() {
+        return new Error("Request.Headers.Authorization", "Jwt refresh is required", ErrorKey.JWT_REFRESH_REQUIRED);
+    }
+
     public static Error notFound(String field, String username) {
         return new Error(field, "%s not found for user - %s".formatted(field, username), ErrorKey.ENTITY_NOT_FOUND);
     }

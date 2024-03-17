@@ -16,6 +16,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Set;
 
 @Component
@@ -41,6 +42,12 @@ public class AuthFilter extends OncePerRequestFilter {
         } else {
             try {
                 DecodedJWT decodedJWT = jwtVerifier.verify(wrappedRequest.getHeader("Authorization"));
+                if (decodedJWT.getNotBeforeAsInstant().isBefore(Instant.now())){
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType(ContentType.APPLICATION_JSON.getMimeType());
+                    response.getWriter().write(objectMapper.writeValueAsString(Error.jwtRefreshRequired()));
+                    response.getWriter().close();
+                }
                 wrappedRequest.setAttribute("userId", decodedJWT.getSubject());
                 filterChain.doFilter(wrappedRequest, response);
             } catch (JWTVerificationException jwtVerificationException){
