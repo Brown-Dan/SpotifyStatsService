@@ -62,4 +62,5 @@ SpotiStatsService is a simple web service that allows users to upload and query 
 - `endTime`
 - `month`
 - `dayOfTheWeek`
+- `createPlaylist`
 - `year`
