@@ -16,12 +16,11 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
-import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracks;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
-import uk.co.spotistats.spotistatsservice.Service.Mapper.StreamingDataToRankedTracksMapper;
 import uk.co.spotistats.spotistatsservice.Service.Validator.RecentTracksSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Service.Validator.StreamDataSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Service.Validator.TopTracksSearchRequestValidator;
@@ -40,7 +39,6 @@ public class StreamingDataService {
     private final SpotifyRepository spotifyRepository;
     private final StreamingDataRepository streamingDataRepository;
     private final StreamingDataUploadRepository streamingDataUploadRepository;
-    private final StreamingDataToRankedTracksMapper streamingDataToRankedTracksMapper;
     private final StreamDataSearchRequestValidator streamDataSearchRequestValidator;
     private final TopTracksSearchRequestValidator topTracksSearchRequestValidator;
     private final RecentTracksSearchRequestValidator recentTracksSearchRequestValidator;
@@ -48,12 +46,11 @@ public class StreamingDataService {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
-    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository, StreamingDataToRankedTracksMapper streamingDataToRankedTracksMapper, StreamDataSearchRequestValidator streamDataSearchRequestValidator, TopTracksSearchRequestValidator topTracksSearchRequestValidator, RecentTracksSearchRequestValidator recentTracksSearchRequestValidator, StreamingDataUploadService streamingDataUploadService) {
+    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository, StreamDataSearchRequestValidator streamDataSearchRequestValidator, TopTracksSearchRequestValidator topTracksSearchRequestValidator, RecentTracksSearchRequestValidator recentTracksSearchRequestValidator, StreamingDataUploadService streamingDataUploadService) {
         this.spotifyAuthService = spotifyAuthService;
         this.spotifyRepository = spotifyRepository;
         this.streamingDataRepository = streamingDataRepository;
         this.streamingDataUploadRepository = streamingDataUploadRepository;
-        this.streamingDataToRankedTracksMapper = streamingDataToRankedTracksMapper;
         this.streamDataSearchRequestValidator = streamDataSearchRequestValidator;
         this.topTracksSearchRequestValidator = topTracksSearchRequestValidator;
         this.recentTracksSearchRequestValidator = recentTracksSearchRequestValidator;
@@ -74,7 +71,7 @@ public class StreamingDataService {
         return spotifyRepository.getRecentStreamingData(searchRequest.cloneBuilder().withAuthData(spotifyAuthDataResult.getValue()).build());
     }
 
-    public Result<TopTracksResource, Errors> getTopTracks(TopTracksSearchRequest searchRequest) {
+    public Result<TopTracks, Errors> getTopTracks(TopTracksSearchRequest searchRequest) {
         Errors validationErrors = topTracksSearchRequestValidator.validate(searchRequest);
         if (validationErrors.hasErrors()) {
             return failure(validationErrors);
@@ -84,19 +81,11 @@ public class StreamingDataService {
         if (spotifyAuthDataResult.isFailure()) {
             return failure(spotifyAuthDataResult.getError());
         }
-
-        Result<StreamingData, Errors> result = spotifyRepository
-                .getTopTracks(searchRequest.cloneBuilder().withAuthData(spotifyAuthDataResult.getValue()).build());
-        return switch (result) {
-            case Result.Failure(Errors errors) -> failure(errors);
-            case Result.Success(StreamingData streamingData) ->
-                    searchRequest.advanced() ? streamingDataToRankedTracksMapper.mapToAdvanced(streamingData, searchRequest) :
-                            streamingDataToRankedTracksMapper.mapToSimple(streamingData, searchRequest);
-        };
+        return spotifyRepository.getTopTracks(searchRequest.cloneBuilder().withAuthData(spotifyAuthDataResult.getValue()).build());
     }
 
     public Result<AdvancedTrack, Errors> getByTrackUri(TrackUriSearchRequest trackUriSearchRequest) {
-        if (!streamingDataUploadService.hasStreamingData(trackUriSearchRequest.username())){
+        if (!streamingDataUploadService.hasStreamingData(trackUriSearchRequest.username())) {
             return failure(Errors.fromError(new Error(null, "uploaded streaming data is required to use search insights", ErrorKey.STREAMING_DATA_NOT_UPLOADED)));
         }
 
@@ -110,21 +99,20 @@ public class StreamingDataService {
         return success(AdvancedTrack.fromSearchResponse(streamingData));
     }
 
-
     public Result<SearchResponse, Errors> search(StreamingDataSearchRequest searchRequest) {
         Errors errors = streamDataSearchRequestValidator.validate(searchRequest);
         if (errors.hasErrors()) {
-           return failure(errors);
-        }
-        Result<SearchResponse, Errors>  result = success(streamingDataRepository.search(searchRequest));
-
-        if (result.isFailure()){
             return failure(errors);
         }
-        if (searchRequest.createPlaylist()){
+        Result<SearchResponse, Errors> result = success(streamingDataRepository.search(searchRequest));
+
+        if (result.isFailure()) {
+            return failure(errors);
+        }
+        if (searchRequest.createPlaylist()) {
             Result<Playlist, Errors> createPlaylistResult = spotifyRepository.createPlaylist(CreatePlaylistRequest.fromStreamingDataSearchRequest(searchRequest, result.getValue().tracks(),
                     spotifyAuthService.getSpotifyAuthData(searchRequest.userId()).getValue()));
-            if (createPlaylistResult.isFailure()){
+            if (createPlaylistResult.isFailure()) {
                 return failure(createPlaylistResult.getError());
             }
             return success(result.getValue().cloneBuilder().withCreatedPlaylist(true).withPlaylistId(createPlaylistResult.getValue().id()).build());

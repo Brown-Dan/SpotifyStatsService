@@ -1,4 +1,4 @@
-package uk.co.spotistats.spotistatsservice.Service.Mapper;
+package uk.co.spotistats.spotistatsservice.Repository.Mapper;
 
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
@@ -13,7 +13,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponseTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Advanced.AdvancedRankedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Simple.SimpleRankedTrack;
-import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracks;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class StreamingDataToRankedTracksMapper {
         this.streamingDataRepository = streamingDataRepository;
     }
 
-    public Result<TopTracksResource, Errors> mapToAdvanced(StreamingData streamingData, TopTracksSearchRequest searchRequest) {
+    public Result<TopTracks, Errors> mapToAdvanced(StreamingData streamingData, TopTracksSearchRequest searchRequest, String playlistId) {
         Result<StreamingData, Error> getStreamingDataResult = streamingDataRepository.getStreamingData(searchRequest.userId());
         if (getStreamingDataResult.isFailure()) {
             return new Result.Failure<>(Errors.fromError(getStreamingDataResult.getError()));
@@ -53,19 +53,18 @@ public class StreamingDataToRankedTracksMapper {
                 .withTracks(advancedRankedTracks)
                 .withTotalResults(100)
                 .withPage(searchRequest.page())
+                .withCreatedPlaylist(playlistId != null)
+                .withPlaylistId(playlistId)
                 .build());
     }
-
-    private Integer calculateRank(Integer index, Integer page, Integer limit) {
-        return (index + 1) + ((page - 1) * limit);
-    }
-
-    public Result<TopTracksResource, Errors> mapToSimple(StreamingData streamingData, TopTracksSearchRequest searchRequest) {
+    public Result<TopTracks, Errors> mapToSimple(StreamingData streamingData, TopTracksSearchRequest searchRequest, String playlistId) {
         return new Result.Success<>(someSimpleRankedTracks()
-                .withStreamData(streamingData.streamData().stream().map(streamData -> mapSimpleTrackData(streamData,
+                .withTracks(streamingData.streamData().stream().map(streamData -> mapSimpleTrackData(streamData,
                         calculateRank(streamingData.streamData().indexOf(streamData), searchRequest.page(), searchRequest.limit()))).toList())
                 .withTotalResults(100)
                 .withPage(searchRequest.page())
+                .withCreatedPlaylist(playlistId != null)
+                .withPlaylistId(playlistId)
                 .build());
     }
 
@@ -102,4 +101,9 @@ public class StreamingDataToRankedTracksMapper {
                                 .map(SearchResponseTrack::streamDateTime).orElse(null))
                         .build();
     }
+
+    private Integer calculateRank(Integer index, Integer page, Integer limit) {
+        return (index + 1) + ((page - 1) * limit);
+    }
+
 }

@@ -16,7 +16,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.AdvancedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
-import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracks;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.util.function.Function;
@@ -34,7 +34,7 @@ public class StreamingDataController {
     }
 
     @GetMapping(value = "/top")
-    public ResponseEntity<ApiResult<TopTracksResource, Errors>> getTopTracks(@RequestAttribute String userId, TopTracksSearchRequest searchRequest) {
+    public ResponseEntity<ApiResult<TopTracks, Errors>> getTopTracks(@RequestAttribute String userId, TopTracksSearchRequest searchRequest) {
         return get(streamingDataService::getTopTracks, streamingDataRequestCleaner.clean(searchRequest, userId));
     }
 
