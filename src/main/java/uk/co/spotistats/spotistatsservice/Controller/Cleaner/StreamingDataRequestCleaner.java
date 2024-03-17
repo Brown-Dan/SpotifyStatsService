@@ -2,7 +2,9 @@ package uk.co.spotistats.spotistatsservice.Controller.Cleaner;
 
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.TrackUriSearchRequest;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest.Builder.aTopTracksSearchRequest;
@@ -26,5 +28,16 @@ public class StreamingDataRequestCleaner {
                 .withCreatePlaylist(searchRequest.createPlaylist() != null && searchRequest.createPlaylist())
                 .withUserId(userId)
                 .build();
+    }
+
+    public StreamingDataSearchRequest clean(StreamingDataSearchRequest searchRequest, String userId){
+        return searchRequest.cloneBuilder()
+                .withCreatePlaylist(searchRequest.createPlaylist() != null && searchRequest.createPlaylist())
+                .withUserId(userId)
+                .build();
+    }
+
+    public TrackUriSearchRequest clean(String userId, String trackUri){
+        return new TrackUriSearchRequest(userId, trackUri);
     }
 }

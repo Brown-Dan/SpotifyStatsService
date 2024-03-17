@@ -3,22 +3,22 @@ package uk.co.spotistats.spotistatsservice.Repository;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.ConditionBuilder;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamDataSearchRequestOrderBy;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponseTrack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static uk.co.spotistats.generated.tables.StreamData.STREAM_DATA;
 import static uk.co.spotistats.generated.tables.StreamingData.STREAMING_DATA;
-import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder.aStreamData;
-import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.someStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse.Builder.aSearchResponse;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponseTrack.Builder.aSearchResponseTrack;
 
 @Repository
 public class StreamingDataRepository {
@@ -39,14 +39,14 @@ public class StreamingDataRepository {
         return new Result.Success<>(StreamingData.fromStreamingDataEntity(streamingData));
     }
 
-    public StreamingData search(StreamingDataSearchRequest streamingDataSearchRequest) {
+    public SearchResponse search(StreamingDataSearchRequest streamingDataSearchRequest) {
         List<Condition> conditions = buildQueryConditions(streamingDataSearchRequest);
 
         List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData =
-                db.selectFrom(STREAM_DATA).where(conditions).and(STREAM_DATA.USERNAME.eq(streamingDataSearchRequest.username()))
+                db.selectFrom(STREAM_DATA).where(conditions).and(STREAM_DATA.USERNAME.eq(streamingDataSearchRequest.userId()))
                         .orderBy(StreamDataSearchRequestOrderBy.valueOf(streamingDataSearchRequest.orderBy()).getField())
                         .limit(streamingDataSearchRequest.limit()).fetchInto(uk.co.spotistats.generated.tables.pojos.StreamData.class);
-        return buildStreamingData(streamData);
+        return mapStreamDataEntityListToSearchResponse(streamData);
     }
 
     public List<StreamingData> getUnsyncedStreamingData() {
@@ -61,27 +61,27 @@ public class StreamingDataRepository {
                 .toList();
     }
 
-    private StreamingData buildStreamingData(List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData) {
+    private SearchResponse mapStreamDataEntityListToSearchResponse(List<uk.co.spotistats.generated.tables.pojos.StreamData> streamData) {
         if (streamData.isEmpty()) {
-            return someStreamingData()
-                    .withSize(0)
-                    .withStreamData(new ArrayList<>())
+            return aSearchResponse()
+                    .withTracks(List.of())
                     .build();
         }
-        return someStreamingData()
-                .withFirstStreamDateTime(streamData.getFirst().getDateTime())
-                .withStreamData(streamData.stream().map(this::mapStreamDataEntityToStreamData).toList())
-                .withLastStreamDateTime(streamData.getLast().getDateTime())
+        return aSearchResponse()
+                .withTracks(streamData.stream().map(this::mapStreamDataEntityToSearchResponseTrack).toList())
+                .withFirstStreamDate(streamData.getFirst().getDateTime())
+                .withLastStreamDate(streamData.getLast().getDateTime())
                 .withSize(streamData.size())
+                .withTotalStreamTimeMinutes(((int) streamData.stream().mapToLong(uk.co.spotistats.generated.tables.pojos.StreamData::getTimeStreamed).sum() / 1000) / 60)
                 .build();
     }
 
-    private StreamData mapStreamDataEntityToStreamData(uk.co.spotistats.generated.tables.pojos.StreamData streamData) {
-        return aStreamData()
-                .withName(streamData.getTrackName())
-                .withTimeStreamed(streamData.getTimeStreamed())
-                .withArtist(streamData.getArtistName())
-                .withAlbum(streamData.getAlbumName())
+    private SearchResponseTrack mapStreamDataEntityToSearchResponseTrack(uk.co.spotistats.generated.tables.pojos.StreamData streamData) {
+        return aSearchResponseTrack()
+                .withTrackName(streamData.getTrackName())
+                .withTotalMsPlayed(streamData.getTimeStreamed())
+                .withArtistName(streamData.getArtistName())
+                .withAlbumName(streamData.getAlbumName())
                 .withPlatform(streamData.getPlatform())
                 .withTrackUri(streamData.getTrackUri())
                 .withStreamDateTime(streamData.getDateTime())

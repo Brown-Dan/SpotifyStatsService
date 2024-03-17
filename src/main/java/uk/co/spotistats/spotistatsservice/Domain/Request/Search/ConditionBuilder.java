@@ -9,7 +9,7 @@ import java.util.function.Function;
 import static uk.co.spotistats.generated.tables.StreamData.STREAM_DATA;
 
 public enum ConditionBuilder {
-    USERNAME(username -> STREAM_DATA.USERNAME.eq((String) username), StreamingDataSearchRequest::username),
+    USERNAME(username -> STREAM_DATA.USERNAME.eq((String) username), StreamingDataSearchRequest::userId),
     ON_DATE(date -> STREAM_DATA.DATE.eq((LocalDate) date), StreamingDataSearchRequest::onDate),
     URI(uri -> STREAM_DATA.TRACK_URI.eq((String) uri), StreamingDataSearchRequest::uri),
     ALBUM(album -> STREAM_DATA.ALBUM_NAME.eq((String) album), StreamingDataSearchRequest::album),

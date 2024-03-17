@@ -38,6 +38,10 @@ public record Error(String field, String message, ErrorKey key) {
         return new Error(field, message, ErrorKey.UNKNOWN_ERROR);
     }
 
+    public static Error searchRequestUnauthorized(String field) {
+        return new Error(field, "Spotify authorization is required for parameter '%s'".formatted(field), ErrorKey.AUTHORIZATION_FAILURE);
+    }
+
     public static Error spotifyRateLimitExceeded() {
         return new Error("spotify.API", "Exceeded spotify rate limit - try again in 60s", ErrorKey.SPOTIFY_RATE_LIMIT_EXCEEDED);
     }

@@ -58,6 +58,10 @@ public class SpotifyAuthService {
         return refreshToken(spotifyAuthData);
     }
 
+    public boolean isAuthorized(String userId) {
+        return spotifyAuthRepository.getAuthorizationDetailsByUsername(userId).isPresent();
+    }
+
     public RedirectView redirect() {
         try {
             return new RedirectView(new URIBuilder()

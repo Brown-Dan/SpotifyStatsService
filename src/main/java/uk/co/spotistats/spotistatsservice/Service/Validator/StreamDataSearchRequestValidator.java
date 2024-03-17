@@ -2,9 +2,10 @@ package uk.co.spotistats.spotistatsservice.Service.Validator;
 
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamDataSearchRequestOrderBy;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,13 +15,29 @@ import java.util.Optional;
 @Component
 public class StreamDataSearchRequestValidator {
 
+    private final SpotifyAuthService spotifyAuthService;
+
+    public StreamDataSearchRequestValidator(SpotifyAuthService spotifyAuthService) {
+        this.spotifyAuthService = spotifyAuthService;
+    }
+
     public Errors validate(StreamingDataSearchRequest streamingDataSearchRequest) {
         List<Error> errors = new ArrayList<>();
         validateQueryDatePeriod(streamingDataSearchRequest).ifPresent(errors::add);
         validateQueryTimePeriod(streamingDataSearchRequest).ifPresent(errors::add);
         validateOrderBy(streamingDataSearchRequest).ifPresent(errors::add);
         validateLimit(streamingDataSearchRequest).ifPresent(errors::add);
+        validateCreatePlaylist(streamingDataSearchRequest).ifPresent(errors::add);
         return Errors.fromErrors(errors);
+    }
+
+    private Optional<Error> validateCreatePlaylist(StreamingDataSearchRequest streamingDataSearchRequest){
+        if (streamingDataSearchRequest.createPlaylist()){
+             if (!spotifyAuthService.isAuthorized(streamingDataSearchRequest.userId())){
+                 return Optional.of(Error.searchRequestUnauthorized("createPlaylist"));
+             }
+        }
+        return Optional.empty();
     }
 
     private Optional<Error> validateLimit(StreamingDataSearchRequest streamingDataSearchRequest) {

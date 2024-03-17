@@ -2,6 +2,8 @@ package uk.co.spotistats.spotistatsservice.Service.Mapper;
 
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponseTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Advanced.AdvancedRankedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
@@ -38,7 +40,7 @@ public class StreamingDataToRankedTracksMapper {
             return new Result.Failure<>(Errors.fromError(getStreamingDataResult.getError()));
         }
         StreamingDataSearchRequest.Builder streamingDataSearchRequestBuilder = aStreamingDataSearchRequest()
-                .withUsername(searchRequest.userId())
+                .withUserId(searchRequest.userId())
                 .withOrderBy(StreamDataSearchRequestOrderBy.DATE.name())
                 .withStartDate(getStreamingDataResult.getValue().firstStreamDateTime().toLocalDate())
                 .withEndDate(getStreamingDataResult.getValue().lastStreamDateTime().toLocalDate());
@@ -80,9 +82,9 @@ public class StreamingDataToRankedTracksMapper {
 
     private AdvancedRankedTrack mapAdvancedTrackData(StreamData streamData, StreamingDataSearchRequest.Builder searchRequestBuilder, Integer rank) {
         StreamingDataSearchRequest streamingDataSearchRequest = searchRequestBuilder.withUri(streamData.trackUri()).build();
-        StreamingData streamingData = streamingDataRepository.search(streamingDataSearchRequest);
+        SearchResponse searchResponse = streamingDataRepository.search(streamingDataSearchRequest);
 
-        long totalTimeStreamed = streamingData.streamData().stream().mapToLong(StreamData::timeStreamed).sum();
+        long totalTimeStreamed = searchResponse.tracks().stream().mapToLong(SearchResponseTrack::totalMsPlayed).sum();
         AdvancedRankedTrack.Builder advancedTrackData = anAdvancedRankedTrack()
                 .withTotalMsPlayed((int) totalTimeStreamed)
                 .withTrackName(streamData.name())
@@ -91,10 +93,10 @@ public class StreamingDataToRankedTracksMapper {
                 .withArtistName(streamData.artist())
                 .withAlbumName(streamData.album())
                 .withTrackUri(streamData.trackUri())
-                .withTotalStreams(streamingData.size());
+                .withTotalStreams(searchResponse.size());
 
-        return streamingData.streamData().isEmpty() ? advancedTrackData.build() :
-                advancedTrackData.withLastStreamedDate(Optional.ofNullable(streamingData.streamData().getLast())
-                        .map(StreamData::streamDateTime).orElse(null)).build();
+        return searchResponse.tracks().isEmpty() ? advancedTrackData.build() :
+                advancedTrackData.withLastStreamedDate(Optional.ofNullable(searchResponse.tracks().getLast())
+                        .map(SearchResponseTrack::streamDateTime).orElse(null)).build();
     }
 }

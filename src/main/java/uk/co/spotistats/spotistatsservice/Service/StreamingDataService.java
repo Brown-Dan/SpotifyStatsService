@@ -9,14 +9,13 @@ import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.*;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Request.TrackUriSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Response.AdvancedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracksResource;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
@@ -104,20 +103,33 @@ public class StreamingDataService {
         StreamingDataSearchRequest streamingDataSearchRequest = aStreamingDataSearchRequest()
                 .withUri(trackUriSearchRequest.trackUri())
                 .withOrderBy(DATE.toString())
-                .withUsername(trackUriSearchRequest.username()).build();
+                .withUserId(trackUriSearchRequest.username()).build();
 
-        StreamingData streamingData = streamingDataRepository.search(streamingDataSearchRequest);
+        SearchResponse streamingData = streamingDataRepository.search(streamingDataSearchRequest);
 
-        return success(AdvancedTrack.fromStreamingData(streamingData));
+        return success(AdvancedTrack.fromSearchResponse(streamingData));
     }
 
 
-    public Result<StreamingData, Errors> search(StreamingDataSearchRequest searchRequest) {
+    public Result<SearchResponse, Errors> search(StreamingDataSearchRequest searchRequest) {
         Errors errors = streamDataSearchRequestValidator.validate(searchRequest);
         if (errors.hasErrors()) {
            return failure(errors);
         }
-        return success(streamingDataRepository.search(searchRequest));
+        Result<SearchResponse, Errors>  result = success(streamingDataRepository.search(searchRequest));
+
+        if (result.isFailure()){
+            return failure(errors);
+        }
+        if (searchRequest.createPlaylist()){
+            Result<Playlist, Errors> createPlaylistResult = spotifyRepository.createPlaylist(CreatePlaylistRequest.fromStreamingDataSearchRequest(searchRequest, result.getValue().tracks(),
+                    spotifyAuthService.getSpotifyAuthData(searchRequest.userId()).getValue()));
+            if (createPlaylistResult.isFailure()){
+                return failure(createPlaylistResult.getError());
+            }
+            return success(result.getValue().cloneBuilder().withCreatedPlaylist(true).withPlaylistId(createPlaylistResult.getValue().id()).build());
+        }
+        return success(result.getValue());
     }
 
     @Async

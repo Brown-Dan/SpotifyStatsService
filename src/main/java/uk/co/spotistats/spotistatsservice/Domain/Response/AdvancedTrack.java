@@ -1,8 +1,8 @@
 package uk.co.spotistats.spotistatsservice.Domain.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
-import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponseTrack;
 
 import java.time.LocalDateTime;
 
@@ -20,22 +20,22 @@ public record AdvancedTrack(
         @JsonProperty int totalStreams) {
 
 
-    public static AdvancedTrack fromStreamingData(StreamingData streamingData) {
-        if (streamingData.streamData().isEmpty()){
+    public static AdvancedTrack fromSearchResponse(SearchResponse searchResponse) {
+        if (searchResponse.tracks().isEmpty()){
             return AdvancedTrack.Builder.anAdvancedTrack().build();
         }
-        long totalMsPlayed = streamingData.streamData().stream().mapToLong(StreamData::timeStreamed).sum();
-        StreamData track = streamingData.streamData().getFirst();
+        long totalMsPlayed = searchResponse.tracks().stream().mapToLong(SearchResponseTrack::totalMsPlayed).sum();
+        SearchResponseTrack track = searchResponse.tracks().getFirst();
         return anAdvancedTrack()
-                .withAlbumName(track.album())
-                .withTrackName(track.name())
-                .withArtistName(track.artist())
+                .withAlbumName(track.albumName())
+                .withTrackName(track.trackName())
+                .withArtistName(track.artistName())
                 .withTrackUri(track.trackUri())
-                .withFirstStreamDate(streamingData.firstStreamDateTime())
-                .withLastStreamedDate(streamingData.lastStreamDateTime())
+                .withFirstStreamDate(searchResponse.firstStreamDate())
+                .withLastStreamedDate(searchResponse.lastStreamDate())
                 .withTotalMsPlayed(totalMsPlayed)
-                .withTotalStreams(streamingData.streamData().size())
-                .withTotalMinutesPlayed(((int) totalMsPlayed / 1000) / 60)
+                .withTotalStreams(searchResponse.tracks().size())
+                .withTotalMinutesPlayed(searchResponse.totalStreamTimeMinutes())
                 .build();
     }
 

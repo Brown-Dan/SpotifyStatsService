@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 
 public record StreamingDataSearchRequest(
-        String username,
+        String userId,
         LocalDate startDate,
         LocalDate endDate,
         LocalDate onDate,
@@ -21,10 +21,12 @@ public record StreamingDataSearchRequest(
         LocalTime startTime,
         LocalTime endTime,
         Boolean createPlaylist
-) {
+)
 
+
+{
     public static final class Builder {
-        private String username;
+        private String userId;
         private LocalDate startDate;
         private LocalDate endDate;
         private LocalDate onDate;
@@ -47,8 +49,8 @@ public record StreamingDataSearchRequest(
             return new Builder();
         }
 
-        public Builder withUsername(String username) {
-            this.username = username;
+        public Builder withUserId(String userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -123,13 +125,34 @@ public record StreamingDataSearchRequest(
         }
 
         public StreamingDataSearchRequest build() {
-            return new StreamingDataSearchRequest(username, startDate, endDate, onDate, country, uri, trackName, artist, album, platform, orderBy, limit, startTime, endTime, createPlaylist);
+            return new StreamingDataSearchRequest(userId, startDate, endDate, onDate, country, uri, trackName, artist, album, platform, orderBy, limit, startTime, endTime, createPlaylist);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "StreamingDataSearchRequest{" +
+               "userId='" + userId + '\'' +
+               ", startDate=" + startDate +
+               ", endDate=" + endDate +
+               ", onDate=" + onDate +
+               ", country='" + country + '\'' +
+               ", uri='" + uri + '\'' +
+               ", trackName='" + trackName + '\'' +
+               ", artist='" + artist + '\'' +
+               ", album='" + album + '\'' +
+               ", platform='" + platform + '\'' +
+               ", orderBy='" + orderBy + '\'' +
+               ", limit=" + limit +
+               ", startTime=" + startTime +
+               ", endTime=" + endTime +
+               ", createPlaylist=" + createPlaylist +
+               '}';
     }
 
     public StreamingDataSearchRequest.Builder cloneBuilder() {
         return aStreamingDataSearchRequest()
-                .withUsername(username)
+                .withUserId(userId)
                 .withStartDate(startDate)
                 .withEndDate(endDate)
                 .withOnDate(onDate)
