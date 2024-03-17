@@ -16,6 +16,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.TopArtists;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracks;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Repository.SpotifyRepository;
@@ -23,6 +24,7 @@ import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataUploadRepository;
 import uk.co.spotistats.spotistatsservice.Service.Validator.RecentTracksSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Service.Validator.StreamDataSearchRequestValidator;
+import uk.co.spotistats.spotistatsservice.Service.Validator.TopArtistsSearchRequestValidator;
 import uk.co.spotistats.spotistatsservice.Service.Validator.TopTracksSearchRequestValidator;
 
 import java.util.List;
@@ -43,10 +45,11 @@ public class StreamingDataService {
     private final TopTracksSearchRequestValidator topTracksSearchRequestValidator;
     private final RecentTracksSearchRequestValidator recentTracksSearchRequestValidator;
     private final StreamingDataUploadService streamingDataUploadService;
+    private final TopArtistsSearchRequestValidator topArtistsSearchRequestValidator;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataService.class);
 
-    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository, StreamDataSearchRequestValidator streamDataSearchRequestValidator, TopTracksSearchRequestValidator topTracksSearchRequestValidator, RecentTracksSearchRequestValidator recentTracksSearchRequestValidator, StreamingDataUploadService streamingDataUploadService) {
+    public StreamingDataService(SpotifyAuthService spotifyAuthService, SpotifyRepository spotifyRepository, StreamingDataRepository streamingDataRepository, StreamingDataUploadRepository streamingDataUploadRepository, StreamDataSearchRequestValidator streamDataSearchRequestValidator, TopTracksSearchRequestValidator topTracksSearchRequestValidator, RecentTracksSearchRequestValidator recentTracksSearchRequestValidator, StreamingDataUploadService streamingDataUploadService, TopArtistsSearchRequestValidator topArtistsSearchRequestValidator) {
         this.spotifyAuthService = spotifyAuthService;
         this.spotifyRepository = spotifyRepository;
         this.streamingDataRepository = streamingDataRepository;
@@ -55,6 +58,7 @@ public class StreamingDataService {
         this.topTracksSearchRequestValidator = topTracksSearchRequestValidator;
         this.recentTracksSearchRequestValidator = recentTracksSearchRequestValidator;
         this.streamingDataUploadService = streamingDataUploadService;
+        this.topArtistsSearchRequestValidator = topArtistsSearchRequestValidator;
     }
 
     public Result<RecentTracks, Errors> getRecentStreams(RecentTracksSearchRequest searchRequest) {
@@ -82,6 +86,19 @@ public class StreamingDataService {
             return failure(spotifyAuthDataResult.getError());
         }
         return spotifyRepository.getTopTracks(searchRequest.cloneBuilder().withAuthData(spotifyAuthDataResult.getValue()).build());
+    }
+
+    public Result<TopArtists, Errors> getTopArtists(TopArtistsSearchRequest searchRequest) {
+        Errors validationErrors = topArtistsSearchRequestValidator.validate(searchRequest);
+        if (validationErrors.hasErrors()) {
+            return failure(validationErrors);
+        }
+
+        Result<SpotifyAuthData, Errors> spotifyAuthDataResult = spotifyAuthService.getSpotifyAuthData(searchRequest.userId());
+        if (spotifyAuthDataResult.isFailure()) {
+            return failure(spotifyAuthDataResult.getError());
+        }
+        return spotifyRepository.getTopArtists(searchRequest.cloneBuilder().withAuthData(spotifyAuthDataResult.getValue()).build());
     }
 
     public Result<AdvancedTrack, Errors> getByTrackUri(TrackUriSearchRequest trackUriSearchRequest) {

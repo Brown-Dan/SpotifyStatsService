@@ -5,12 +5,14 @@ import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchReque
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.DayOfTheWeek;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.Month;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.TopArtistsSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TrackUriSearchRequest;
 
 import java.util.Arrays;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
+import static uk.co.spotistats.spotistatsservice.Domain.Request.TopArtistsSearchRequest.Builder.aTopArtistsSearchRequest;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest.Builder.aTopTracksSearchRequest;
 
 @Component
@@ -21,6 +23,15 @@ public class StreamingDataRequestCleaner {
                 .withLimit(searchRequest.limit() == null ? 10 : searchRequest.limit())
                 .withPage(searchRequest.page() == null ? 1 : searchRequest.page())
                 .withCreatePlaylist(searchRequest.createPlaylist() != null && searchRequest.createPlaylist())
+                .withAdvanced(searchRequest.advanced() != null && searchRequest.advanced())
+                .withUserId(userId)
+                .build();
+    }
+
+    public TopArtistsSearchRequest clean(TopArtistsSearchRequest searchRequest, String userId){
+        return aTopArtistsSearchRequest()
+                .withLimit(searchRequest.limit() == null ? 10 : searchRequest.limit())
+                .withPage(searchRequest.page() == null ? 1 : searchRequest.page())
                 .withAdvanced(searchRequest.advanced() != null && searchRequest.advanced())
                 .withUserId(userId)
                 .build();
