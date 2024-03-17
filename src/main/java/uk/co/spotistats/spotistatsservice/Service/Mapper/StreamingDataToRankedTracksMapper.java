@@ -41,7 +41,7 @@ public class StreamingDataToRankedTracksMapper {
         }
         StreamingDataSearchRequest.Builder streamingDataSearchRequestBuilder = aStreamingDataSearchRequest()
                 .withUserId(searchRequest.userId())
-                .withOrderBy(StreamDataSearchRequestOrderBy.DATE.name())
+                .withOrderBy(StreamDataSearchRequestOrderBy.DATE_ASC.name())
                 .withStartDate(getStreamingDataResult.getValue().firstStreamDateTime().toLocalDate())
                 .withEndDate(getStreamingDataResult.getValue().lastStreamDateTime().toLocalDate());
 
