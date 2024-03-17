@@ -56,8 +56,12 @@ public class SpotifyClient {
         return new RecentStreamingDataRequest(this);
     }
 
-    public TopTracksGetRequest getTopTracks() {
-        return new TopTracksGetRequest(this);
+    public TopEntityGetRequest getTopTracks() {
+        return new TopEntityGetRequest(this, "https://api.spotify.com/v1/me/top/tracks");
+    }
+
+    public TopEntityGetRequest getTopArtists() {
+        return new TopEntityGetRequest(this, "https://api.spotify.com/v1/me/top/artists");
     }
 
     public CreatePlaylistRequest createPlaylist() {

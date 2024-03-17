@@ -11,11 +11,14 @@ import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.SimpleTopArtist;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.SimpleTopArtists;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -25,6 +28,8 @@ import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Buil
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Playlist.Builder.aPlaylist;
 import static uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTrack.Builder.aRecentTrack;
 import static uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks.Builder.someRecentTracks;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.SimpleTopArtist.Builder.aSimpleTopArtist;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.SimpleTopArtists.Builder.aSimpleTopArtists;
 
 @Component
 public class SpotifyResponseMapper {
@@ -78,6 +83,39 @@ public class SpotifyResponseMapper {
             LOG.error("Failed to parse streaming data");
             throw new RuntimeException();
         }
+    }
+
+    public SimpleTopArtists fromTopArtists(JSONObject json, int page) {
+        try {
+            JsonNode responseAsJsonNode = objectMapper.readTree(json.toJSONString()).get("artists");
+            List<SimpleTopArtist> artists = StreamSupport.stream(responseAsJsonNode.spliterator(), false)
+                    .map(this::mapToArtist).toList();
+            return aSimpleTopArtists()
+                    .withArtists(artists)
+                    .withTotalResults(artists.size())
+                    .withPage(page)
+                    .build();
+        } catch (Exception e) {
+            LOG.error("Failed to parse spotify api response");
+            throw new RuntimeException();
+        }
+    }
+
+    private SimpleTopArtist mapToArtist(JsonNode artist){
+        List<String> genres = new ArrayList<>();
+        JsonNode genresNode = artist.get("genres");
+        if (genresNode.isArray()) {
+            for (JsonNode genreNode : genresNode) {
+                genres.add(genreNode.asText());
+            }
+        }
+        return aSimpleTopArtist()
+                .withName(artist.get("name").asText())
+                .withGenres(genres)
+                .withPopularity(artist.get("popularity").asInt())
+                .withSpotifyUri(artist.get("uri").toString())
+                .withSpotifyProfileLink(artist.get("href").toString())
+                .build();
     }
 
     public SpotifyRefreshTokenResponse toRefreshTokenResponse(JSONObject resource) {

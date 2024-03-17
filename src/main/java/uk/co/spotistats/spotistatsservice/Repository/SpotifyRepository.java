@@ -4,13 +4,13 @@ import com.alibaba.fastjson2.JSONObject;
 import org.springframework.stereotype.Repository;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
-import uk.co.spotistats.spotistatsservice.Domain.Request.CreatePlaylistRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
-import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
-import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.*;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.SimpleTopArtists;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.TopArtists;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracks;
+import uk.co.spotistats.spotistatsservice.Repository.Mapper.SimpleTopArtistsToAdvancedTopArtistsMapper;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.SpotifyResponseMapper;
 import uk.co.spotistats.spotistatsservice.Repository.Mapper.StreamingDataToRankedTracksMapper;
 import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.SpotifyRequestError;
@@ -24,11 +24,13 @@ import static uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryPar
 @Repository
 public class SpotifyRepository {
 
+    private final SimpleTopArtistsToAdvancedTopArtistsMapper artistMapper;
     private final StreamingDataToRankedTracksMapper streamingDataToRankedTracksMapper;
     private final SpotifyResponseMapper spotifyResponseMapper;
     private final SpotifyClient spotifyClient;
 
-    public SpotifyRepository(StreamingDataToRankedTracksMapper streamingDataToRankedTracksMapper, SpotifyResponseMapper spotifyResponseMapper, SpotifyClient spotifyClient) {
+    public SpotifyRepository(SimpleTopArtistsToAdvancedTopArtistsMapper artistMapper, StreamingDataToRankedTracksMapper streamingDataToRankedTracksMapper, SpotifyResponseMapper spotifyResponseMapper, SpotifyClient spotifyClient) {
+        this.artistMapper = artistMapper;
         this.streamingDataToRankedTracksMapper = streamingDataToRankedTracksMapper;
         this.spotifyResponseMapper = spotifyResponseMapper;
         this.spotifyClient = spotifyClient;
@@ -50,11 +52,26 @@ public class SpotifyRepository {
         if (recentTracksSearchRequest.createPlaylist()) {
             Result<Playlist, Errors> createPlaylistResult =
                     createPlaylist(CreatePlaylistRequest.fromRecentTracksSearchRequest(recentTracksSearchRequest, result.getValue().tracks()));
-            if (!createPlaylistResult.isFailure()){
+            if (!createPlaylistResult.isFailure()) {
                 return success(result.getValue().addPlaylist(createPlaylistResult.getValue().id()));
             }
         }
         return success(result.getValue());
+    }
+
+    public Result<TopArtists, Errors> getTopArtists(TopArtistsSearchRequest searchRequest) {
+        Result<SimpleTopArtists, SpotifyRequestError> result = spotifyClient
+                        .withAccessToken(searchRequest.authData().accessToken())
+                        .getTopArtists()
+                        .withTimeRange(LONG_TERM)
+                        .withLimit(searchRequest.limit())
+                        .withOffset((searchRequest.page() - 1) * searchRequest.limit())
+                        .fetchInto(JSONObject.class)
+                        .map(jsonObject -> spotifyResponseMapper.fromTopArtists(jsonObject, searchRequest.page()));
+        if (result.isFailure()) {
+            return failure(searchRequest.userId(), result.getError());
+        }
+        return searchRequest.advanced() ? artistMapper.map(result.getValue(), searchRequest.userId()) : success(result.getValue());
     }
 
     public Result<TopTracks, Errors> getTopTracks(TopTracksSearchRequest searchRequest) {
@@ -71,8 +88,8 @@ public class SpotifyRepository {
             return failure(searchRequest.userId(), result.getError());
         }
         if (searchRequest.createPlaylist()) {
-            Result<Playlist, Errors>  createPlaylistResult = createPlaylist(CreatePlaylistRequest.fromTopTracksSearchRequest(searchRequest, result.getValue().streamData()));
-            if(!createPlaylistResult.isFailure()){
+            Result<Playlist, Errors> createPlaylistResult = createPlaylist(CreatePlaylistRequest.fromTopTracksSearchRequest(searchRequest, result.getValue().streamData()));
+            if (!createPlaylistResult.isFailure()) {
                 return searchRequest.advanced() ? streamingDataToRankedTracksMapper.mapToAdvanced(result.getValue(), searchRequest, createPlaylistResult.getValue().id()) :
                         streamingDataToRankedTracksMapper.mapToSimple(result.getValue(), searchRequest, createPlaylistResult.getValue().id());
             }

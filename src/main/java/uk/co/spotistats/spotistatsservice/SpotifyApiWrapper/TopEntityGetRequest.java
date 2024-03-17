@@ -5,27 +5,28 @@ import uk.co.spotistats.spotistatsservice.SpotifyApiWrapper.Enum.QueryParamValue
 import java.util.HashMap;
 import java.util.Map;
 
-public class TopTracksGetRequest implements AbstractSpotifyGetRequest {
+public class TopEntityGetRequest implements AbstractSpotifyGetRequest {
     private final Map<String, String> queryParams = new HashMap<>();
     private final SpotifyClient spotifyClient;
 
-    private static final String URL = "https://api.spotify.com/v1/me/top/tracks";
+    private final String url;
 
-    TopTracksGetRequest(SpotifyClient spotifyClient) {
+    TopEntityGetRequest(SpotifyClient spotifyClient, String url) {
+        this.url = url;
         this.spotifyClient = spotifyClient;
     }
 
-    public <T> TopTracksGetRequest withLimit(T limit) {
+    public <T> TopEntityGetRequest withLimit(T limit) {
         queryParams.put("limit", String.valueOf(limit));
         return this;
     }
 
-    public TopTracksGetRequest withTimeRange(QueryParamValue timeRange) {
+    public TopEntityGetRequest withTimeRange(QueryParamValue timeRange) {
         queryParams.put("time_range", timeRange.getValue());
         return this;
     }
 
-    public <T> TopTracksGetRequest withOffset(T offset) {
+    public <T> TopEntityGetRequest withOffset(T offset) {
         queryParams.put("offset", String.valueOf(offset));
         return this;
     }
@@ -40,6 +41,6 @@ public class TopTracksGetRequest implements AbstractSpotifyGetRequest {
 
     @Override
     public String getUrl() {
-        return URL;
+        return url;
     }
 }
