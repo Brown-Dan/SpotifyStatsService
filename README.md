@@ -1,31 +1,65 @@
-# [WIP] SpotiStatsService
-Simple web service enabling user's to perform advanced queries on their uploaded Spotify account data.
+## SpotiStatsService
 
-FINISHED 
+SpotiStatsService is a simple web service that allows users to upload and query their Spotify streaming data.
 
-www.spotifystats.co.uk/username/recent Params -> limit (default=10, max=50), createPlaylist(default=false) 
-www.spotifystats.co.uk/username/top   Params -> limit (default=10, max=50), createPlaylist(default=false) 
-www.spotifystats.co.uk/username/upload MultipartRequest -> upload spotify streaming history json file < 20mb with name "StreamingDataFile" 
+### Instructions
 
-<H1> SEARCH </H1> 
+1. Visit [SpotiStats Login](https://www.spotifystats.co.uk/login) to obtain a JWT token.
+2. Provide the JWT token in the "Authorization" header of your requests.
+3. Optionally, you can upload your streaming data from [SpotiStats Data Upload](https://www.spotifystats.co.uk/data/upload) using a multipart request. Ensure the file is in JSON format and is under 20MB. Name the file "streamingDataFile".
 
-<H2> www.spotifystats.co.uk/username/search </H2>
+### Endpoints
 
-<H3> filters <H3>
+- **Recent Tracks**: `/tracks/recent`
+  - **Parameters**:
+    - `limit`: Specifies the number of recent tracks. Default is 10, maximum is 50.
+    - `createPlaylist`: Optional. Default is `false`.
+    - `advanced`: Optional. Default is `false`.
+- **Top Tracks**: `/tracks/top`
+  - **Parameters**:
+    - `limit`: Specifies the number of top tracks. Default is 10, maximum is 50.
+    - `page`: Optional. Default is 1.
+    - `createPlaylist`: Optional. Default is `false`.
+    - `advanced`: Optional. Default is `false`.
+- **Top Artists**: `/artists/top`
+  - **Parameters**:
+    - `limit`: Specifies the number of top artists. Default is 10, maximum is 50.
+    - `page`: Optional. Default is 1.
+    - `createPlaylist`: Optional. Default is `false`.
+    - `advanced`: Optional. Default is `false`.
+- **Data Upload**: `/data/upload`
+  - **Multipart Request**:
+    - Upload your Spotify streaming history JSON file (max 20MB) with the name "StreamingDataFile".
 
-<ul>
-  <li> startDate </li>
-    <li> endDate </li>
-  <li> orderBy </li>
-  <li> platform </li>
-  <li> country </li>
-  <li> artist </li>
-  <li> trackUri </li>
-  <li> trackName </li>
-  <li> artist </li>
-  <li> album </li>
-  <li> artist </li>
-  <li> limit </li>
-  <li> startTime </li>
-  <li> endTime </li>
-</ul>
+### Search
+
+- **Endpoint**: `/search`
+
+#### Ordering Options:
+
+- `DATE_ASC`
+- `DATE_DESC`
+- `MS_STREAMED_ASC`
+- `MS_STREAMED_DESC`
+- `ARTIST_NAME_ASC`
+- `ARTIST_NAME_DESC`
+- `TRACK_NAME_ASC`
+- `TRACK_NAME_DESC`
+
+#### Filters:
+
+- `startDate`
+- `endDate`
+- `orderBy`
+- `platform`
+- `country`
+- `artist`
+- `trackUri`
+- `trackName`
+- `album`
+- `limit`
+- `startTime`
+- `endTime`
+- `month`
+- `dayOfTheWeek`
+- `year`
