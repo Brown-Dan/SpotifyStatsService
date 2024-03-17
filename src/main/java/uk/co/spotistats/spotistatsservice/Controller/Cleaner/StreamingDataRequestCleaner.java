@@ -2,9 +2,13 @@ package uk.co.spotistats.spotistatsservice.Controller.Cleaner;
 
 import org.springframework.stereotype.Component;
 import uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.DayOfTheWeek;
+import uk.co.spotistats.spotistatsservice.Domain.Request.Search.Month;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest;
 import uk.co.spotistats.spotistatsservice.Domain.Request.TrackUriSearchRequest;
+
+import java.util.Arrays;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.TopTracksSearchRequest.Builder.aTopTracksSearchRequest;
@@ -31,7 +35,14 @@ public class StreamingDataRequestCleaner {
     }
 
     public StreamingDataSearchRequest clean(StreamingDataSearchRequest searchRequest, String userId){
-        return searchRequest.cloneBuilder()
+        StreamingDataSearchRequest.Builder cleanedSearchRequest = searchRequest.cloneBuilder();
+        if (searchRequest.dayOfTheWeek() != null && Arrays.stream(DayOfTheWeek.values()).map(DayOfTheWeek::name).toList().contains(searchRequest.dayOfTheWeek().toUpperCase())) {
+            cleanedSearchRequest.withDayOfTheWeek(DayOfTheWeek.valueOf(searchRequest.dayOfTheWeek().toUpperCase()).getDbRepresentation().toString());
+        }
+        if (searchRequest.month() != null && Arrays.stream(Month.values()).map(Month::name).toList().contains(searchRequest.month().toUpperCase())) {
+            cleanedSearchRequest.withMonth(Month.valueOf(searchRequest.month().toUpperCase()).getDbRepresentation().toString());
+        }
+        return cleanedSearchRequest
                 .withCreatePlaylist(searchRequest.createPlaylist() != null && searchRequest.createPlaylist())
                 .withUserId(userId)
                 .build();

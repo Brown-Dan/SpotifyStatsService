@@ -24,6 +24,9 @@ public class StreamDataSearchRequestValidator {
     public Errors validate(StreamingDataSearchRequest streamingDataSearchRequest) {
         List<Error> errors = new ArrayList<>();
         validateQueryDatePeriod(streamingDataSearchRequest).ifPresent(errors::add);
+        validateDayOfTheWeek(streamingDataSearchRequest).ifPresent(errors::add);
+        validateMonth(streamingDataSearchRequest).ifPresent(errors::add);
+        validateYear(streamingDataSearchRequest).ifPresent(errors::add);
         validateQueryTimePeriod(streamingDataSearchRequest).ifPresent(errors::add);
         validateOrderBy(streamingDataSearchRequest).ifPresent(errors::add);
         validateLimit(streamingDataSearchRequest).ifPresent(errors::add);
@@ -31,11 +34,11 @@ public class StreamDataSearchRequestValidator {
         return Errors.fromErrors(errors);
     }
 
-    private Optional<Error> validateCreatePlaylist(StreamingDataSearchRequest streamingDataSearchRequest){
-        if (streamingDataSearchRequest.createPlaylist()){
-             if (!spotifyAuthService.isAuthorized(streamingDataSearchRequest.userId())){
-                 return Optional.of(Error.searchRequestUnauthorized("createPlaylist"));
-             }
+    private Optional<Error> validateCreatePlaylist(StreamingDataSearchRequest streamingDataSearchRequest) {
+        if (streamingDataSearchRequest.createPlaylist()) {
+            if (!spotifyAuthService.isAuthorized(streamingDataSearchRequest.userId())) {
+                return Optional.of(Error.searchRequestUnauthorized("createPlaylist"));
+            }
         }
         return Optional.empty();
     }
@@ -71,6 +74,38 @@ public class StreamDataSearchRequestValidator {
         }
         return Optional.empty();
     }
+
+    private Optional<Error> validateDayOfTheWeek(StreamingDataSearchRequest searchRequest) {
+        List<String> validValues = List.of("0", "1", "2", "3", "4", "5", "6");
+        if (searchRequest.dayOfTheWeek() == null || validValues.contains(searchRequest.dayOfTheWeek())) {
+            return Optional.empty();
+        }
+        return Optional.of(Error.requestParamContentViolation("dayOfTheWeek", "dayOfTheWeek must be a valid textual representation of a day. provided - %s".formatted(searchRequest.dayOfTheWeek())));
+    }
+
+    private Optional<Error> validateMonth(StreamingDataSearchRequest searchRequest) {
+        List<String> validValues = List.of("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
+        if (searchRequest.month() == null || validValues.contains(searchRequest.month())) {
+            return Optional.empty();
+        }
+        return Optional.of(Error.requestParamContentViolation("month", "month must be a valid textual representation of a month. provided - %s".formatted(searchRequest.month())));
+    }
+
+    private Optional<Error> validateYear(StreamingDataSearchRequest searchRequest) {
+        try {
+            if (searchRequest.year() == null){
+                return Optional.empty();
+            }
+            int year = Integer.parseInt(searchRequest.year());
+            if (year < 1970 || year > 3000) {
+                return Optional.of(Error.requestParamContentViolation("year", "year must be between 1970-3000. provided - %s".formatted(searchRequest.year())));
+            }
+        } catch (NumberFormatException ignored) {
+            return Optional.of(Error.requestParamContentViolation("year", "year must be between 1970-3000. provided - %s".formatted(searchRequest.year())));
+        }
+        return Optional.empty();
+    }
+
 
     private Optional<Error> validateQueryDatePeriod(StreamingDataSearchRequest streamingDataSearchRequest) {
         if (streamingDataSearchRequest.onDate() != null) {

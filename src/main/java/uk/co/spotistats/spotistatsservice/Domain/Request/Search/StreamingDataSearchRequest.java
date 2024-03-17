@@ -20,11 +20,11 @@ public record StreamingDataSearchRequest(
         Integer limit,
         LocalTime startTime,
         LocalTime endTime,
+        String dayOfTheWeek,
+        String month,
+        String year,
         Boolean createPlaylist
-)
-
-
-{
+) {
     public static final class Builder {
         private String userId;
         private LocalDate startDate;
@@ -40,6 +40,9 @@ public record StreamingDataSearchRequest(
         private Integer limit;
         private LocalTime startTime;
         private LocalTime endTime;
+        private String dayOfTheWeek;
+        private String month;
+        private String year;
         private Boolean createPlaylist;
 
         private Builder() {
@@ -119,13 +122,28 @@ public record StreamingDataSearchRequest(
             return this;
         }
 
+        public Builder withDayOfTheWeek(String dayOfTheWeek) {
+            this.dayOfTheWeek = dayOfTheWeek;
+            return this;
+        }
+
+        public Builder withMonth(String month) {
+            this.month = month;
+            return this;
+        }
+
+        public Builder withYear(String year) {
+            this.year = year;
+            return this;
+        }
+
         public Builder withCreatePlaylist(Boolean createPlaylist) {
             this.createPlaylist = createPlaylist;
             return this;
         }
 
         public StreamingDataSearchRequest build() {
-            return new StreamingDataSearchRequest(userId, startDate, endDate, onDate, country, uri, trackName, artist, album, platform, orderBy, limit, startTime, endTime, createPlaylist);
+            return new StreamingDataSearchRequest(userId, startDate, endDate, onDate, country, uri, trackName, artist, album, platform, orderBy, limit, startTime, endTime, dayOfTheWeek, month, year, createPlaylist);
         }
     }
 
@@ -146,6 +164,9 @@ public record StreamingDataSearchRequest(
                ", limit=" + limit +
                ", startTime=" + startTime +
                ", endTime=" + endTime +
+               ", dayOfTheWeek=" + dayOfTheWeek +
+               ", month=" + month +
+               ", year=" + year +
                ", createPlaylist=" + createPlaylist +
                '}';
     }
@@ -166,6 +187,9 @@ public record StreamingDataSearchRequest(
                 .withPlatform(platform)
                 .withOrderBy(orderBy)
                 .withCreatePlaylist(createPlaylist)
+                .withDayOfTheWeek(dayOfTheWeek)
+                .withMonth(month)
+                .withYear(year)
                 .withLimit(limit);
     }
 }

@@ -20,6 +20,9 @@ public enum ConditionBuilder {
     START_DATE(startDate -> STREAM_DATA.DATE.ge((LocalDate) startDate), StreamingDataSearchRequest::startDate),
     END_DATE(endDate -> STREAM_DATA.DATE.le((LocalDate) endDate), StreamingDataSearchRequest::endDate),
     START_TIME(startTime -> STREAM_DATA.TIME.ge((LocalTime) startTime), StreamingDataSearchRequest::startTime),
+    DAY_OF_THE_WEEK(dayOfTheWeek -> STREAM_DATA.DAY_OF_THE_WEEK.eq(Short.parseShort((String) dayOfTheWeek)), StreamingDataSearchRequest::dayOfTheWeek),
+    MONTH(month -> STREAM_DATA.MONTH.eq(Short.parseShort((String) month)), StreamingDataSearchRequest::month),
+    YEAR(year -> STREAM_DATA.YEAR.eq(Short.parseShort((String) year)), StreamingDataSearchRequest::year),
     END_TIME(endTime -> STREAM_DATA.TIME.le((LocalTime) endTime), StreamingDataSearchRequest::endTime);
 
     private final Function<Object, Condition> condition;

@@ -5,11 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import uk.co.spotistats.spotistatsservice.Domain.Response.Upload.StreamingDataUpsertResult;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Upload.StreamingDataUpsertResult;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import static uk.co.spotistats.generated.Tables.STREAM_DATA;
@@ -22,7 +23,15 @@ public class StreamingDataUploadRepository {
     private final DSLContext db;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamingDataUploadRepository.class);
-
+    private final static Map<Integer, Short> javaToSqlDayOfTheWeek = Map.of(
+            7, (short) 0,
+            6, (short) 5,
+            5, (short) 4,
+            4, (short) 3,
+            3, (short) 2,
+            2, (short) 1,
+            1, (short) 0
+    );
 
     public StreamingDataUploadRepository(DSLContext db) {
         this.db = db;
@@ -62,6 +71,9 @@ public class StreamingDataUploadRepository {
                 .set(STREAM_DATA.TRACK_NAME, streamData.name())
                 .set(STREAM_DATA.PLATFORM, streamData.platform())
                 .set(STREAM_DATA.TIME, streamData.streamDateTime().toLocalTime())
+                .set(STREAM_DATA.DAY_OF_THE_WEEK, javaToSqlDayOfTheWeek.get(streamData.streamDateTime().getDayOfWeek().getValue()))
+                .set(STREAM_DATA.MONTH, (short) streamData.streamDateTime().getMonthValue())
+                .set(STREAM_DATA.YEAR, (short) streamData.streamDateTime().getYear())
                 .set(STREAM_DATA.COUNTRY, streamData.country()).execute();
     }
 
