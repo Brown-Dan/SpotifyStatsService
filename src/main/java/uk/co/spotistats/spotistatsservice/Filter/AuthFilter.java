@@ -26,7 +26,7 @@ public class AuthFilter extends OncePerRequestFilter {
     private final JWTVerifier jwtVerifier;
     private final ObjectMapper objectMapper;
 
-    private static final Set<String> UNFILTERED_ENDPOINTS = Set.of("/spotify/login", "/spotify/authenticate/callback");
+    private static final Set<String> UNFILTERED_ENDPOINTS = Set.of("/login", "/authenticate/callback", "/token/refresh");
 
     public AuthFilter(JWTVerifier jwtVerifier, ObjectMapper objectMapper) {
         this.jwtVerifier = jwtVerifier;
