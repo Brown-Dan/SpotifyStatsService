@@ -7,11 +7,11 @@ public record AdvancedRankedTrack(int ranking,
                                   String artistName,
                                   String albumName,
                                   String trackUri,
+                                  LocalDateTime firstStreamedDate,
                                   LocalDateTime lastStreamedDate,
                                   int totalMinutesPlayed,
                                   int totalMsPlayed,
                                   int totalStreams) {
-
 
     public static final class Builder {
         private int ranking;
@@ -19,6 +19,7 @@ public record AdvancedRankedTrack(int ranking,
         private String artistName;
         private String albumName;
         private String trackUri;
+        private LocalDateTime firstStreamedDate;
         private LocalDateTime lastStreamedDate;
         private int totalMinutesPlayed;
         private int totalMsPlayed;
@@ -56,6 +57,11 @@ public record AdvancedRankedTrack(int ranking,
             return this;
         }
 
+        public Builder withFirstStreamedDate(LocalDateTime firstStreamedDate) {
+            this.firstStreamedDate = firstStreamedDate;
+            return this;
+        }
+
         public Builder withLastStreamedDate(LocalDateTime lastStreamedDate) {
             this.lastStreamedDate = lastStreamedDate;
             return this;
@@ -77,7 +83,7 @@ public record AdvancedRankedTrack(int ranking,
         }
 
         public AdvancedRankedTrack build() {
-            return new AdvancedRankedTrack(ranking, trackName, artistName, albumName, trackUri, lastStreamedDate, totalMinutesPlayed, totalMsPlayed, totalStreams);
+            return new AdvancedRankedTrack(ranking, trackName, artistName, albumName, trackUri, firstStreamedDate, lastStreamedDate, totalMinutesPlayed, totalMsPlayed, totalStreams);
         }
     }
 }
