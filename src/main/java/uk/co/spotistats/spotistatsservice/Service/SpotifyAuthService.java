@@ -134,7 +134,7 @@ public class SpotifyAuthService {
 
     private String getJwtToken(String username){
         return JWT.create()
-                .withIssuer("spotiStatsService")
+                .withIssuer("SpotiStatsService")
                 .withSubject(username)
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plusSeconds(7200))
