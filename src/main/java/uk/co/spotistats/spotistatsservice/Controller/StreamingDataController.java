@@ -48,7 +48,7 @@ public class StreamingDataController {
         return get(streamingDataService::getRecentStreams, streamingDataRequestCleaner.clean(searchRequest, userId));
     }
 
-    @GetMapping(value = "tracks//search")
+    @GetMapping(value = "tracks/search")
     public ResponseEntity<ApiResult<SearchResponse, Errors>> search(@RequestAttribute String userId, StreamingDataSearchRequest searchRequest) {
         return get(streamingDataService::search, streamingDataRequestCleaner.clean(searchRequest, userId));
     }
