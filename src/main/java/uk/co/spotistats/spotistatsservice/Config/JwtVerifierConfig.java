@@ -12,14 +12,14 @@ public class JwtVerifierConfig {
 
     @Bean
     public JWTVerifier getJwtVerifier(){
-        Algorithm algorithm = Algorithm.HMAC256("SpotiStatsService");
+        Algorithm algorithm = Algorithm.HMAC256(System.getenv("SECRET"));
         return JWT.require(algorithm)
-                .withIssuer("SpotiStatsService")
+                .withIssuer(System.getenv("SECRET"))
                 .build();
     }
 
     @Bean
     public Algorithm getAlgorithm(){
-        return Algorithm.HMAC256("SpotiStatsService");
+        return Algorithm.HMAC256(System.getenv("SECRET"));
     }
 }
