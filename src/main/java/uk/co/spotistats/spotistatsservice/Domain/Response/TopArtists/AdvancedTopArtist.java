@@ -3,7 +3,7 @@ package uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record AdvancedTopArtist(String name, String spotifyUri, Integer popularity, String spotifyProfileLink,
+public record AdvancedTopArtist(String name, String spotifyUri, Integer popularity,
                                 List<String> genres, Integer totalMinutesStreamed, Long totalMsStreamed,
                                 LocalDateTime firstStreamedDate, LocalDateTime lastStreamedDate, Integer totalStreams) {
 
@@ -11,7 +11,6 @@ public record AdvancedTopArtist(String name, String spotifyUri, Integer populari
         private String name;
         private String spotifyUri;
         private Integer popularity;
-        private String spotifyProfileLink;
         private List<String> genres;
         private Integer totalMinutesStreamed;
         private Long totalMsStreamed;
@@ -38,11 +37,6 @@ public record AdvancedTopArtist(String name, String spotifyUri, Integer populari
 
         public Builder withPopularity(Integer popularity) {
             this.popularity = popularity;
-            return this;
-        }
-
-        public Builder withSpotifyProfileLink(String spotifyProfileLink) {
-            this.spotifyProfileLink = spotifyProfileLink;
             return this;
         }
 
@@ -77,7 +71,7 @@ public record AdvancedTopArtist(String name, String spotifyUri, Integer populari
         }
 
         public AdvancedTopArtist build() {
-            return new AdvancedTopArtist(name, spotifyUri, popularity, spotifyProfileLink, genres, totalMinutesStreamed, totalMsStreamed, firstStreamedDate, lastStreamedDate, totalStreams);
+            return new AdvancedTopArtist(name, spotifyUri, popularity, genres, totalMinutesStreamed, totalMsStreamed, firstStreamedDate, lastStreamedDate, totalStreams);
         }
     }
 }

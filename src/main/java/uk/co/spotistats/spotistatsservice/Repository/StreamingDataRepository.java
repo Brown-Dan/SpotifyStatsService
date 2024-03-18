@@ -3,6 +3,7 @@ package uk.co.spotistats.spotistatsservice.Repository;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
+import uk.co.spotistats.generated.tables.pojos.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Search.ConditionBuilder;
@@ -12,6 +13,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponseTrack;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,10 +69,13 @@ public class StreamingDataRepository {
                     .withTracks(List.of())
                     .build();
         }
+
+        List<LocalDateTime> times = streamData.stream().map(StreamData::getDateTime).sorted().toList();
+
         return aSearchResponse()
                 .withTracks(streamData.stream().map(this::mapStreamDataEntityToSearchResponseTrack).toList())
-                .withFirstStreamDate(streamData.getFirst().getDateTime())
-                .withLastStreamDate(streamData.getLast().getDateTime())
+                .withFirstStreamDate(times.getFirst())
+                .withLastStreamDate(times.getLast())
                 .withSize(streamData.size())
                 .withTotalStreamTimeMinutes(((int) streamData.stream().mapToLong(uk.co.spotistats.generated.tables.pojos.StreamData::getTimeStreamed).sum() / 1000) / 60)
                 .build();
