@@ -54,6 +54,7 @@ public class StreamingDataRequestCleaner {
             cleanedSearchRequest.withMonth(Month.valueOf(searchRequest.month().toUpperCase()).getDbRepresentation().toString());
         }
         return cleanedSearchRequest
+                .withLimit(searchRequest.limit() == null ? 10 : searchRequest.limit())
                 .withCreatePlaylist(searchRequest.createPlaylist() != null && searchRequest.createPlaylist())
                 .withUserId(userId)
                 .build();

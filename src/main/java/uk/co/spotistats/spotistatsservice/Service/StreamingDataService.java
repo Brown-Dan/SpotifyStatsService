@@ -61,7 +61,7 @@ public class StreamingDataService {
         this.topArtistsSearchRequestValidator = topArtistsSearchRequestValidator;
     }
 
-    public Result<RecentTracks, Errors> getRecentStreams(RecentTracksSearchRequest searchRequest) {
+    public Result<RecentTracks, Errors> getRecentTracks(RecentTracksSearchRequest searchRequest) {
         Errors validationErrors = recentTracksSearchRequestValidator.validate(searchRequest);
         if (validationErrors.hasErrors()) {
             return failure(validationErrors);
@@ -141,7 +141,7 @@ public class StreamingDataService {
     public void syncRecentStreamData(StreamingData streamingData) {
         LOG.info("Syncing streaming data for user - {}", streamingData.username());
         RecentTracksSearchRequest recentTracksSearchRequest = aRecentTracksSearchRequest().withCreatePlaylist(false).withUserId(streamingData.username()).withLimit(50).build();
-        Result<RecentTracks, Errors> recentTracksResult = getRecentStreams(recentTracksSearchRequest);
+        Result<RecentTracks, Errors> recentTracksResult = getRecentTracks(recentTracksSearchRequest);
         if (recentTracksResult.isFailure()) {
             LOG.error("Failure syncing streaming data for user - {}", streamingData.username());
             return;
