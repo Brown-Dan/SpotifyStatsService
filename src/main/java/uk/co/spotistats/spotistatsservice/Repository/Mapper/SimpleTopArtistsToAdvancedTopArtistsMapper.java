@@ -9,7 +9,10 @@ import uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSea
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponseTrack;
-import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.*;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.AdvancedTopArtist;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.SimpleTopArtist;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.SimpleTopArtists;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.TopArtists;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
@@ -45,7 +48,6 @@ public class SimpleTopArtistsToAdvancedTopArtistsMapper {
                 .build());
     }
 
-
     private AdvancedTopArtist mapSimpleArtistToAdvancedArtist(SimpleTopArtist simpleTopArtist, StreamingDataSearchRequest.Builder searchRequest) {
         SearchResponse searchResponse = streamingDataRepository.search(searchRequest.withArtist(simpleTopArtist.name()).build());
 
@@ -53,9 +55,11 @@ public class SimpleTopArtistsToAdvancedTopArtistsMapper {
 
         return anAdvancedTopArtist()
                 .withName(simpleTopArtist.name())
+                .withImage(simpleTopArtist.image())
                 .withGenres(simpleTopArtist.genres())
                 .withPopularity(simpleTopArtist.popularity())
                 .withSpotifyUri(simpleTopArtist.spotifyUri())
+                .withImage(simpleTopArtist.image())
                 .withFirstStreamedDate(searchResponse.tracks().isEmpty() ? null : searchResponse.tracks().getFirst().streamDateTime())
                 .withLastStreamedDate(searchResponse.tracks().isEmpty() ? null : searchResponse.tracks().getLast().streamDateTime())
                 .withTotalMsStreamed(totalMsStreamed)

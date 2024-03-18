@@ -71,6 +71,7 @@ public class StreamingDataToRankedTracksMapper {
     private SimpleRankedTrack mapSimpleTrackData(StreamData streamData, Integer rank) {
         return aSimpleRankedTrack()
                 .withAlbum(streamData.album())
+                .withImage(streamData.image())
                 .withArtist(streamData.artist())
                 .withLengthMs(streamData.timeStreamed())
                 .withRank(rank)
@@ -88,6 +89,7 @@ public class StreamingDataToRankedTracksMapper {
                 .withTotalMsPlayed((int) totalTimeStreamed)
                 .withTrackName(streamData.name())
                 .withRanking(rank)
+                .withImageUrl(streamData.image())
                 .withTotalMinutesPlayed(((int) totalTimeStreamed / 1000) / 60)
                 .withArtistName(streamData.artist())
                 .withAlbumName(streamData.album())
