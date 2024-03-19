@@ -123,7 +123,7 @@ public class SpotifyResponseMapper {
         return aSimpleTopArtist()
                 .withName(artist.get("name").asText())
                 .withGenres(genres)
-                .withImage(mapImage(imagesList.isEmpty() ? null : imagesList.getFirst()))
+                .withImage(mapImage(imagesList.isEmpty() ? null : imagesList.getLast()))
                 .withPopularity(artist.get("popularity").asInt())
                 .withSpotifyUri(artist.get("uri").asText())
                 .build();
@@ -155,7 +155,6 @@ public class SpotifyResponseMapper {
                 .withWidth(image.getInteger("width"))
                 .build();
     }
-
 
     public Playlist toPlaylist(JSONObject json) {
         return aPlaylist()

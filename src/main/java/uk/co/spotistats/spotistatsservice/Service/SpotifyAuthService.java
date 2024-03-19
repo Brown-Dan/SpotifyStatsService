@@ -8,6 +8,8 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.net.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
@@ -39,6 +41,9 @@ public class SpotifyAuthService {
     private final Algorithm algorithm;
 
     private static final String REDIRECT_URL = "http://localhost:8080/authenticate/callback";
+
+    private static final Logger LOG = LoggerFactory.getLogger(SpotifyAuthService.class);
+
 
     public SpotifyAuthService(SpotifyResponseMapper spotifyResponseMapper, SpotifyAuthRepository spotifyAuthRepository, SpotifyClient spotifyClient, JWTVerifier jwtVerifier, Algorithm algorithm) {
         this.spotifyResponseMapper = spotifyResponseMapper;
@@ -87,6 +92,7 @@ public class SpotifyAuthService {
     }
 
     public Result<String, Errors> exchangeAccessToken(String accessToken) {
+        LOG.info("Exchanging access token");
         Result<SpotifyAuthData, SpotifyRequestError> exchangeAccessTokenResult = spotifyClient.withAuthorization(System.getenv("SPOTIFY_BASE_64_AUTH"))
                 .withContentType(ContentType.APPLICATION_FORM_URLENCODED)
                 .exchangeAccessToken()
@@ -149,7 +155,7 @@ public class SpotifyAuthService {
 
     private String getJwtToken(String username) {
         return JWT.create()
-                .withIssuer("test")
+                .withIssuer("SpotiStatsService")
                 .withSubject(username)
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plusSeconds(7200))

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.co.spotistats.spotistatsservice.Controller.Cleaner.StreamingDataRequestCleaner;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
@@ -16,6 +17,7 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.AdvancedTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.AdvancedTopArtist;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.TopArtists;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracks;
 import uk.co.spotistats.spotistatsservice.Service.StreamingDataService;
@@ -56,6 +58,11 @@ public class StreamingDataController {
     @GetMapping(value = "artists/top")
     public ResponseEntity<ApiResult<TopArtists, Errors>> getTopArtists(@RequestAttribute String userId, TopArtistsSearchRequest searchRequest){
         return get(streamingDataService::getTopArtists, streamingDataRequestCleaner.clean(searchRequest, userId));
+    }
+
+    @GetMapping(value = "artists/search")
+    public ResponseEntity<ApiResult<AdvancedTopArtist, Errors>> getArtist(@RequestAttribute String userId, @RequestParam String artistName){
+        return get(streamingDataService::getArtist, streamingDataRequestCleaner.cleanArtist(userId, artistName));
     }
 
     private <T, U> ResponseEntity<ApiResult<T, Errors>> get(Function<U, Result<T, Errors>> function, U parameter) {
