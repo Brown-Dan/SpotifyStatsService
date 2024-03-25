@@ -30,6 +30,9 @@ SpotiStatsService is a simple web service that allows users to upload and query 
 - **Data Upload**: `/data/upload`
   - **Multipart Request**:
     - Upload your Spotify streaming history JSON file (max 20MB) with the name "StreamingDataFile".
+   
+- **Tracks/get**
+- **Artist/get** 
 
 ### Search
 
