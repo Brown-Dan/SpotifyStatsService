@@ -40,7 +40,7 @@ public class SpotifyAuthService {
     private final JWTVerifier jwtVerifier;
     private final Algorithm algorithm;
 
-    private static final String REDIRECT_URL = "http://localhost:8080/authenticate/callback";
+    private static final String REDIRECT_URL = "https://spotify-stats-service-541cae0ce77e.herokuapp.com/authenticate/callback";
 
     private static final Logger LOG = LoggerFactory.getLogger(SpotifyAuthService.class);
 
