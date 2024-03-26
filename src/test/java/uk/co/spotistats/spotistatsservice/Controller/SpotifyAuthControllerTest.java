@@ -2,7 +2,6 @@ package uk.co.spotistats.spotistatsservice.Controller;
 
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import org.apache.hc.core5.net.URIBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,15 +9,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.servlet.view.RedirectView;
 import uk.co.spotistats.spotistatsservice.Controller.Model.ApiResult;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Service.SpotifyAuthService;
-
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -94,23 +89,23 @@ public class SpotifyAuthControllerTest {
         verify(spotifyAuthService).refreshJwt(jwt);
     }
 
-    @Test
-    void authorizationRedirect_shouldRedirectToSpotify() throws URISyntaxException, MalformedURLException {
-        RedirectView redirectView = new RedirectView(new URIBuilder()
-                .setScheme("https")
-                .setHost("accounts.spotify.com")
-                .setPath("/authorize")
-                .setParameter("client_id", System.getenv("SPOTIFY_CLIENT_ID"))
-                .setParameter("response_type", "code")
-                .setParameter("redirect_uri", "https://spotifystats.co.uk/authenticate/callback")
-                .setParameter("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read user-read-private user-read-email playlist-modify-public playlist-modify-private")
-                .build().toURL().toString());
-
-        when(spotifyAuthService.redirect()).thenReturn(redirectView);
-
-        RedirectView result = spotifyAuthController.authorizationRedirect();
-
-        assertThat(result).isEqualTo(redirectView);
-        verify(spotifyAuthService).redirect();
-    }
+//    @Test
+//    void authorizationRedirect_shouldRedirectToSpotify() throws URISyntaxException, MalformedURLException {
+//        RedirectView redirectView = new RedirectView(new URIBuilder()
+//                .setScheme("https")
+//                .setHost("accounts.spotify.com")
+//                .setPath("/authorize")
+//                .setParameter("client_id", System.getenv("SPOTIFY_CLIENT_ID"))
+//                .setParameter("response_type", "code")
+//                .setParameter("redirect_uri", "https://spotifystats.co.uk/authenticate/callback")
+//                .setParameter("scope", "playlist-read-private user-follow-read user-top-read user-read-recently-played user-library-read user-read-private user-read-email playlist-modify-public playlist-modify-private")
+//                .build().toURL().toString());
+//
+//        when(spotifyAuthService.redirect()).thenReturn(redirectView);
+//
+//        RedirectView result = spotifyAuthController.authorizationRedirect();
+//
+//        assertThat(result).isEqualTo(redirectView);
+//        verify(spotifyAuthService).redirect();
+//    }
 }

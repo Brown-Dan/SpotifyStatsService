@@ -1,5 +1,7 @@
 package uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Advanced;
 
+import uk.co.spotistats.spotistatsservice.Domain.Model.Image;
+
 import java.time.LocalDateTime;
 
 public record AdvancedRankedTrack(int ranking,
@@ -11,7 +13,9 @@ public record AdvancedRankedTrack(int ranking,
                                   LocalDateTime lastStreamedDate,
                                   int totalMinutesPlayed,
                                   int totalMsPlayed,
-                                  int totalStreams) {
+                                  int totalStreams,
+                                  Image imageUrl
+) {
 
     public static final class Builder {
         private int ranking;
@@ -24,6 +28,7 @@ public record AdvancedRankedTrack(int ranking,
         private int totalMinutesPlayed;
         private int totalMsPlayed;
         private int totalStreams;
+        private Image imageUrl;
 
         private Builder() {
         }
@@ -82,8 +87,13 @@ public record AdvancedRankedTrack(int ranking,
             return this;
         }
 
+        public Builder withImageUrl(Image imageUrl) {
+            this.imageUrl = imageUrl;
+            return this;
+        }
+
         public AdvancedRankedTrack build() {
-            return new AdvancedRankedTrack(ranking, trackName, artistName, albumName, trackUri, firstStreamedDate, lastStreamedDate, totalMinutesPlayed, totalMsPlayed, totalStreams);
+            return new AdvancedRankedTrack(ranking, trackName, artistName, albumName, trackUri, firstStreamedDate, lastStreamedDate, totalMinutesPlayed, totalMsPlayed, totalStreams, imageUrl);
         }
     }
 }

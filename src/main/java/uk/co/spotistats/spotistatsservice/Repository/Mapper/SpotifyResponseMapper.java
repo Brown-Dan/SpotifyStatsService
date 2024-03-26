@@ -1,13 +1,16 @@
 package uk.co.spotistats.spotistatsservice.Repository.Mapper;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.co.spotistats.spotistatsservice.Domain.Model.Image;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamData;
 import uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData;
+import uk.co.spotistats.spotistatsservice.Domain.Model.User;
 import uk.co.spotistats.spotistatsservice.Domain.Request.Playlist;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTrack;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
@@ -23,8 +26,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
+import static uk.co.spotistats.spotistatsservice.Domain.Model.Image.Builder.anImage;
 import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamData.Builder.aStreamData;
 import static uk.co.spotistats.spotistatsservice.Domain.Model.StreamingData.Builder.someStreamingData;
+import static uk.co.spotistats.spotistatsservice.Domain.Model.User.Builder.anUser;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Playlist.Builder.aPlaylist;
 import static uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTrack.Builder.aRecentTrack;
 import static uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks.Builder.someRecentTracks;
@@ -109,9 +114,16 @@ public class SpotifyResponseMapper {
                 genres.add(genreNode.asText());
             }
         }
+        JsonNode images = artist.get("images");
+        List<JSONObject> imagesList = new ArrayList<>();
+        for (JsonNode image : images){
+            imagesList.add(JSON.parseObject(image.toPrettyString()));
+        }
+
         return aSimpleTopArtist()
                 .withName(artist.get("name").asText())
                 .withGenres(genres)
+                .withImage(mapImage(imagesList.isEmpty() ? null : imagesList.getLast()))
                 .withPopularity(artist.get("popularity").asInt())
                 .withSpotifyUri(artist.get("uri").asText())
                 .build();
@@ -125,8 +137,23 @@ public class SpotifyResponseMapper {
         return objectMapper.convertValue(jsonObject, SpotifyAuthData.class);
     }
 
-    public String toUserProfile(JSONObject jsonObject) {
-        return jsonObject.get("id").toString();
+    public User toUserProfile(JSONObject jsonObject) {
+        return anUser()
+                .withId(jsonObject.get("id").toString())
+                .withUrl(jsonObject.get("uri").toString())
+                .withImage(mapImage(jsonObject.getJSONArray("images").isEmpty() ? null :  jsonObject.getJSONArray("images").getJSONObject(0)))
+                .build();
+    };
+
+    public Image mapImage(JSONObject image){
+        if (image == null){
+            return null;
+        }
+        return anImage()
+                .withUri(image.getString("url"))
+                .withHeight(image.getInteger("height"))
+                .withWidth(image.getInteger("width"))
+                .build();
     }
 
     public Playlist toPlaylist(JSONObject json) {
@@ -139,10 +166,17 @@ public class SpotifyResponseMapper {
     }
 
     private StreamData.Builder toStreamData(JsonNode track) {
+        JsonNode images = track.get("album").get("images");
+        List<JSONObject> imagesList = new ArrayList<>();
+        for (JsonNode image : images){
+            imagesList.add(JSON.parseObject(image.toPrettyString()));
+        }
+
         return aStreamData()
                 .withAlbum(track.get("album").get("name").asText())
                 .withArtist(track.get("artists").get(0).get("name").asText())
                 .withName(track.get("name").asText())
+                .withImage(mapImage(imagesList.isEmpty() ? null : imagesList.getFirst()))
                 .withTrackUri(track.get("uri").asText())
                 .withTimeStreamed(track.get("duration_ms").asLong());
     }

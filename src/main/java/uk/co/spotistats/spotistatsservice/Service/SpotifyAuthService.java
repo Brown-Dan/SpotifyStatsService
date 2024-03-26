@@ -8,10 +8,13 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.net.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
 import uk.co.spotistats.spotistatsservice.Controller.Model.Errors;
 import uk.co.spotistats.spotistatsservice.Domain.Model.Error;
+import uk.co.spotistats.spotistatsservice.Domain.Model.User;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyRefreshTokenResponse;
@@ -37,7 +40,10 @@ public class SpotifyAuthService {
     private final JWTVerifier jwtVerifier;
     private final Algorithm algorithm;
 
-    private static final String REDIRECT_URL = "https://spotifystats.co.uk/authenticate/callback";
+    private static final String REDIRECT_URL = "http://localhost:8080/authenticate/callback";
+
+    private static final Logger LOG = LoggerFactory.getLogger(SpotifyAuthService.class);
+
 
     public SpotifyAuthService(SpotifyResponseMapper spotifyResponseMapper, SpotifyAuthRepository spotifyAuthRepository, SpotifyClient spotifyClient, JWTVerifier jwtVerifier, Algorithm algorithm) {
         this.spotifyResponseMapper = spotifyResponseMapper;
@@ -86,6 +92,7 @@ public class SpotifyAuthService {
     }
 
     public Result<String, Errors> exchangeAccessToken(String accessToken) {
+        LOG.info("Exchanging access token");
         Result<SpotifyAuthData, SpotifyRequestError> exchangeAccessTokenResult = spotifyClient.withAuthorization(System.getenv("SPOTIFY_BASE_64_AUTH"))
                 .withContentType(ContentType.APPLICATION_FORM_URLENCODED)
                 .exchangeAccessToken()
@@ -97,18 +104,18 @@ public class SpotifyAuthService {
         if (exchangeAccessTokenResult.isFailure()) {
             return failure(Errors.fromSpotifyRequestError(exchangeAccessTokenResult.getError()));
         }
-        Result<String, Errors> getUserIdResult = getUserId(exchangeAccessTokenResult.getValue());
+        Result<User, Errors> getUserIdResult = getUserProfile(exchangeAccessTokenResult.getValue());
 
         if (getUserIdResult.isFailure()) {
             return failure(getUserIdResult.getError());
         }
-        SpotifyAuthData insertedSpotifyAuthData = insertSpotifyAuthData(exchangeAccessTokenResult.getValue().cloneBuilder().withUserId(getUserIdResult.getValue()).build());
+        SpotifyAuthData insertedSpotifyAuthData = insertSpotifyAuthData(exchangeAccessTokenResult.getValue().cloneBuilder().withUserId(getUserIdResult.getValue().id()).build());
 
         return success(getJwtToken(insertedSpotifyAuthData.userId()));
     }
 
-    private Result<String, Errors> getUserId(SpotifyAuthData spotifyAuthData) {
-        Result<String, SpotifyRequestError> result = spotifyClient
+    public Result<User, Errors> getUserProfile(SpotifyAuthData spotifyAuthData) {
+        Result<User, SpotifyRequestError> result = spotifyClient
                 .withAccessToken(spotifyAuthData.accessToken())
                 .getUserProfile()
                 .fetchInto(JSONObject.class)
@@ -116,7 +123,7 @@ public class SpotifyAuthService {
 
         return switch (result) {
             case Result.Failure(SpotifyRequestError error) -> failure(error);
-            case Result.Success(String userId) -> success(userId);
+            case Result.Success(User userId) -> success(userId);
         };
     }
 
@@ -148,7 +155,7 @@ public class SpotifyAuthService {
 
     private String getJwtToken(String username) {
         return JWT.create()
-                .withIssuer(System.getenv("SECRET"))
+                .withIssuer("SpotiStatsService")
                 .withSubject(username)
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plusSeconds(7200))

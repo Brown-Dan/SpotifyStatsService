@@ -15,7 +15,8 @@ public record StreamData(
         @JsonProperty("master_metadata_track_name") String name,
         @JsonProperty("master_metadata_album_artist_name") String artist,
         @JsonProperty("master_metadata_album_album_name") String album,
-        @JsonProperty("platform") String platform) {
+        @JsonProperty("platform") String platform,
+        Image image) {
 
     public static StreamData fromRecentTrack(RecentTrack recentTrack){
         return aStreamData()
@@ -37,6 +38,7 @@ public record StreamData(
         private String artist;
         private String album;
         private String platform;
+        private Image image;
 
         private Builder() {
         }
@@ -85,8 +87,13 @@ public record StreamData(
             return this;
         }
 
+        public Builder withImage(Image image) {
+            this.image = image;
+            return this;
+        }
+
         public StreamData build() {
-            return new StreamData(streamDateTime, country, timeStreamed, trackUri, name, artist, album, platform);
+            return new StreamData(streamDateTime, country, timeStreamed, trackUri, name, artist, album, platform, image);
         }
     }
 }

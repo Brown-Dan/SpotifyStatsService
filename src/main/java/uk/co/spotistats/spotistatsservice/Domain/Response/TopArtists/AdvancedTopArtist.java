@@ -1,11 +1,14 @@
 package uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists;
 
+import uk.co.spotistats.spotistatsservice.Domain.Model.Image;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 public record AdvancedTopArtist(String name, String spotifyUri, Integer popularity,
                                 List<String> genres, Integer totalMinutesStreamed, Long totalMsStreamed,
-                                LocalDateTime firstStreamedDate, LocalDateTime lastStreamedDate, Integer totalStreams) {
+                                LocalDateTime firstStreamedDate, LocalDateTime lastStreamedDate, Integer totalStreams, Image image) {
+
 
     public static final class Builder {
         private String name;
@@ -17,6 +20,7 @@ public record AdvancedTopArtist(String name, String spotifyUri, Integer populari
         private LocalDateTime firstStreamedDate;
         private LocalDateTime lastStreamedDate;
         private Integer totalStreams;
+        private Image image;
 
         private Builder() {
         }
@@ -70,8 +74,13 @@ public record AdvancedTopArtist(String name, String spotifyUri, Integer populari
             return this;
         }
 
+        public Builder withImage(Image image) {
+            this.image = image;
+            return this;
+        }
+
         public AdvancedTopArtist build() {
-            return new AdvancedTopArtist(name, spotifyUri, popularity, genres, totalMinutesStreamed, totalMsStreamed, firstStreamedDate, lastStreamedDate, totalStreams);
+            return new AdvancedTopArtist(name, spotifyUri, popularity, genres, totalMinutesStreamed, totalMsStreamed, firstStreamedDate, lastStreamedDate, totalStreams, image);
         }
     }
 }

@@ -16,6 +16,8 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.Api.ErrorKey;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Api.Result;
 import uk.co.spotistats.spotistatsservice.Domain.Response.RecentTracks.RecentTracks;
 import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponse;
+import uk.co.spotistats.spotistatsservice.Domain.Response.Search.SearchResponseTrack;
+import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.AdvancedTopArtist;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.TopArtists;
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.TopTracks;
 import uk.co.spotistats.spotistatsservice.Domain.SpotifyAuth.SpotifyAuthData;
@@ -32,6 +34,7 @@ import java.util.List;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.RecentTracksSearchRequest.Builder.aRecentTracksSearchRequest;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamDataSearchRequestOrderBy.DATE_ASC;
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
+import static uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.AdvancedTopArtist.Builder.anAdvancedTopArtist;
 
 @Service
 @EnableAsync
@@ -99,6 +102,34 @@ public class StreamingDataService {
             return failure(spotifyAuthDataResult.getError());
         }
         return spotifyRepository.getTopArtists(searchRequest.cloneBuilder().withAuthData(spotifyAuthDataResult.getValue()).build());
+    }
+
+    public Result<AdvancedTopArtist, Errors> getArtist(ArtistSearchRequest searchRequest) {
+        Result<StreamingData, Error> streamingData = streamingDataRepository.getStreamingData(searchRequest.userId());
+
+        if (streamingData.isFailure()) {
+            return failure(Errors.fromError(new Error(null, "uploaded streaming data is required to get advanced artist data", ErrorKey.STREAMING_DATA_NOT_UPLOADED)));
+        }
+
+        StreamingDataSearchRequest streamingDataSearchRequest = aStreamingDataSearchRequest()
+                .withOrderBy(DATE_ASC.toString())
+                .withArtist(searchRequest.artistName())
+                .withStartDate(streamingData.getValue().firstStreamDateTime().toLocalDate())
+                .withEndDate(streamingData.getValue().lastStreamDateTime().toLocalDate())
+                .withUserId(searchRequest.userId()).build();
+
+        SearchResponse searchResponse= streamingDataRepository.search(streamingDataSearchRequest);
+
+        long totalMsStreamed = searchResponse.tracks().stream().mapToLong(SearchResponseTrack::totalMsPlayed).sum();
+
+        return success(anAdvancedTopArtist()
+                .withName(searchRequest.artistName())
+                .withFirstStreamedDate(searchResponse.tracks().isEmpty() ? null : searchResponse.tracks().getFirst().streamDateTime())
+                .withLastStreamedDate(searchResponse.tracks().isEmpty() ? null : searchResponse.tracks().getLast().streamDateTime())
+                .withTotalMsStreamed(totalMsStreamed)
+                .withTotalStreams(searchResponse.tracks().size())
+                .withTotalMinutesStreamed(((int) totalMsStreamed / 1000) / 60)
+                .build());
     }
 
     public Result<AdvancedTrack, Errors> getByTrackUri(TrackUriSearchRequest trackUriSearchRequest) {

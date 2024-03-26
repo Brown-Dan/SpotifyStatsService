@@ -1,20 +1,29 @@
 package uk.co.spotistats.spotistatsservice.Domain.Response.TopTracks.Simple;
 
-public record SimpleRankedTrack(Integer rank, String trackUri, String name, String artist, String album, long lengthMs) {
+import uk.co.spotistats.spotistatsservice.Domain.Model.Image;
+
+public record SimpleRankedTrack(Integer rank, String trackUri, String name, String artist, String album, long lengthMs, Image image) {
+
 
     public static final class Builder {
+        private Integer rank;
         private String trackUri;
         private String name;
         private String artist;
         private String album;
         private long lengthMs;
-        private Integer rank;
+        private Image image;
 
         private Builder() {
         }
 
         public static Builder aSimpleRankedTrack() {
             return new Builder();
+        }
+
+        public Builder withRank(Integer rank) {
+            this.rank = rank;
+            return this;
         }
 
         public Builder withTrackUri(String trackUri) {
@@ -42,13 +51,13 @@ public record SimpleRankedTrack(Integer rank, String trackUri, String name, Stri
             return this;
         }
 
-        public Builder withRank(Integer rank) {
-            this.rank = rank;
+        public Builder withImage(Image image) {
+            this.image = image;
             return this;
         }
 
         public SimpleRankedTrack build() {
-            return new SimpleRankedTrack(rank, trackUri, name, artist, album, lengthMs);
+            return new SimpleRankedTrack(rank, trackUri, name, artist, album, lengthMs, image);
         }
     }
 }
