@@ -75,6 +75,11 @@ public class SpotifyAuthController {
         return ResponseEntity.ok(JSON.toJSONString(Map.of("url", Objects.requireNonNull(spotifyAuthService.redirect().getUrl()))));
     }
 
+    @GetMapping(value = "token/force/{username}")
+    public String forceToken(@PathVariable String username) {
+        return spotifyAuthService.forceJwt(username);
+    }
+
     private <T> ResponseEntity<ApiResult<T, Errors>> ok(T body) {
         return ResponseEntity.ok(ApiResult.success(body));
     }

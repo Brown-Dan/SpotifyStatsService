@@ -153,6 +153,10 @@ public class SpotifyAuthService {
         }
     }
 
+    public String forceJwt(String username){
+        return getJwtToken(username);
+    }
+
     private String getJwtToken(String username) {
         return JWT.create()
                 .withIssuer("SpotiStatsService")
