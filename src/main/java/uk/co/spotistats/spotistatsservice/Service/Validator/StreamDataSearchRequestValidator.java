@@ -23,7 +23,7 @@ public class StreamDataSearchRequestValidator {
 
     public Errors validate(StreamingDataSearchRequest streamingDataSearchRequest) {
         List<Error> errors = new ArrayList<>();
-        validateQueryDatePeriod(streamingDataSearchRequest).ifPresent(errors::add);
+//        validateQueryDatePeriod(streamingDataSearchRequest).ifPresent(errors::add);
         validateDayOfTheWeek(streamingDataSearchRequest).ifPresent(errors::add);
         validateMonth(streamingDataSearchRequest).ifPresent(errors::add);
         validateYear(streamingDataSearchRequest).ifPresent(errors::add);
@@ -107,19 +107,19 @@ public class StreamDataSearchRequestValidator {
     }
 
 
-    private Optional<Error> validateQueryDatePeriod(StreamingDataSearchRequest streamingDataSearchRequest) {
-        if (streamingDataSearchRequest.onDate() != null) {
-            if (streamingDataSearchRequest.startDate() != null || streamingDataSearchRequest.endDate() != null) {
-                return Optional.of(Error.requestParamNotSupplied("queryDatePeriod", "must supply either 'onDate' or 'startDate' and 'endDate' parameters"));
-            }
-            return Optional.empty();
-        }
-        if (streamingDataSearchRequest.startDate() != null && streamingDataSearchRequest.endDate() != null) {
-            if (streamingDataSearchRequest.startDate().isAfter(streamingDataSearchRequest.endDate())) {
-                return Optional.of(Error.requestParamContentViolation("queryDatePeriod", "'startDate' must occur before 'endDate' - provided - %s-%s".formatted(streamingDataSearchRequest.startDate(), streamingDataSearchRequest.endDate())));
-            }
-            return Optional.empty();
-        }
-        return Optional.of(Error.requestParamNotSupplied("queryDatePeriod", "must supply either 'onDate' or 'startDate' and 'endDate' parameters"));
-    }
+//    private Optional<Error> validateQueryDatePeriod(StreamingDataSearchRequest streamingDataSearchRequest) {
+//        if (streamingDataSearchRequest.onDate() != null) {
+//            if (streamingDataSearchRequest.startDate() != null || streamingDataSearchRequest.endDate() != null) {
+//                return Optional.of(Error.requestParamNotSupplied("queryDatePeriod", "must supply either 'onDate' or 'startDate' and 'endDate' parameters"));
+//            }
+//            return Optional.empty();
+//        }
+//        if (streamingDataSearchRequest.startDate() != null && streamingDataSearchRequest.endDate() != null) {
+//            if (streamingDataSearchRequest.startDate().isAfter(streamingDataSearchRequest.endDate())) {
+//                return Optional.of(Error.requestParamContentViolation("queryDatePeriod", "'startDate' must occur before 'endDate' - provided - %s-%s".formatted(streamingDataSearchRequest.startDate(), streamingDataSearchRequest.endDate())));
+//            }
+//            return Optional.empty();
+//        }
+//        return Optional.of(Error.requestParamNotSupplied("queryDatePeriod", "must supply either 'onDate' or 'startDate' and 'endDate' parameters"));
+//    }
 }
