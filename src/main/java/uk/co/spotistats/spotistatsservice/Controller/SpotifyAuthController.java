@@ -75,7 +75,7 @@ public class SpotifyAuthController {
         return ResponseEntity.ok(JSON.toJSONString(Map.of("url", Objects.requireNonNull(spotifyAuthService.redirect().getUrl()))));
     }
 
-    @GetMapping(value = "token/force/{username}")
+    @GetMapping(value = "/token/force/{username}")
     public String forceToken(@PathVariable String username) {
         return spotifyAuthService.forceJwt(username);
     }
