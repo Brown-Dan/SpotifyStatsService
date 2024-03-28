@@ -58,7 +58,7 @@ public class SimpleTopArtistsToAdvancedTopArtistsMapper {
         return anAdvancedTopArtist()
                 .withName(simpleTopArtist.name())
                 .withImage(simpleTopArtist.image())
-                .withRanking(simpleArtists.indexOf(simpleTopArtist) + (25 * (pageNumber -1)))
+                .withRanking((simpleArtists.indexOf(simpleTopArtist) + (25 * (pageNumber -1))) + 1)
                 .withGenres(simpleTopArtist.genres())
                 .withPopularity(simpleTopArtist.popularity())
                 .withSpotifyUri(simpleTopArtist.spotifyUri())
