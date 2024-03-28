@@ -15,6 +15,8 @@ import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.SimpleTopAr
 import uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.TopArtists;
 import uk.co.spotistats.spotistatsservice.Repository.StreamingDataRepository;
 
+import java.util.List;
+
 import static uk.co.spotistats.spotistatsservice.Domain.Request.Search.StreamingDataSearchRequest.Builder.aStreamingDataSearchRequest;
 import static uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.AdvancedTopArtist.Builder.anAdvancedTopArtist;
 import static uk.co.spotistats.spotistatsservice.Domain.Response.TopArtists.AdvancedTopArtists.Builder.someAdvancedTopArtists;
@@ -28,7 +30,7 @@ public class SimpleTopArtistsToAdvancedTopArtistsMapper {
         this.streamingDataRepository = streamingDataRepository;
     }
 
-    public Result<TopArtists, Errors> map(SimpleTopArtists simpleTopArtists, String userId) {
+    public Result<TopArtists, Errors> map(SimpleTopArtists simpleTopArtists, String userId, Integer pageNumber) {
         Result<StreamingData, Error> getStreamingDataResult = streamingDataRepository.getStreamingData(userId);
         if (getStreamingDataResult.isFailure()) {
             return new Result.Failure<>(Errors.fromError(getStreamingDataResult.getError()));
@@ -42,13 +44,13 @@ public class SimpleTopArtistsToAdvancedTopArtistsMapper {
 
 
         return new Result.Success<>(someAdvancedTopArtists()
-                .withArtists(simpleTopArtists.artists().stream().map(simpleArtist -> mapSimpleArtistToAdvancedArtist(simpleArtist, streamingDataSearchRequestBuilder)).toList())
+                .withArtists(simpleTopArtists.artists().stream().map(simpleArtist -> mapSimpleArtistToAdvancedArtist(simpleArtist, streamingDataSearchRequestBuilder, simpleTopArtists.artists(), pageNumber)).toList())
                 .withPage(simpleTopArtists.page())
                 .withTotalResults(simpleTopArtists.totalResults())
                 .build());
     }
 
-    private AdvancedTopArtist mapSimpleArtistToAdvancedArtist(SimpleTopArtist simpleTopArtist, StreamingDataSearchRequest.Builder searchRequest) {
+    private AdvancedTopArtist mapSimpleArtistToAdvancedArtist(SimpleTopArtist simpleTopArtist, StreamingDataSearchRequest.Builder searchRequest, List<SimpleTopArtist> simpleArtists, Integer pageNumber) {
         SearchResponse searchResponse = streamingDataRepository.search(searchRequest.withArtist(simpleTopArtist.name()).build());
 
         long totalMsStreamed = searchResponse.tracks().stream().mapToLong(SearchResponseTrack::totalMsPlayed).sum();
@@ -56,6 +58,7 @@ public class SimpleTopArtistsToAdvancedTopArtistsMapper {
         return anAdvancedTopArtist()
                 .withName(simpleTopArtist.name())
                 .withImage(simpleTopArtist.image())
+                .withRanking(simpleArtists.indexOf(simpleTopArtist) + (25 * (pageNumber -1)))
                 .withGenres(simpleTopArtist.genres())
                 .withPopularity(simpleTopArtist.popularity())
                 .withSpotifyUri(simpleTopArtist.spotifyUri())

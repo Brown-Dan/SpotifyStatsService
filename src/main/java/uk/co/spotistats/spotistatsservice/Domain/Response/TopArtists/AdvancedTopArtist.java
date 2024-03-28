@@ -5,12 +5,13 @@ import uk.co.spotistats.spotistatsservice.Domain.Model.Image;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record AdvancedTopArtist(String name, String spotifyUri, Integer popularity,
+public record AdvancedTopArtist(Integer ranking, String name, String spotifyUri, Integer popularity,
                                 List<String> genres, Integer totalMinutesStreamed, Long totalMsStreamed,
                                 LocalDateTime firstStreamedDate, LocalDateTime lastStreamedDate, Integer totalStreams, Image image) {
 
 
     public static final class Builder {
+        private Integer ranking;
         private String name;
         private String spotifyUri;
         private Integer popularity;
@@ -27,6 +28,11 @@ public record AdvancedTopArtist(String name, String spotifyUri, Integer populari
 
         public static Builder anAdvancedTopArtist() {
             return new Builder();
+        }
+
+        public Builder withRanking(Integer ranking) {
+            this.ranking = ranking;
+            return this;
         }
 
         public Builder withName(String name) {
@@ -80,7 +86,7 @@ public record AdvancedTopArtist(String name, String spotifyUri, Integer populari
         }
 
         public AdvancedTopArtist build() {
-            return new AdvancedTopArtist(name, spotifyUri, popularity, genres, totalMinutesStreamed, totalMsStreamed, firstStreamedDate, lastStreamedDate, totalStreams, image);
+            return new AdvancedTopArtist(ranking, name, spotifyUri, popularity, genres, totalMinutesStreamed, totalMsStreamed, firstStreamedDate, lastStreamedDate, totalStreams, image);
         }
     }
 }

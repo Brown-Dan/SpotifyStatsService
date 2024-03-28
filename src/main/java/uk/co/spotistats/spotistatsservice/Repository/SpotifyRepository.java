@@ -71,7 +71,7 @@ public class SpotifyRepository {
         if (result.isFailure()) {
             return failure(searchRequest.userId(), result.getError());
         }
-        return searchRequest.advanced() ? artistMapper.map(result.getValue(), searchRequest.userId()) : success(result.getValue());
+        return searchRequest.advanced() ? artistMapper.map(result.getValue(), searchRequest.userId(), searchRequest.page()) : success(result.getValue());
     }
 
     public Result<TopTracks, Errors> getTopTracks(TopTracksSearchRequest searchRequest) {
