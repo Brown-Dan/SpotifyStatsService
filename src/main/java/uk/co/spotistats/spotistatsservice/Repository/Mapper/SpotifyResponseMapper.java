@@ -60,7 +60,7 @@ public class SpotifyResponseMapper {
                     .withFirstStreamDateTime(streamData.getLast().streamDateTime())
                     .withLastStreamDateTime(streamData.getFirst().streamDateTime()).build();
         } catch (Exception e) {
-            LOG.error("Failed to parse streaming data");
+            LOG.error("Failed to parse streaming data - {}", json, e);
             throw new RuntimeException();
         }
     }
@@ -85,7 +85,7 @@ public class SpotifyResponseMapper {
                     .withFirstStreamDateTime(streamData.isEmpty() ? null : streamData.getLast().streamDateTime())
                     .withLastStreamDateTime(streamData.isEmpty() ? null : streamData.getFirst().streamDateTime()).build();
         } catch (Exception e) {
-            LOG.error("Failed to parse streaming data");
+            LOG.error("Failed to parse streaming data - {}", json, e);
             throw new RuntimeException();
         }
     }
@@ -101,7 +101,7 @@ public class SpotifyResponseMapper {
                     .withPage(page)
                     .build();
         } catch (Exception e) {
-            LOG.error("Failed to parse spotify api response");
+            LOG.error("Failed to parse spotify api response - {}", json, e);
             throw new RuntimeException();
         }
     }
